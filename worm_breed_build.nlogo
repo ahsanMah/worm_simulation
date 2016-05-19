@@ -42,7 +42,7 @@ turtles-own [
 patches-own
 [
   food-here ;amount of food on this patch
-  ;mobility ;different mobility rates simulate different terrain
+  permeability ;; 0 - 1, 0 being completely impermeable, 1 meaning complete freedom of movement
 ]
 
 to setup
@@ -52,7 +52,7 @@ to setup
   set day_num starting_day
   set year 0
   set periods-in-day 10
-  set normal_death_threshold 0.0685 / (2 * periods-in-day) ; Simulates a 4 year life span
+  set normal_death_threshold 0.685 / (2 * periods-in-day) ; Simulates a 4 year life span
   set death_threshold normal_death_threshold
   set reprod_threshold normal_reproduction_rate ; Simulates successful births
 
@@ -69,12 +69,15 @@ to setup
 
   ask patches
   [
+    set permeability 1
+
     setup-initial-food
-    ;setup_mobility
+    setup-obstacles
     recolor-patch
   ]
  create-adults worm_population[
-    setxy random-xcor random-ycor
+    ;;setxy random-xcor random-ycor
+    move-to one-of patches with [permeability > 0]
     set size 2
     set shape "worm"
 
@@ -105,23 +108,50 @@ to setup-initial-food
 ;    set food-here 400
 ;  ]
 
-  set food-here (random 251 + 250)
+set food-here (random 251 + 250)
   ;;set food-here 500
 end
 
 to recolor-patch
-  set pcolor scale-color green food-here 600 0
+  ifelse (permeability != 0)
+  [
+    set pcolor scale-color green food-here 600 0
+  ]
+  [
+    set pcolor blue
+  ]
+end
+
+
+to setup-obstacles
+  if obstacle_shape = "circle"
+  [
+    if (distancexy obstacle_x obstacle_y) < obstacle_size
+    [
+      set food-here 0
+      set permeability 0
+    ]
+  ]
+  if obstacle_shape = "square"
+  [
+   if pxcor >= obstacle_x - obstacle_size and pxcor <= obstacle_x + obstacle_size and pycor >= obstacle_y - obstacle_size and pycor <= obstacle_y + obstacle_size
+   [
+     set food-here 0
+     set permeability 0
+   ]
+  ]
 end
 
 
 
 to move
   set stamina stamina - 0.3
-  let potential-destinations (patch-set patch-here neighbors)
+  let potential-destinations (patch-set patch-here neighbors with [permeability != 0])
   ifelse iseating?
   [
-    uphill food-here
-    forward speed
+    ;; uphill [food-here]
+    face max-one-of potential-destinations [food-here]
+    forward speed * permeability
     eat
 
     if cycle-counter >= steps-per-ie
@@ -131,8 +161,9 @@ to move
     ]
   ]
   [
-    downhill food-here
-    forward speed
+    ;; downhill [food-here]
+    face max-one-of potential-destinations [food-here]
+    forward speed * permeability
     egest
     if cycle-counter >= steps-per-ie
     [
@@ -215,20 +246,16 @@ to check_reproduction
   ]
 end
 
+;;updates probablities of dying and reproducing
 to update_thresholds
-  ifelse (day_num < 60) [ ;;from Jan to Feb extreme cold reduces survival rate
-    set death_threshold (max_death_rate / (60 * 2 * periods-in-day)) * (60 - day_num) ;; probability of dying decreases as it gets warmer
-    ;;show death_threshold
-    ] [set death_threshold normal_death_threshold]
+  ;cold reduces survival rate
+  ifelse (temperature < 5) [
+    set death_threshold (max_death_rate / (2 * periods-in-day))
+    ] [set death_threshold normal_death_threshold / temperature ] ; probability of dying decreases as it gets warmer
 
-  if (day_num > 180) [ ;;from June to August
-    if (day_num < 270)[ ;; percent chance to lay cocoon during summers
-    set reprod_threshold (max_reproduction_rate / (90 * 2 * periods-in-day)) * (day_num - 180) ] ;; increases as it gets hotter
-    ]
-
-  if (day_num > 330) [ ;;for december
-    set death_threshold (max_death_rate / (30 * 2 * periods-in-day)) * (day_num - 330) ;; probability of dying increases as it gets colder
-    ]
+  ;reproduction rate affected by temperature
+  if (temperature > 20) [
+    set reprod_threshold (max_reproduction_rate / (10 * 2 * periods-in-day) * temperature) ] ; probability of reproducing increases as it gets warmer
 
 end
 
@@ -280,7 +307,7 @@ to go
   calculate_time
   calculate_temp
   ;show temperature
-  update_thresholds
+  ;;update_thresholds
   if (year = 10) [stop]
   if (count turtles = 0) [stop]
 
@@ -295,7 +322,7 @@ to go
     ;update_speed
     if (ticks mod (2 * periods-in-day) = 0) [
       update_maturity
-      show maturation
+      ;show maturation
       ]
     move
     recolor-patch
@@ -424,7 +451,7 @@ normal_reproduction_rate
 normal_reproduction_rate
 0
 1
-1
+0.3
 0.1
 1
 NIL
@@ -439,7 +466,7 @@ max_reproduction_rate
 max_reproduction_rate
 0
 5
-2
+1.5
 0.1
 1
 NIL
@@ -454,7 +481,7 @@ max_death_rate
 max_death_rate
 0
 100
-25
+90
 1
 1
 NIL
@@ -539,6 +566,61 @@ temperature
 2
 1
 11
+
+CHOOSER
+11
+347
+149
+392
+obstacle_shape
+obstacle_shape
+"circle" "square"
+0
+
+SLIDER
+14
+400
+186
+433
+obstacle_size
+obstacle_size
+0
+50
+13
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+16
+442
+188
+475
+obstacle_x
+obstacle_x
+-50
+50
+0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+16
+481
+188
+514
+obstacle_y
+obstacle_y
+-50
+50
+0
+1
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
