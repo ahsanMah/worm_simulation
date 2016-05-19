@@ -203,14 +203,14 @@ to check_reproduction
   ;;random-seed new-seed
   set reprod_p random-float 100
   if (reprod_p < reprod_threshold) [
-    if (maturation > 59) [
+    if (maturation > 999) [
       hatch-cocoons 3 [
         set maturation 0
         set wait_period 7
         set color white
         set shape "dot"
         ]
-      set maturation 30 ;;wait 30 days before laying next cocoon
+      set maturation maturation - 100 ;;wait a few days before laying next cocoon
       ]
   ]
 end
@@ -233,8 +233,8 @@ to update_thresholds
 end
 
 to update_maturity
-    if (maturation < 60) [
-      set maturation maturation + 1
+    if (maturation < 1000) [
+      set maturation maturation + temperature
     ]
 end
 
@@ -287,12 +287,16 @@ to go
   if (ticks mod (2 * periods-in-day) = 0) [
     ask cocoons [
       check_if_hatch
-      show wait_period ]
+      ;;show wait_period
+    ]
   ]
 
   ask adults [
     ;update_speed
-    if (ticks mod (2 * periods-in-day) = 0) [update_maturity]
+    if (ticks mod (2 * periods-in-day) = 0) [
+      update_maturity
+      show maturation
+      ]
     move
     recolor-patch
     set food-here food-here + organic-regen
@@ -450,7 +454,7 @@ max_death_rate
 max_death_rate
 0
 100
-70
+25
 1
 1
 NIL
@@ -520,7 +524,7 @@ INPUTBOX
 88
 70
 starting_day
-30
+180
 1
 0
 Number
