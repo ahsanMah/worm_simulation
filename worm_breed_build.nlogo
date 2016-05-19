@@ -25,6 +25,8 @@ turtles-own [
   reprod_p
   maturation
 
+  stamina ;;added stamina
+
   time-since-eaten
   food-consumed-last
   iseating?
