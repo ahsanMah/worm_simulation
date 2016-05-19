@@ -32,7 +32,7 @@ turtles-own [
   iseating?
   cycle-counter
   speed
-
+  ;; new-var
   ]
 
 patches-own
