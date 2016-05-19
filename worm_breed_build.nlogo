@@ -4,6 +4,8 @@ globals [
   year
   normal_death_threshold death_threshold ;;probability of death
   reprod_threshold ;;probablity of reproducing
+  temperature ;temperature in a given day
+  var ;multi-use temporary variable
 
   ;;daily globals
   num-turtles
@@ -27,7 +29,7 @@ turtles-own [
   reprod_p
   maturation
 
-  stamina ;;added stamina
+  stamina ;helps simulate starvation
 
   time-since-eaten
   food-consumed-last
@@ -39,14 +41,15 @@ turtles-own [
 
 patches-own
 [
-  food-here ;; amount of food on this patch
+  food-here ;amount of food on this patch
+  ;mobility ;different mobility rates simulate different terrain
 ]
 
 to setup
   clear-all
   ;;reset-ticks
 
-  set day_num 150
+  set day_num starting_day
   set year 0
   set periods-in-day 10
   set normal_death_threshold 0.0685 / (2 * periods-in-day) ; Simulates a 4 year life span
@@ -59,15 +62,15 @@ to setup
 
   set counter 0
   set num-turtles 40
-  set assimilation 0.05
+  set assimilation 0.03
   set consumption-in-period 1
 
-  set organic-regen 0.2 ;;0.004;; / 5
-  ;;set organic-regen 0
+  set organic-regen 0.3 ;;0.004;; / 5
 
   ask patches
   [
     setup-initial-food
+    ;setup_mobility
     recolor-patch
   ]
  create-adults worm_population[
@@ -241,12 +244,26 @@ to calculate_time
   if (day_num = 366) [
     set year year + 1
     set day_num day_num mod 365 ;;reset for every year
-    ;;clear-plot
   ]
   end
 
+;Calcualtes temperature for every day based on Bhaskar I's sine approxiamtion formula
+;Roughly simulates a temperature curve
+to calculate_temp
+
+  if (ticks mod (2 * periods-in-day) = 0) [
+    set var day_num / 2
+    set temperature (4 * var * (180 - var)) / (40500 - var * (180 - var))
+    set temperature temperature * 30 ;scales temperature to real world values
+  ]
+
+end
+
+
 to go
   calculate_time
+  calculate_temp
+  show temperature
   update_thresholds
   if (year = 10) [stop]
   if (count turtles = 0) [stop]
@@ -262,6 +279,7 @@ to go
 
 
   ask adults [
+    ;update_speed
     move
     recolor-patch
     set food-here food-here + organic-regen
@@ -296,17 +314,17 @@ GRAPHICS-WINDOW
 50
 -50
 50
-0
-0
+1
+1
 1
 ticks
 60.0
 
 BUTTON
-9
-225
-75
-258
+5
+272
+71
+305
 Setup
 setup
 NIL
@@ -320,10 +338,10 @@ NIL
 1
 
 BUTTON
-96
-224
-159
-257
+88
+272
+147
+306
 Go
 go
 T
@@ -348,10 +366,10 @@ day_num
 11
 
 SLIDER
-10
-39
-230
-72
+9
+86
+229
+119
 worm_population
 worm_population
 0
@@ -381,25 +399,25 @@ PENS
 "default" 1.0 0 -16777216 true "" "plotxy day_num count turtles\nif (day_num = 365) [clear-plot]"
 
 SLIDER
-9
-86
-229
-119
+8
+133
+228
+166
 normal_reproduction_rate
 normal_reproduction_rate
 0
 1
-0.2
+0.3
 0.1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-9
-125
-231
-158
+8
+172
+230
+205
 max_reproduction_rate
 max_reproduction_rate
 0
@@ -411,15 +429,15 @@ NIL
 HORIZONTAL
 
 SLIDER
-9
-165
-231
-198
+8
+212
+230
+245
 max_death_rate
 max_death_rate
 0
 100
-6
+80
 1
 1
 NIL
@@ -483,15 +501,27 @@ count cocoons
 1
 11
 
-CHOOSER
-23
-319
-161
-364
-month
-month
-"March" "April"
+INPUTBOX
+9
+10
+88
+70
+starting_day
+2
+1
 0
+Number
+
+MONITOR
+6
+341
+87
+386
+Daily Temp
+temperature
+17
+1
+11
 
 @#$#@#$#@
 ## WHAT IS IT?
