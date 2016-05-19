@@ -13,6 +13,8 @@ globals [
   counter
   organic-regen
   steps-per-ie
+  max_stamina
+  min_stamina
 
   ]
 
@@ -42,22 +44,25 @@ patches-own
 
 to setup
   clear-all
-  set day_num 0
+  ;;reset-ticks
+
+  set day_num 150
   set year 0
   set periods-in-day 10
   set normal_death_threshold 0.0685 / (2 * periods-in-day) ; Simulates a 4 year life span
   set death_threshold normal_death_threshold
   set reprod_threshold normal_reproduction_rate ; Simulates successful births
 
-
   set steps-per-ie 5
-  reset-ticks
+  set max_stamina (2 * steps-per-ie)
+  set min_stamina 1
+
   set counter 0
   set num-turtles 40
-  set assimilation 0.03
+  set assimilation 0.05
   set consumption-in-period 1
 
-  set organic-regen 0.004;; / 5
+  set organic-regen 0.2 ;;0.004;; / 5
   ;;set organic-regen 0
 
   ask patches
@@ -66,11 +71,11 @@ to setup
     recolor-patch
   ]
  create-adults worm_population[
-   setxy random-xcor random-ycor
+    setxy random-xcor random-ycor
    ;;set color yellow
    ;;set size 2
-   set maturation 60
-
+    set maturation 60
+    set stamina 6
     set size 2
     ;;set color yellow
     set shape "worm"
@@ -85,19 +90,19 @@ to setup
 end
 
 to setup-initial-food
-  let setup-patch one-of patches
-  if (distancexy 0 60) < 30
-  [
-    set food-here 400
-  ]
+;  let setup-patch one-of patches
+;  if (distancexy 0 60) < 30
+;  [
+;    set food-here 400
+;  ]
+;
+;  let setup-patch2 one-of patches
+;  if (distancexy 0 -60) < 30
+;  [
+;    set food-here 400
+;  ]
 
-  let setup-patch2 one-of patches
-  if (distancexy 0 -60) < 30
-  [
-    set food-here 400
-  ]
-
-  ;;set food-here (random 251 + 250)
+  set food-here (random 251 + 250)
   ;;set food-here 500
 end
 
@@ -108,12 +113,14 @@ end
 
 
 to move
+  set stamina stamina - 0.3
   let potential-destinations (patch-set patch-here neighbors)
   ifelse iseating?
   [
     uphill food-here
     forward speed
     eat
+
     if cycle-counter >= steps-per-ie
     [
       set iseating? false
@@ -138,16 +145,9 @@ end
 
 to eat
 
-  ifelse food-here < consumption-in-period
+  ifelse (food-here < consumption-in-period) ;;prevents consuming more food than on patch
   [
     set food-consumed-last food-here
-    ifelse food-here = 0
-    [
-      set time-since-eaten time-since-eaten + 1
-    ]
-    [
-      set time-since-eaten 0
-    ]
     set food-here 0
   ]
   [
@@ -155,6 +155,16 @@ to eat
     set food-here food-here - consumption-in-period
     set time-since-eaten 0
   ]
+
+  if (food-here > 0) [
+      if (stamina < max_stamina) [set stamina stamina + food-consumed-last]
+    ]
+
+  ;;ifelse (stamina < (max_stamina - food-consumed-last)) [ set stamina stamina + food-consumed-last ]
+  ;;[if stamina < max_stamina [set stamina max_stamina]]
+
+  ;;if (stamina < max_stamina) [set stamina stamina + 1]
+
   ;;if time-since-eaten > 40
   ;;[die]
 
@@ -181,13 +191,9 @@ to check_death
   ;;random-seed new-seed
   set death_p random-float 100
   ;;show death_p
-  if (death_p < death_threshold) [
-    ifelse (maturation > 10) [die] ;;cocoons survive for 10 days
-    [ ;;cocoons hibernate if winter
-      if (day_num > 330) [set maturation 0]
-      if (day_num < 60) [set maturation 0]
-      ]
-  ]
+  ifelse (stamina < min_stamina) [die] ;; dies if out of energy
+  [if (death_p < death_threshold) [die]] ;; dies of cold/natural causes
+
   end
 
 to check_reproduction
@@ -243,13 +249,13 @@ to go
   calculate_time
   update_thresholds
   if (year = 10) [stop]
+  if (count turtles = 0) [stop]
 
   ask cocoons [
     if (day_num > 60) [
       if (day_num < 330)[
       set breed adults
       set size 2
-      set color red
       set shape "worm"]
     ]
   ]
@@ -257,9 +263,6 @@ to go
 
   ask adults [
     move
-    ;;if (ticks mod (2 * periods-in-day) = 0) [ ;;for every day
-
-    ;;  ]
     recolor-patch
     set food-here food-here + organic-regen
   ]
@@ -275,11 +278,11 @@ end
 GRAPHICS-WINDOW
 267
 10
-1081
-845
-100
-100
-4.0
+1085
+849
+50
+50
+8.0
 1
 10
 1
@@ -289,10 +292,10 @@ GRAPHICS-WINDOW
 0
 0
 1
--100
-100
--100
-100
+-50
+50
+-50
+50
 0
 0
 1
@@ -353,7 +356,7 @@ worm_population
 worm_population
 0
 500
-500
+100
 10
 1
 NIL
@@ -401,7 +404,7 @@ max_reproduction_rate
 max_reproduction_rate
 0
 5
-1
+1.4
 0.1
 1
 NIL
@@ -416,7 +419,7 @@ max_death_rate
 max_death_rate
 0
 100
-10
+6
 1
 1
 NIL
@@ -479,6 +482,16 @@ count cocoons
 17
 1
 11
+
+CHOOSER
+23
+319
+161
+364
+month
+month
+"March" "April"
+0
 
 @#$#@#$#@
 ## WHAT IS IT?
