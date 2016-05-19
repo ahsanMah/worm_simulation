@@ -24,13 +24,13 @@ breed [cocoons]
 breed [adults]
 
 turtles-own [
-  ;;probability of death and reproduction of each worm
-  death_p
+  death_p     ;probability of death and reproduction of each worm
   reprod_p
   maturation
+  wait_period ;days taken by cocoon to hatch given optimal temperature considitions
+  hatch_temp  ;minimum temperature required for cocoons to hatch
 
-  stamina ;helps simulate starvation
-
+  stamina     ;helps simulate starvation
   time-since-eaten
   food-consumed-last
   iseating?
@@ -75,13 +75,13 @@ to setup
   ]
  create-adults worm_population[
     setxy random-xcor random-ycor
-   ;;set color yellow
-   ;;set size 2
-    set maturation 60
-    set stamina 6
     set size 2
-    ;;set color yellow
     set shape "worm"
+
+    set maturation 60
+    set wait_period 7
+    set hatch_temp 10
+    set stamina 6
     set food-consumed-last 0
     set iseating? one-of[true false]
     set cycle-counter (random (steps-per-ie + 1))
@@ -206,16 +206,13 @@ to check_reproduction
     if (maturation > 59) [
       hatch-cocoons 3 [
         set maturation 0
+        set wait_period 7
         set color white
         set shape "dot"
         ]
       set maturation 30 ;;wait 30 days before laying next cocoon
       ]
   ]
-  if (maturation < 60)[
-      if (ticks mod (2 * periods-in-day) = 0) [
-        set maturation maturation + 1 ]
-    ]
 end
 
 to update_thresholds
@@ -234,6 +231,25 @@ to update_thresholds
     ]
 
 end
+
+to update_maturity
+    if (maturation < 60) [
+      set maturation maturation + 1
+    ]
+end
+
+;;hatches temperature is optimum for birth
+to check_if_hatch
+    if (temperature > hatch_temp) [
+      set wait_period wait_period - 1
+
+      if (wait_period < 1) [
+      set breed adults
+      set size 2
+      set shape "worm"]
+    ]
+end
+
 
 to calculate_time
   ;; two ticks to simulate one gestation cycle
@@ -263,23 +279,20 @@ end
 to go
   calculate_time
   calculate_temp
-  show temperature
+  ;show temperature
   update_thresholds
   if (year = 10) [stop]
   if (count turtles = 0) [stop]
 
-  ask cocoons [
-    if (day_num > 60) [
-      if (day_num < 330)[
-      set breed adults
-      set size 2
-      set shape "worm"]
-    ]
+  if (ticks mod (2 * periods-in-day) = 0) [
+    ask cocoons [
+      check_if_hatch
+      show wait_period ]
   ]
-
 
   ask adults [
     ;update_speed
+    if (ticks mod (2 * periods-in-day) = 0) [update_maturity]
     move
     recolor-patch
     set food-here food-here + organic-regen
@@ -357,7 +370,7 @@ NIL
 MONITOR
 1100
 50
-1189
+1208
 95
 Day Number
 day_num
@@ -407,7 +420,7 @@ normal_reproduction_rate
 normal_reproduction_rate
 0
 1
-0.3
+1
 0.1
 1
 NIL
@@ -422,7 +435,7 @@ max_reproduction_rate
 max_reproduction_rate
 0
 5
-1.4
+2
 0.1
 1
 NIL
@@ -437,7 +450,7 @@ max_death_rate
 max_death_rate
 0
 100
-80
+70
 1
 1
 NIL
@@ -507,19 +520,19 @@ INPUTBOX
 88
 70
 starting_day
-2
+30
 1
 0
 Number
 
 MONITOR
-6
-341
-87
-386
-Daily Temp
+1216
+51
+1311
+96
+Daily Temp *C
 temperature
-17
+2
 1
 11
 
