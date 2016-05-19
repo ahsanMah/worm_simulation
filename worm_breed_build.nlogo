@@ -32,7 +32,7 @@ turtles-own [
   iseating?
   cycle-counter
   speed
-  ;; new-var
+
   ]
 
 patches-own
@@ -44,11 +44,12 @@ to setup
   clear-all
   set day_num 0
   set year 0
-  set normal_death_threshold 0.0685 ; Simulates a 4 year life span
+  set periods-in-day 10
+  set normal_death_threshold 0.0685 / (2 * periods-in-day) ; Simulates a 4 year life span
   set death_threshold normal_death_threshold
   set reprod_threshold normal_reproduction_rate ; Simulates successful births
 
- set periods-in-day 10
+
   set steps-per-ie 5
   reset-ticks
   set counter 0
@@ -129,6 +130,8 @@ to move
       set cycle-counter 0
     ]
   ]
+  check_death
+  if not iseating? [check_reproduction]
   set cycle-counter cycle-counter + 1
 end
 
@@ -208,17 +211,17 @@ end
 
 to update_thresholds
   ifelse (day_num < 60) [ ;;from Jan to Feb extreme cold reduces survival rate
-    set death_threshold (max_death_rate / 60) * (60 - day_num) ;; probability of dying decreases as it gets warmer
+    set death_threshold (max_death_rate / (60 * 2 * periods-in-day)) * (60 - day_num) ;; probability of dying decreases as it gets warmer
     ;;show death_threshold
     ] [set death_threshold normal_death_threshold]
 
   if (day_num > 180) [ ;;from June to August
     if (day_num < 270)[ ;; percent chance to lay cocoon during summers
-    set reprod_threshold (max_reproduction_rate / 90) * (day_num - 180) ] ;; increases as it gets hotter
+    set reprod_threshold (max_reproduction_rate / (90 * 2 * periods-in-day)) * (day_num - 180) ] ;; increases as it gets hotter
     ]
 
   if (day_num > 330) [ ;;for december
-    set death_threshold (max_death_rate / 30) * (day_num - 330) ;; probability of dying increases as it gets colder
+    set death_threshold (max_death_rate / (30 * 2 * periods-in-day)) * (day_num - 330) ;; probability of dying increases as it gets colder
     ]
 
 end
@@ -254,10 +257,9 @@ to go
 
   ask adults [
     move
-    if (ticks mod (2 * periods-in-day) = 0) [ ;;for every day
-      check_death
-      check_reproduction
-      ]
+    ;;if (ticks mod (2 * periods-in-day) = 0) [ ;;for every day
+
+    ;;  ]
     recolor-patch
     set food-here food-here + organic-regen
   ]
