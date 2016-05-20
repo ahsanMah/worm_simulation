@@ -1,5 +1,3 @@
-extensions [array]
-
 globals [
   ;;annual globals
   day_num ;;day number
@@ -19,16 +17,9 @@ globals [
   steps-per-ie
   max_stamina
   min_stamina
-
-  obstacle
-  obstacle_list
-  temp_arr
-
-  temp_shape
-  temp_size
-  temp_x
-  temp_y
-  temp_pH
+  current_month
+  next_month
+  temperatures
 
   ]
 
@@ -49,8 +40,6 @@ turtles-own [
   cycle-counter
   ;;speed
 
-
-
   ]
 
 patches-own
@@ -60,7 +49,6 @@ patches-own
   permeability ;; 0 - 1, 0 being completely impermeable, 1 meaning complete freedom of movement
   local_death_threshold
   food-consumed-from
-
 ]
 
 to setup
@@ -69,6 +57,10 @@ to setup
   set day_num starting_day
   set year 0
   set periods-in-day 10
+  set current_month int starting_day / 365
+  set next_month current_month + 1 mod 12
+  set temperatures (list January February March April May June July August September October November December)
+
   set normal_death_threshold 0.685 / (2 * periods-in-day) ; Simulates a 4 year life span
   set death_threshold normal_death_threshold
   set reprod_threshold normal_reproduction_rate ; Simulates successful births
@@ -79,25 +71,20 @@ to setup
 
   set counter 0
   set num-turtles 40
-  set assimilation 1
+  set assimilation 0.03
   set consumption-in-period 1
 
   set organic-regen 0.3 ;;0.004;; / 5
-  set temp_arr array:from-list n-values 5 [0] ;array used to temporarily store obstacle parameters
-  set obstacle array:to-list temp_arr
-
-  ;print obstacle
-  set obstacle_list n-values number_of_obstacles [obstacle]
-  show obstacle_list
 
   ask patches
   [
     set permeability 1
     set ph 7
     set local_death_threshold death_threshold
+    set food-consumed-from random 10
 
     setup-initial-food
-    ;foreach obstacle_list [setup-obstacles ? ]
+    setup-obstacles 0
     recolor-patch
   ]
  create-adults worm_population[
@@ -115,33 +102,9 @@ to setup
     ;;set speed 0.3;; / 5
 
    ]
+
  reset-ticks
 end
-
-
-to add_obstacle
-  array:set temp_arr 0 obstacle_shape
-  array:set temp_arr 1 obstacle_size
-  array:set temp_arr 2 obstacle_x
-  array:set temp_arr 3 obstacle_y
-  array:set temp_arr 4 obstacle_pH
-
-  set obstacle array:to-list temp_arr
-
-  print obstacle
-  set obstacle_list replace-item (obstacle_number - 1) obstacle_list obstacle
-  ;show obstacle_list
-
-  foreach obstacle_list [
-    show ?]
-
-  ask patches [
-    foreach obstacle_list [setup-obstacles ? ]
-    recolor-patch
-    ]
-
-end
-
 
 to setup-initial-food
 ;  let setup-patch one-of patches
@@ -156,8 +119,8 @@ to setup-initial-food
 ;    set food-here 400
 ;  ]
 
-set food-here (random 251 + 250)
-  ;;set food-here 500
+  ;;set food-here (random 251 + 250)
+  set food-here 500
 end
 
 to recolor-patch
@@ -173,44 +136,47 @@ to recolor-patch
 end
 
 
-to setup-obstacles [one_obstacle]
-  ;if obstacle parameters given
-
-  if (item 0 one_obstacle != 0) [
-    ;looks at items in the array to setup the obstacle
-    ;print "Condition passed!"
-
-    set temp_shape item 0 one_obstacle
-    ;show temp_shape
-    set temp_size item 1 one_obstacle
-    set temp_x item 2 one_obstacle
-    set temp_y item 3 one_obstacle
-    set temp_pH item 4 one_obstacle
-
-
-    if temp_shape = "circle"
+to setup-obstacles [perm]
+  if obstacle_shape = "circle"
+  [
+    if (distancexy obstacle_x obstacle_y) < obstacle_size
     [
-      if (distancexy temp_x temp_y) < temp_size [
-        set food-here 0
-        set permeability 0
-      ]
+      set food-here 0
+      set permeability perm
     ]
-    if temp_shape = "square"
-    [
-      if pxcor >= temp_x - temp_size and pxcor <= temp_x + temp_size and pycor >= temp_y - temp_size and pycor <= temp_y + temp_size
-      [
-        set food-here 0
-        set permeability 0
-      ]
-    ]
+  ]
+  if obstacle_shape = "square"
+  [
+   if pxcor >= obstacle_x - obstacle_size and pxcor <= obstacle_x + obstacle_size and pycor >= obstacle_y - obstacle_size and pycor <= obstacle_y + obstacle_size
+   [
+     set food-here 0
+     set permeability perm
+   ]
+  ]
 
-    if temp_shape = "pH"
+  if obstacle_shape = "pH"
+  [
+    if (distancexy obstacle_x obstacle_y) < obstacle_size
     [
-      if (distancexy temp_x temp_y) < temp_size
-      [
-        set permeability 1
-        set ph random-normal temp_pH 1
-      ]
+      ;;set permeability 1
+      set ph random-normal obstacle_pH 1
+    ]
+  ]
+  if obstacle_shape = "line, horizontal"
+  [
+    if distancexy obstacle_x obstacle_y <= obstacle_size and obstacle_y = pycor
+    [
+    ;;set food-here 0
+    set permeability 1;;perm
+    set ph obstacle_pH
+    ]
+  ]
+  if obstacle_shape = "line, vertical"
+  [
+    if distancexy obstacle_x obstacle_y <= obstacle_size and obstacle_x = pxcor
+    [
+      set food-here 0
+      set permeability perm
     ]
 
   if obstacle_shape = "line, horizontal"
@@ -231,6 +197,8 @@ to setup-obstacles [one_obstacle]
   ]
 
   ]
+
+
 end
 
 
@@ -297,8 +265,9 @@ to eat
 end
 
 to egest
-  set food-here food-here + ((1 - assimilation) * food-consumed-last)
-  set food-consumed-last 0
+  set food-consumed-from food-consumed-from - ((1 - assimilation) * food-consumed-last / steps-per-ie)
+  ;;set food-here food-here + ((1 - assimilation) * food-consumed-last)
+  set food-consumed-last food-consumed-last / steps-per-ie
 end
 
 
@@ -346,7 +315,7 @@ to check_reproduction
   ]
 end
 
-;updates probablities of dying and reproducing
+;;updates probablities of dying and reproducing
 to update_thresholds
   ;cold reduces survival rate
   ifelse (temperature < 8) [
@@ -393,24 +362,21 @@ to calculate_time
 ;Calcualtes temperature for every day based on Bhaskar I's sine approxiamtion formula
 ;Roughly simulates a temperature curve
 to calculate_temp
-
-  if (ticks mod (2 * periods-in-day) = 0) [
     set var day_num / 2
     set temperature (4 * var * (180 - var)) / (40500 - var * (180 - var))
     set temperature temperature * max_temperature ;scales temperature to real world values
-  ]
-
 end
 
 
 to go
   calculate_time
-  calculate_temp
+
   ;show temperature
-  if (year = 10) [stop]
+  if (year = 20) [stop]
   if (count turtles = 0) [stop]
 
   if (ticks mod (2 * periods-in-day) = 0) [
+    calculate_temp
     update_thresholds
     ask cocoons [
       check_if_hatch
@@ -429,7 +395,6 @@ to go
     set food-here food-here + organic-regen
   ]
 
-  ;;foreach obstacle show
   ;;ask patches [recolor-patch]
   ;;ask patches [set food-here food-here + organic-regen]
   ;;show food-count
@@ -466,10 +431,10 @@ ticks
 60.0
 
 BUTTON
-11
-383
-77
-416
+5
+272
+71
+305
 Setup
 setup
 NIL
@@ -483,10 +448,10 @@ NIL
 1
 
 BUTTON
-94
-383
-153
-417
+88
+272
+147
+306
 Go
 go
 T
@@ -519,7 +484,7 @@ worm_population
 worm_population
 0
 500
-500
+250
 10
 1
 NIL
@@ -567,7 +532,7 @@ max_reproduction_rate
 max_reproduction_rate
 0
 5
-1.5
+0.7
 0.1
 1
 NIL
@@ -582,7 +547,7 @@ max_death_rate
 max_death_rate
 0
 100
-59
+100
 1
 1
 NIL
@@ -669,55 +634,55 @@ temperature
 11
 
 CHOOSER
-7
-473
-106
-518
+11
+347
+152
+392
 obstacle_shape
 obstacle_shape
-"circle" "square" "pH"
-1
+"circle" "square" "line, horizontal" "line, vertical" "pH"
+2
 
 SLIDER
-5
-525
-177
-558
+9
+399
+181
+432
 obstacle_size
 obstacle_size
 0
-50
-31
+max-pxcor
+25
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-5
-566
-177
-599
-obstacle_x
-obstacle_x
--50
-50
 9
+440
+181
+473
+obstacle_x
+obstacle_x
+-50
+50
+0
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-5
-605
-177
-638
+9
+479
+181
+512
 obstacle_y
 obstacle_y
 -50
 50
--33
+20
 1
 1
 NIL
@@ -735,72 +700,214 @@ max_temperature
 Number
 
 SLIDER
-8
-649
-180
-682
+9
+516
+181
+549
 obstacle_pH
 obstacle_pH
 0
 14
-3.7
+5
 0.1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-9
-258
-181
-291
+11
+598
+183
+631
 speed
 speed
 0
 1
-0.3
+0.6
 0.1
 1
 NIL
 HORIZONTAL
 
-INPUTBOX
-3
-310
-124
-372
-number_of_obstacles
-12
-1
+SLIDER
+1094
+687
+1131
+837
+January
+January
 0
-Number
-
-CHOOSER
-117
-474
-209
-519
-obstacle_number
-obstacle_number
-1 2 3 4 5 6
-3
-
-BUTTON
-3
-777
-66
-810
-Add
-add_obstacle
-NIL
+100
+0
 1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
 1
+NIL
+VERTICAL
+
+SLIDER
+1133
+687
+1170
+837
+February
+February
+0
+100
+0
+1
+1
+NIL
+VERTICAL
+
+SLIDER
+1172
+687
+1209
+837
+March
+March
+0
+100
+0
+1
+1
+NIL
+VERTICAL
+
+SLIDER
+1212
+687
+1249
+837
+April
+April
+0
+100
+10
+1
+1
+NIL
+VERTICAL
+
+SLIDER
+1252
+688
+1289
+838
+May
+May
+0
+100
+14
+1
+1
+NIL
+VERTICAL
+
+SLIDER
+1293
+689
+1330
+839
+June
+June
+0
+100
+16
+1
+1
+NIL
+VERTICAL
+
+SLIDER
+1333
+689
+1370
+839
+July
+July
+0
+100
+24
+1
+1
+NIL
+VERTICAL
+
+SLIDER
+1376
+689
+1413
+839
+August
+August
+0
+100
+21
+1
+1
+NIL
+VERTICAL
+
+SLIDER
+1421
+689
+1458
+839
+September
+September
+0
+100
+16
+1
+1
+NIL
+VERTICAL
+
+SLIDER
+1462
+690
+1499
+840
+October
+October
+0
+100
+11
+1
+1
+NIL
+VERTICAL
+
+SLIDER
+1502
+689
+1539
+839
+November
+November
+0
+100
+4
+1
+1
+NIL
+VERTICAL
+
+SLIDER
+1543
+689
+1580
+839
+December
+December
+0
+100
+3
+1
+1
+NIL
+VERTICAL
 
 @#$#@#$#@
 ## WHAT IS IT?
