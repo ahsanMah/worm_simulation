@@ -212,6 +212,24 @@ to setup-obstacles [one_obstacle]
         set ph random-normal temp_pH 1
       ]
     ]
+
+  if obstacle_shape = "line, horizontal"
+  [
+    if distancexy obstacle_x obstacle_y < obstacle_size and obstacle_y = pycor
+    [
+    set food-here 0
+    set permeability 1
+    ]
+  ]
+  if obstacle_shape = "line, vertical"
+  [
+    if distancexy obstacle_x obstacle_y < obstacle_size and obstacle_x = pxcor
+    [
+      set food-here 0
+      set permeability 1
+    ]
+  ]
+
   ]
 end
 
