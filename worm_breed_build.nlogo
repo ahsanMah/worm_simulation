@@ -45,6 +45,7 @@ patches-own
   food-here ;amount of food on this patch
   permeability ;; 0 - 1, 0 being completely impermeable, 1 meaning complete freedom of movement
   local_death_threshold
+  food-consumed-from
 ]
 
 to setup
@@ -181,7 +182,8 @@ to move
   ]
   [
     ;; downhill [food-here]
-    face max-one-of potential-destinations [food-here]
+    face max-one-of potential-destinations [food-consumed-from]
+    ;;face min-one-of potential-destinations [food-here]
     forward speed * permeability
     egest
     if cycle-counter >= steps-per-ie
@@ -213,6 +215,7 @@ to eat
       if (stamina < max_stamina) [set stamina stamina + food-consumed-last]
     ]
 
+  set food-consumed-from food-consumed-from + consumption-in-period
   ;;ifelse (stamina < (max_stamina - food-consumed-last)) [ set stamina stamina + food-consumed-last ]
   ;;[if stamina < max_stamina [set stamina max_stamina]]
 
@@ -684,7 +687,7 @@ speed
 speed
 0
 1
-0.1
+0.3
 0.1
 1
 NIL
