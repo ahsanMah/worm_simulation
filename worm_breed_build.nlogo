@@ -1,3 +1,5 @@
+extensions [array]
+
 globals [
   ;;annual globals
   day_num ;;day number
@@ -18,6 +20,16 @@ globals [
   max_stamina
   min_stamina
 
+  obstacle
+  obstacle_list
+  temp_arr
+
+  temp_shape
+  temp_size
+  temp_x
+  temp_y
+  temp_pH
+
   ]
 
 breed [cocoons]
@@ -37,6 +49,8 @@ turtles-own [
   cycle-counter
   ;;speed
 
+
+
   ]
 
 patches-own
@@ -46,6 +60,7 @@ patches-own
   permeability ;; 0 - 1, 0 being completely impermeable, 1 meaning complete freedom of movement
   local_death_threshold
   food-consumed-from
+
 ]
 
 to setup
@@ -68,6 +83,12 @@ to setup
   set consumption-in-period 1
 
   set organic-regen 0.3 ;;0.004;; / 5
+  set temp_arr array:from-list n-values 5 [0] ;array used to temporarily store obstacle parameters
+  set obstacle array:to-list temp_arr
+
+  ;print obstacle
+  set obstacle_list n-values number_of_obstacles [obstacle]
+  show obstacle_list
 
   ask patches
   [
@@ -76,7 +97,7 @@ to setup
     set local_death_threshold death_threshold
 
     setup-initial-food
-    setup-obstacles 0
+    ;foreach obstacle_list [setup-obstacles ? ]
     recolor-patch
   ]
  create-adults worm_population[
@@ -94,9 +115,33 @@ to setup
     ;;set speed 0.3;; / 5
 
    ]
-
  reset-ticks
 end
+
+
+to add_obstacle
+  array:set temp_arr 0 obstacle_shape
+  array:set temp_arr 1 obstacle_size
+  array:set temp_arr 2 obstacle_x
+  array:set temp_arr 3 obstacle_y
+  array:set temp_arr 4 obstacle_pH
+
+  set obstacle array:to-list temp_arr
+
+  print obstacle
+  set obstacle_list replace-item (obstacle_number - 1) obstacle_list obstacle
+  ;show obstacle_list
+
+  foreach obstacle_list [
+    show ?]
+
+  ask patches [
+    foreach obstacle_list [setup-obstacles ? ]
+    recolor-patch
+    ]
+
+end
+
 
 to setup-initial-food
 ;  let setup-patch one-of patches
@@ -128,34 +173,46 @@ to recolor-patch
 end
 
 
-to setup-obstacles [perm]
-  if obstacle_shape = "circle"
-  [
-    if (distancexy obstacle_x obstacle_y) < obstacle_size
+to setup-obstacles [one_obstacle]
+  ;if obstacle parameters given
+
+  if (item 0 one_obstacle != 0) [
+    ;looks at items in the array to setup the obstacle
+    ;print "Condition passed!"
+
+    set temp_shape item 0 one_obstacle
+    ;show temp_shape
+    set temp_size item 1 one_obstacle
+    set temp_x item 2 one_obstacle
+    set temp_y item 3 one_obstacle
+    set temp_pH item 4 one_obstacle
+
+
+    if temp_shape = "circle"
     [
-      set food-here 0
-      set permeability perm
+      if (distancexy temp_x temp_y) < temp_size [
+        set food-here 0
+        set permeability 0
+      ]
+    ]
+    if temp_shape = "square"
+    [
+      if pxcor >= temp_x - temp_size and pxcor <= temp_x + temp_size and pycor >= temp_y - temp_size and pycor <= temp_y + temp_size
+      [
+        set food-here 0
+        set permeability 0
+      ]
+    ]
+
+    if temp_shape = "pH"
+    [
+      if (distancexy temp_x temp_y) < temp_size
+      [
+        set permeability 1
+        set ph random-normal temp_pH 1
+      ]
     ]
   ]
-  if obstacle_shape = "square"
-  [
-   if pxcor >= obstacle_x - obstacle_size and pxcor <= obstacle_x + obstacle_size and pycor >= obstacle_y - obstacle_size and pycor <= obstacle_y + obstacle_size
-   [
-     set food-here 0
-     set permeability 0
-   ]
-  ]
-
-  if obstacle_shape = "pH"
-  [
-    if (distancexy obstacle_x obstacle_y) < obstacle_size
-    [
-      set permeability 1
-      set ph random-normal obstacle_pH 1
-    ]
-  ]
-
-
 end
 
 
@@ -177,8 +234,8 @@ to move
   ]
   [
     ;; downhill [food-here]
-    face max-one-of potential-destinations [food-consumed-from]
-    ;;face min-one-of potential-destinations [food-here]
+    ;;face max-one-of potential-destinations [food-consumed-from]
+    face min-one-of potential-destinations [food-here]
     forward speed * permeability
     egest
     if cycle-counter >= steps-per-ie
@@ -271,7 +328,7 @@ to check_reproduction
   ]
 end
 
-;;updates probablities of dying and reproducing
+;updates probablities of dying and reproducing
 to update_thresholds
   ;cold reduces survival rate
   ifelse (temperature < 8) [
@@ -354,6 +411,7 @@ to go
     set food-here food-here + organic-regen
   ]
 
+  ;;foreach obstacle show
   ;;ask patches [recolor-patch]
   ;;ask patches [set food-here food-here + organic-regen]
   ;;show food-count
@@ -390,10 +448,10 @@ ticks
 60.0
 
 BUTTON
-5
-272
-71
-305
+11
+383
+77
+416
 Setup
 setup
 NIL
@@ -407,10 +465,10 @@ NIL
 1
 
 BUTTON
-88
-272
-147
-306
+94
+383
+153
+417
 Go
 go
 T
@@ -443,7 +501,7 @@ worm_population
 worm_population
 0
 500
-250
+500
 10
 1
 NIL
@@ -506,7 +564,7 @@ max_death_rate
 max_death_rate
 0
 100
-100
+59
 1
 1
 NIL
@@ -593,55 +651,55 @@ temperature
 11
 
 CHOOSER
-11
-347
-149
-392
+7
+473
+106
+518
 obstacle_shape
 obstacle_shape
 "circle" "square" "pH"
-2
+1
 
 SLIDER
-9
-399
-181
-432
+5
+525
+177
+558
 obstacle_size
 obstacle_size
 0
 50
-15
+31
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-9
-440
-181
-473
+5
+566
+177
+599
 obstacle_x
 obstacle_x
 -50
 50
--35
+9
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-9
-479
-181
-512
+5
+605
+177
+638
 obstacle_y
 obstacle_y
 -50
 50
-35
+-33
 1
 1
 NIL
@@ -659,25 +717,25 @@ max_temperature
 Number
 
 SLIDER
-12
-523
-184
-556
+8
+649
+180
+682
 obstacle_pH
 obstacle_pH
 0
 14
-5.4
+3.7
 0.1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-11
-598
-183
-631
+9
+258
+181
+291
 speed
 speed
 0
@@ -687,6 +745,44 @@ speed
 1
 NIL
 HORIZONTAL
+
+INPUTBOX
+3
+310
+124
+372
+number_of_obstacles
+12
+1
+0
+Number
+
+CHOOSER
+117
+474
+209
+519
+obstacle_number
+obstacle_number
+1 2 3 4 5 6
+3
+
+BUTTON
+3
+777
+66
+810
+Add
+add_obstacle
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
 
 @#$#@#$#@
 ## WHAT IS IT?
