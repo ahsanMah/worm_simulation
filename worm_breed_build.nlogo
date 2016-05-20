@@ -41,8 +41,10 @@ turtles-own [
 
 patches-own
 [
+  ph        ;pH values ranging from 0-14
   food-here ;amount of food on this patch
   permeability ;; 0 - 1, 0 being completely impermeable, 1 meaning complete freedom of movement
+  local_death_threshold
 ]
 
 to setup
@@ -70,9 +72,11 @@ to setup
   ask patches
   [
     set permeability 1
+    set ph 7
+    set local_death_threshold death_threshold
 
     setup-initial-food
-    setup-obstacles
+    setup-obstacles 0
     recolor-patch
   ]
  create-adults worm_population[
@@ -116,20 +120,25 @@ to recolor-patch
   ifelse (permeability != 0)
   [
     set pcolor scale-color green food-here 600 0
+    if (ph != 7) [ set pcolor scale-color violet ph 0 14]
+
   ]
   [
     set pcolor blue
   ]
+
+
+
 end
 
 
-to setup-obstacles
+to setup-obstacles [perm]
   if obstacle_shape = "circle"
   [
     if (distancexy obstacle_x obstacle_y) < obstacle_size
     [
       set food-here 0
-      set permeability 0
+      set permeability perm
     ]
   ]
   if obstacle_shape = "square"
@@ -140,6 +149,18 @@ to setup-obstacles
      set permeability 0
    ]
   ]
+
+  if obstacle_shape = "pH"
+  [
+    if (distancexy obstacle_x obstacle_y) < obstacle_size
+    [
+      ;set food-here 0
+      set permeability 1
+      set ph random-normal obstacle_pH 1
+    ]
+  ]
+
+
 end
 
 ;; comment here
@@ -225,9 +246,17 @@ end
 to check_death
   ;;random-seed new-seed
   set death_p random-float 100
-  ;;show death_p
+  set local_death_threshold death_threshold
+
+  ;;pH of soil also affects survival rate
+  if (ph != 7) [
+    set var 7 - ph
+    set var abs var
+    set local_death_threshold (death_threshold + (max_death_rate / 7 * var))
+  ]
+
   ifelse (stamina < min_stamina) [die] ;; dies if out of energy
-  [if (death_p < death_threshold) [die]] ;; dies of cold/natural causes
+  [if (death_p < local_death_threshold) [die]] ;; dies of cold/natural causes
 
   end
 
@@ -250,13 +279,13 @@ end
 ;;updates probablities of dying and reproducing
 to update_thresholds
   ;cold reduces survival rate
-  ifelse (temperature < 5) [
+  ifelse (temperature < 8) [
     set death_threshold (max_death_rate)
     ] [set death_threshold normal_death_threshold / temperature ] ; probability of dying decreases as it gets warmer
 
   ;reproduction rate affected by temperature
   if (temperature > 20) [
-    set reprod_threshold (max_reproduction_rate / (10 * 2 * periods-in-day) * temperature) ] ; probability of reproducing increases as it gets warmer
+    set reprod_threshold (max_reproduction_rate / (10 * 2 * periods-in-day) * temperature) ] ; probability of reproducing increases as it gets warmer (10 * 2 * periods-in-day)
 
 end
 
@@ -308,11 +337,11 @@ to go
   calculate_time
   calculate_temp
   ;show temperature
-  update_thresholds
   if (year = 10) [stop]
   if (count turtles = 0) [stop]
 
   if (ticks mod (2 * periods-in-day) = 0) [
+    update_thresholds
     ask cocoons [
       check_if_hatch
       ;;show wait_period
@@ -419,7 +448,7 @@ worm_population
 worm_population
 0
 500
-100
+250
 10
 1
 NIL
@@ -467,7 +496,7 @@ max_reproduction_rate
 max_reproduction_rate
 0
 5
-0.8
+1.5
 0.1
 1
 NIL
@@ -482,7 +511,7 @@ max_death_rate
 max_death_rate
 0
 100
-100
+10
 1
 1
 NIL
@@ -575,8 +604,8 @@ CHOOSER
 392
 obstacle_shape
 obstacle_shape
-"circle" "square"
-0
+"circle" "square" "pH"
+2
 
 SLIDER
 9
@@ -587,7 +616,7 @@ obstacle_size
 obstacle_size
 0
 50
-0
+15
 1
 1
 NIL
@@ -602,7 +631,7 @@ obstacle_x
 obstacle_x
 -50
 50
-19
+-35
 1
 1
 NIL
@@ -617,7 +646,7 @@ obstacle_y
 obstacle_y
 -50
 50
-16
+35
 1
 1
 NIL
@@ -629,10 +658,25 @@ INPUTBOX
 214
 71
 max_temperature
-22
+30
 1
 0
 Number
+
+SLIDER
+12
+523
+184
+556
+obstacle_pH
+obstacle_pH
+0
+14
+5.4
+0.1
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
