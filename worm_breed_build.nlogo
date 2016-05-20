@@ -120,15 +120,12 @@ to recolor-patch
   ifelse (permeability != 0)
   [
     set pcolor scale-color green food-here 600 0
-    ;;if (ph != 7) [ set pcolor scale-color violet ph 0 14]
+    if (ph != 7) [ set pcolor scale-color violet food-here 600 0]
 
   ]
   [
     set pcolor blue
   ]
-
-
-
 end
 
 
@@ -161,8 +158,6 @@ to setup-obstacles [perm]
 
 
 end
-
-;; comment here
 
 
 to move
