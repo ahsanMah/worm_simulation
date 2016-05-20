@@ -143,7 +143,7 @@ to setup-obstacles [perm]
    if pxcor >= obstacle_x - obstacle_size and pxcor <= obstacle_x + obstacle_size and pycor >= obstacle_y - obstacle_size and pycor <= obstacle_y + obstacle_size
    [
      set food-here 0
-     set permeability 0
+     set permeability perm
    ]
   ]
 
@@ -151,8 +151,24 @@ to setup-obstacles [perm]
   [
     if (distancexy obstacle_x obstacle_y) < obstacle_size
     [
-      set permeability 1
+      ;;set permeability 1
       set ph random-normal obstacle_pH 1
+    ]
+  ]
+  if obstacle_shape = "line, horizontal"
+  [
+    if distancexy obstacle_x obstacle_y < obstacle_size and obstacle_y = pycor
+    [
+    set food-here 0
+    set permeability perm
+    ]
+  ]
+  if obstacle_shape = "line, vertical"
+  [
+    if distancexy obstacle_x obstacle_y < obstacle_size and obstacle_x = pxcor
+    [
+      set food-here 0
+      set permeability perm
     ]
   ]
 
@@ -597,11 +613,11 @@ temperature
 CHOOSER
 11
 347
-149
+152
 392
 obstacle_shape
 obstacle_shape
-"circle" "square" "pH"
+"circle" "square" "line, horizontal" "line, vertical" "pH"
 2
 
 SLIDER
@@ -628,7 +644,7 @@ obstacle_x
 obstacle_x
 -50
 50
--35
+-14
 1
 1
 NIL
@@ -643,7 +659,7 @@ obstacle_y
 obstacle_y
 -50
 50
-35
+20
 1
 1
 NIL
