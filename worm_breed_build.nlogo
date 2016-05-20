@@ -64,7 +64,7 @@ to setup
 
   set counter 0
   set num-turtles 40
-  set assimilation 1
+  set assimilation 0.03
   set consumption-in-period 1
 
   set organic-regen 0.3 ;;0.004;; / 5
@@ -74,6 +74,7 @@ to setup
     set permeability 1
     set ph 7
     set local_death_threshold death_threshold
+    set food-consumed-from random 10
 
     setup-initial-food
     setup-obstacles 0
@@ -182,8 +183,8 @@ to move
   ]
   [
     ;; downhill [food-here]
-    face max-one-of potential-destinations [food-consumed-from]
-    ;;face min-one-of potential-destinations [food-here]
+    ;;face max-one-of potential-destinations [food-consumed-from]
+    face min-one-of potential-destinations [food-here]
     forward speed * permeability
     egest
     if cycle-counter >= steps-per-ie
@@ -227,8 +228,9 @@ to eat
 end
 
 to egest
-  set food-here food-here + ((1 - assimilation) * food-consumed-last)
-  set food-consumed-last 0
+  set food-consumed-from food-consumed-from - ((1 - assimilation) * food-consumed-last / steps-per-ie)
+  ;;set food-here food-here + ((1 - assimilation) * food-consumed-last)
+  set food-consumed-last food-consumed-last / steps-per-ie
 end
 
 
@@ -496,7 +498,7 @@ max_reproduction_rate
 max_reproduction_rate
 0
 5
-1.5
+0.7
 0.1
 1
 NIL
@@ -672,7 +674,7 @@ obstacle_pH
 obstacle_pH
 0
 14
-5.4
+6.4
 0.1
 1
 NIL
