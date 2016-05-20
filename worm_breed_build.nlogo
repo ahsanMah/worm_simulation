@@ -250,7 +250,7 @@ end
 to update_thresholds
   ;cold reduces survival rate
   ifelse (temperature < 5) [
-    set death_threshold (max_death_rate / (2 * periods-in-day))
+    set death_threshold (max_death_rate)
     ] [set death_threshold normal_death_threshold / temperature ] ; probability of dying decreases as it gets warmer
 
   ;reproduction rate affected by temperature
@@ -307,7 +307,7 @@ to go
   calculate_time
   calculate_temp
   ;show temperature
-  ;;update_thresholds
+  update_thresholds
   if (year = 10) [stop]
   if (count turtles = 0) [stop]
 
@@ -451,7 +451,7 @@ normal_reproduction_rate
 normal_reproduction_rate
 0
 1
-0.3
+0.2
 0.1
 1
 NIL
@@ -466,7 +466,7 @@ max_reproduction_rate
 max_reproduction_rate
 0
 5
-1.5
+0.8
 0.1
 1
 NIL
@@ -481,7 +481,7 @@ max_death_rate
 max_death_rate
 0
 100
-90
+100
 1
 1
 NIL
@@ -586,7 +586,7 @@ obstacle_size
 obstacle_size
 0
 50
-13
+0
 1
 1
 NIL
@@ -601,7 +601,7 @@ obstacle_x
 obstacle_x
 -50
 50
-0
+19
 1
 1
 NIL
@@ -616,7 +616,7 @@ obstacle_y
 obstacle_y
 -50
 50
-0
+16
 1
 1
 NIL
