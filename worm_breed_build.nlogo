@@ -49,7 +49,6 @@ patches-own
 
 to setup
   clear-all
-  ;;reset-ticks
 
   set day_num starting_day
   set year 0
@@ -80,7 +79,6 @@ to setup
     recolor-patch
   ]
  create-adults worm_population[
-    ;;setxy random-xcor random-ycor
     move-to one-of patches with [permeability > 0]
     set size 2
     set shape "worm"
@@ -154,7 +152,6 @@ to setup-obstacles [perm]
   [
     if (distancexy obstacle_x obstacle_y) < obstacle_size
     [
-      ;set food-here 0
       set permeability 1
       set ph random-normal obstacle_pH 1
     ]
