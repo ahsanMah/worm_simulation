@@ -35,7 +35,7 @@ turtles-own [
   food-consumed-last
   iseating?
   cycle-counter
-  speed
+  ;;speed
 
   ]
 
@@ -64,7 +64,7 @@ to setup
 
   set counter 0
   set num-turtles 40
-  set assimilation 0.03
+  set assimilation 1
   set consumption-in-period 1
 
   set organic-regen 0.3 ;;0.004;; / 5
@@ -92,7 +92,7 @@ to setup
     set food-consumed-last 0
     set iseating? one-of[true false]
     set cycle-counter (random (steps-per-ie + 1))
-    set speed 0.3;; / 5
+    ;;set speed 0.3;; / 5
 
    ]
 
@@ -120,7 +120,7 @@ to recolor-patch
   ifelse (permeability != 0)
   [
     set pcolor scale-color green food-here 600 0
-    if (ph != 7) [ set pcolor scale-color violet ph 0 14]
+    ;;if (ph != 7) [ set pcolor scale-color violet ph 0 14]
 
   ]
   [
@@ -511,7 +511,7 @@ max_death_rate
 max_death_rate
 0
 100
-10
+100
 1
 1
 NIL
@@ -673,6 +673,21 @@ obstacle_pH
 0
 14
 5.4
+0.1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+11
+598
+183
+631
+speed
+speed
+0
+1
+0.1
 0.1
 1
 NIL
