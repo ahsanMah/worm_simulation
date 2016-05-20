@@ -142,6 +142,7 @@ to setup-obstacles
   ]
 end
 
+;; comment here
 
 
 to move
