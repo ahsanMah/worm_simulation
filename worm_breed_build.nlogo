@@ -36,7 +36,7 @@ turtles-own [
   iseating?
   cycle-counter
   speed
-
+  ;; I am the fastest man alive
   ]
 
 patches-own
