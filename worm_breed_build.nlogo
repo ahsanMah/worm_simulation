@@ -297,7 +297,7 @@ to calculate_temp
   if (ticks mod (2 * periods-in-day) = 0) [
     set var day_num / 2
     set temperature (4 * var * (180 - var)) / (40500 - var * (180 - var))
-    set temperature temperature * 30 ;scales temperature to real world values
+    set temperature temperature * max_temperature ;scales temperature to real world values
   ]
 
 end
@@ -578,10 +578,10 @@ obstacle_shape
 0
 
 SLIDER
-14
-400
-186
-433
+9
+399
+181
+432
 obstacle_size
 obstacle_size
 0
@@ -593,10 +593,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-16
-442
-188
-475
+9
+440
+181
+473
 obstacle_x
 obstacle_x
 -50
@@ -608,10 +608,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-16
-481
-188
-514
+9
+479
+181
+512
 obstacle_y
 obstacle_y
 -50
@@ -621,6 +621,17 @@ obstacle_y
 1
 NIL
 HORIZONTAL
+
+INPUTBOX
+95
+11
+214
+71
+max_temperature
+22
+1
+0
+Number
 
 @#$#@#$#@
 ## WHAT IS IT?
