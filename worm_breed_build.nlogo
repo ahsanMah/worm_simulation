@@ -35,7 +35,7 @@ turtles-own [
   food-consumed-last
   iseating?
   cycle-counter
-  ;;speed
+  speed
 
   ]
 
@@ -633,21 +633,6 @@ max_temperature
 1
 0
 Number
-
-SLIDER
-9
-518
-181
-551
-speed
-speed
-0
-5
-0.3
-0.1
-1
-NIL
-HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
