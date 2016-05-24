@@ -21,7 +21,9 @@ globals [
   min_stamina
   current_month
   next_month
+  num_days
   temperatures
+  day_of_month
 
 
   obstacle
@@ -73,9 +75,24 @@ to setup
   set day_num starting_day
   set year 0
   set periods-in-day 10
-  set current_month int starting_day / 365
-  set next_month current_month + 1 mod 12
-  ;set temperatures (list January February March April May June July August September October November December)
+
+  set temperatures (list January February March April May June July August September October November December)
+  set num_days (list 31 28 31 30 31 30 31 31 30 31 30 31)
+  set current_month 0
+  set var starting_day
+  while [var > 0]
+  [
+    if var > item current_month num_days
+    [
+     set current_month current_month + 1
+
+    ]
+    set var var - item current_month num_days
+  ]
+  calculate_temp
+  set day_of_month (var + (item ((current_month - 1) mod 12) num_days))
+  ;;set next_month current_month + 1 mod 12
+
 
   set normal_death_threshold 0.685 / (2 * periods-in-day) ; Simulates a 4 year life span
   set death_threshold normal_death_threshold
@@ -326,7 +343,7 @@ end
 
 
 to check_death
-  ;;random-seed new-seed
+  random-seed new-seed
   set death_p random-float 100
   set local_death_threshold death_threshold
 
@@ -405,9 +422,13 @@ to calculate_time
 ;Calcualtes temperature for every day based on Bhaskar I's sine approxiamtion formula
 ;Roughly simulates a temperature curve
 to calculate_temp
-    set var day_num / 2
-    set temperature (4 * var * (180 - var)) / (40500 - var * (180 - var))
-    set temperature temperature * max_temperature ;scales temperature to real world values
+    if day_of_month > item current_month num_days
+    [
+      set current_month (current_month + 1) mod 12
+    ]
+    set temperature random-normal (item current_month temperatures) (2)
+;    set temperature (4 * var * (180 - var)) / (40500 - var * (180 - var))
+;    set temperature temperature * max_temperature ;scales temperature to real world values
 
 end
 
@@ -592,7 +613,7 @@ max_death_rate
 max_death_rate
 0
 100
-59
+100
 1
 1
 NIL
@@ -815,13 +836,13 @@ NIL
 SLIDER
 1093
 690
-1130
+1126
 840
 January
 January
 -20
 40
-0
+-6
 1
 1
 NIL
@@ -830,13 +851,13 @@ VERTICAL
 SLIDER
 1134
 690
-1171
+1167
 840
 February
 February
 -20
 40
-0
+-4
 1
 1
 NIL
@@ -845,13 +866,13 @@ VERTICAL
 SLIDER
 1176
 691
-1213
+1209
 841
 March
 March
 -20
 40
-0
+4
 1
 1
 NIL
@@ -860,13 +881,13 @@ VERTICAL
 SLIDER
 1219
 691
-1256
+1252
 841
 April
 April
 -20
 40
-0
+8
 1
 1
 NIL
@@ -875,13 +896,13 @@ VERTICAL
 SLIDER
 1260
 691
-1297
+1293
 841
 May
 May
 -20
 40
-0
+14
 1
 1
 NIL
@@ -890,13 +911,13 @@ VERTICAL
 SLIDER
 1300
 692
-1337
+1333
 842
 June
 June
 -20
 40
-0
+16
 1
 1
 NIL
@@ -905,13 +926,13 @@ VERTICAL
 SLIDER
 1341
 692
-1378
+1374
 842
 July
 July
 -20
 40
-0
+18
 1
 1
 NIL
@@ -920,13 +941,13 @@ VERTICAL
 SLIDER
 1382
 693
-1419
+1415
 843
 August
 August
 -20
 40
-0
+20
 1
 1
 NIL
@@ -935,13 +956,13 @@ VERTICAL
 SLIDER
 1422
 694
-1459
+1455
 844
 September
 September
 -20
 40
-0
+16
 1
 1
 NIL
@@ -950,13 +971,13 @@ VERTICAL
 SLIDER
 1463
 693
-1500
+1496
 843
 October
 October
 -20
 40
-0
+9
 1
 1
 NIL
@@ -965,13 +986,13 @@ VERTICAL
 SLIDER
 1505
 693
-1542
+1538
 843
 November
 November
 -20
 40
-0
+4
 1
 1
 NIL
@@ -980,13 +1001,13 @@ VERTICAL
 SLIDER
 1546
 693
-1583
+1579
 843
 December
 December
 -20
 40
-0
+-2
 1
 1
 NIL
