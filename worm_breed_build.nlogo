@@ -942,7 +942,7 @@ June
 June
 -20
 40
-16
+18
 1
 1
 NIL
@@ -957,7 +957,7 @@ July
 July
 -20
 40
-18
+21
 1
 1
 NIL
@@ -987,7 +987,7 @@ September
 September
 -20
 40
-16
+15
 1
 1
 NIL
