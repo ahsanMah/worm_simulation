@@ -76,6 +76,7 @@ to setup
   set current_month int starting_day / 365
   set next_month current_month + 1 mod 12
   ;set temperatures (list January February March April May June July August September October November December)
+  calculate_temp
 
   set normal_death_threshold 0.685 / (2 * periods-in-day) ; Simulates a 4 year life span
   set death_threshold normal_death_threshold
@@ -91,7 +92,7 @@ to setup
   set consumption-in-period 1
 
   set organic-regen 0.3 ;;0.004;; / 5
-  set temp_arr array:from-list n-values 5 [0] ;array used to temporarily store obstacle parameters
+  set temp_arr array:from-list n-values 6 [0] ;array used to temporarily store obstacle parameters
   set obstacle array:to-list temp_arr
 
   ;print obstacle
@@ -133,15 +134,13 @@ to add_obstacle
   array:set temp_arr 2 obstacle_x
   array:set temp_arr 3 obstacle_y
   array:set temp_arr 4 obstacle_pH
+  array:set temp_arr 5 movement
 
   set obstacle array:to-list temp_arr
-
-  print obstacle
   set obstacle_list replace-item (obstacle_number - 1) obstacle_list obstacle
-  ;show obstacle_list
+  show obstacle_list
 
-  foreach obstacle_list [
-    show ?]
+  ;foreach obstacle_list [show ?]
 
   ask patches [
     foreach obstacle_list [setup-obstacles ? ]
@@ -186,10 +185,8 @@ to setup-obstacles [one_obstacle]
 
   if (item 0 one_obstacle != 0) [
     ;looks at items in the array to setup the obstacle
-    ;print "Condition passed!"
 
     set temp_shape item 0 one_obstacle
-    ;show temp_shape
     set temp_size item 1 one_obstacle
     set temp_x item 2 one_obstacle
     set temp_y item 3 one_obstacle
@@ -200,7 +197,12 @@ to setup-obstacles [one_obstacle]
     [
       if (distancexy temp_x temp_y) < temp_size [
         set food-here 0
-        set permeability 0
+        ifelse movement [
+         set permeability 1
+         ask turtles-here [die]
+         ] [set permeability 0]
+        set ph temp_pH
+
       ]
     ]
     if temp_shape = "square"
@@ -208,19 +210,14 @@ to setup-obstacles [one_obstacle]
       if pxcor >= temp_x - temp_size and pxcor <= temp_x + temp_size and pycor >= temp_y - temp_size and pycor <= temp_y + temp_size
       [
         set food-here 0
-        set permeability 0
+        ifelse movement [
+         set permeability 1
+         ask turtles-here [die]
+         ] [set permeability 0]
+        set ph temp_pH
+
       ]
     ]
-
-    if temp_shape = "pH"
-    [
-      if (distancexy temp_x temp_y) < temp_size
-      [
-        set permeability 1
-        set ph random-normal temp_pH 1
-      ]
-    ]
-
 
   if obstacle_shape = "line, horizontal"
   [
@@ -228,7 +225,7 @@ to setup-obstacles [one_obstacle]
     [
     ;;set food-here 0
     set permeability 1
-    set ph obstacle_pH
+    set ph temp_pH
     ]
   ]
   if obstacle_shape = "line, vertical"
@@ -237,6 +234,7 @@ to setup-obstacles [one_obstacle]
     [
       set food-here 0
       set permeability 1
+      set ph temp_pH
     ]
 
   ]
@@ -299,7 +297,7 @@ to eat
   ;;ifelse (stamina < (max_stamina - food-consumed-last)) [ set stamina stamina + food-consumed-last ]
   ;;[if stamina < max_stamina [set stamina max_stamina]]
 
-  ;;if (stamina < max_stamina) [set stamina stamina + 1]
+  ;if (stamina < max_stamina) [set stamina stamina + 1]
 
   ;;if time-since-eaten > 40
   ;;[die]
@@ -308,8 +306,8 @@ end
 
 
 to egest
-  set food-consumed-from food-consumed-from - ((1 - assimilation) * food-consumed-last / steps-per-ie)
-  ;;set food-here food-here + ((1 - assimilation) * food-consumed-last)
+  ;;set food-consumed-from food-consumed-from - ((1 - assimilation) * food-consumed-last / steps-per-ie)
+  set food-here food-here + ((1 - assimilation) * food-consumed-last)
   set food-consumed-last food-consumed-last / steps-per-ie
 end
 
@@ -326,19 +324,25 @@ end
 
 
 to check_death
-  ;;random-seed new-seed
+  random-seed new-seed
   set death_p random-float 100
   set local_death_threshold death_threshold
 
   ;;pH of soil also affects survival rate
-  if (ph != 7) [
-    set var 7 - ph
+  if (ph < 5) [
+    ;show ph
+    set var 5 - ph
     set var abs var
-    set local_death_threshold (death_threshold + (max_death_rate / 7 * var))
+;    set local_death_threshold (death_threshold + (max_death_rate / 7 * var))
+    set local_death_threshold (death_threshold + (random 55) / 5 * var )
   ]
 
-  ifelse (stamina < min_stamina) [die] ;; dies if out of energy
-  [if (death_p < local_death_threshold) [die]] ;; dies of cold/natural causes
+  ifelse (stamina < min_stamina) [
+    ;print "Stamina low"
+    die
+    ] ;; dies if out of energy
+  [if (death_p < local_death_threshold) [
+      die]] ;; dies of cold/natural causes
 
   end
 
@@ -363,7 +367,7 @@ to update_thresholds
   ;cold reduces survival rate
   ifelse (temperature < 8) [
     set death_threshold (max_death_rate)
-    ] [set death_threshold normal_death_threshold / temperature ] ; probability of dying decreases as it gets warmer
+    ] [set death_threshold (normal_death_threshold / temperature) ] ; probability of dying decreases as it gets warmer
 
   ;reproduction rate affected by temperature
   if (temperature > 20) [
@@ -592,7 +596,7 @@ max_death_rate
 max_death_rate
 0
 100
-59
+30
 1
 1
 NIL
@@ -681,12 +685,12 @@ temperature
 CHOOSER
 7
 473
-106
+148
 518
 obstacle_shape
 obstacle_shape
-"circle" "square" "pH"
-1
+"circle" "square" "line, horizontal" "line, vertical"
+0
 
 SLIDER
 5
@@ -697,7 +701,7 @@ obstacle_size
 obstacle_size
 0
 50
-31
+25
 1
 1
 NIL
@@ -712,7 +716,7 @@ obstacle_x
 obstacle_x
 -50
 50
-9
+-40
 1
 1
 NIL
@@ -727,7 +731,7 @@ obstacle_y
 obstacle_y
 -50
 50
--33
+39
 1
 1
 NIL
@@ -753,7 +757,7 @@ obstacle_pH
 obstacle_pH
 0
 14
-3.7
+5.5
 0.1
 1
 NIL
@@ -796,10 +800,10 @@ obstacle_number
 3
 
 BUTTON
-3
-777
-66
-810
+8
+731
+71
+764
 Add
 add_obstacle
 NIL
@@ -811,6 +815,17 @@ NIL
 NIL
 NIL
 1
+
+SWITCH
+8
+690
+118
+723
+movement
+movement
+0
+1
+-1000
 
 @#$#@#$#@
 ## WHAT IS IT?
