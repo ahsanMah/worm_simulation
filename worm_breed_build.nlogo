@@ -279,7 +279,8 @@ to move
   ifelse iseating?
   [
     ;; uphill [food-here]
-    face max-one-of potential-destinations [food-here]
+    ;;face max-one-of potential-destinations [food-here]
+    right (random 181) - 90
     forward speed * permeability
     eat
 
@@ -292,7 +293,8 @@ to move
   [
     ;; downhill [food-here]
     ;;face max-one-of potential-destinations [food-consumed-from]
-    face min-one-of potential-destinations [food-here]
+    ;;face min-one-of potential-destinations [food-here]
+    right (random 181) - 90
     forward speed * permeability
     egest
     if cycle-counter >= steps-per-ie
@@ -436,9 +438,11 @@ to calculate_time
 ;Calcualtes temperature for every day based on Bhaskar I's sine approxiamtion formula
 ;Roughly simulates a temperature curve
 to calculate_temp
+  set day_of_month day_of_month + 1
     if day_of_month > item current_month num_days
     [
       set current_month (current_month + 1) mod 12
+      set day_of_month 0
     ]
     set temperature random-normal (item current_month temperatures) (2)
 ;    set temperature (4 * var * (180 - var)) / (40500 - var * (180 - var))
@@ -747,7 +751,7 @@ obstacle_x
 obstacle_x
 -50
 50
-1
+28
 1
 1
 NIL
@@ -762,7 +766,7 @@ obstacle_y
 obstacle_y
 -50
 50
--11
+0
 1
 1
 NIL
@@ -803,7 +807,7 @@ speed
 speed
 0
 1
-0.3
+0.1
 0.1
 1
 NIL
@@ -821,14 +825,14 @@ number_of_obstacles
 Number
 
 CHOOSER
-117
+151
 474
-209
+243
 519
 obstacle_number
 obstacle_number
 1 2 3 4 5 6
-3
+0
 
 BUTTON
 8
