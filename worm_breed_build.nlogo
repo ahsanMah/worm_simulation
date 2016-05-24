@@ -345,14 +345,14 @@ to egest
 end
 
 
-to-report food-count
-  let food-total 0
-  ask patches
-  [
-    set food-total food-total + food-here
-  ]
-  report food-total
-end
+;to-report food-count
+;  let food-total 0
+;  ask patches
+;  [
+;    set food-total food-total + food-here
+;  ]
+;  report food-total
+;end
 
 
 
@@ -382,7 +382,7 @@ to check_reproduction
     if (maturation > 999) [
       hatch-cocoons 3 [
         set maturation 0
-        set wait_period 7
+        set wait_period 40
         set color white
         set shape "dot"
         ]
@@ -395,7 +395,7 @@ end
 to update_thresholds
   ;cold reduces survival rate
   ifelse (temperature < 8) [
-    set death_threshold (max_death_rate)
+    set death_threshold (random-normal max_death_rate abs (temperature - 8)) - max_death_rate ; max_death_rate
     ] [set death_threshold (normal_death_threshold / temperature) ] ; probability of dying decreases as it gets warmer
 
   ;reproduction rate affected by temperature
@@ -412,14 +412,14 @@ end
 
 ;;hatches temperature is optimum for birth
 to check_if_hatch
-    if (temperature > hatch_temp) [
+    ifelse (temperature > hatch_temp) [
       set wait_period wait_period - 1
 
       if (wait_period < 1) [
       set breed adults
       set size 2
       set shape "worm"]
-    ]
+    ] [set wait_period 40]
 end
 
 
@@ -631,7 +631,7 @@ max_death_rate
 max_death_rate
 0
 100
-30
+9
 1
 1
 NIL
@@ -701,7 +701,7 @@ INPUTBOX
 88
 70
 starting_day
-180
+190
 1
 0
 Number
@@ -725,7 +725,7 @@ CHOOSER
 obstacle_shape
 obstacle_shape
 "circle" "square" "line, horizontal" "line, vertical"
-3
+0
 
 SLIDER
 5
@@ -736,7 +736,7 @@ obstacle_size
 obstacle_size
 0
 50
-50
+15
 1
 1
 NIL
@@ -751,7 +751,7 @@ obstacle_x
 obstacle_x
 -50
 50
-28
+-49
 1
 1
 NIL
@@ -766,7 +766,7 @@ obstacle_y
 obstacle_y
 -50
 50
-0
+50
 1
 1
 NIL
@@ -819,19 +819,19 @@ INPUTBOX
 124
 372
 number_of_obstacles
-12
+3
 1
 0
 Number
 
 CHOOSER
-151
-474
-243
-519
+155
+472
+260
+517
 obstacle_number
 obstacle_number
-1 2 3 4 5 6
+1 2 3 4 5 6 7 8 9 10
 0
 
 BUTTON
