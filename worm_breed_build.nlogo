@@ -241,25 +241,34 @@ to setup-obstacles [one_obstacle]
       ]
     ]
 
-  if obstacle_shape = "line, horizontal"
-  [
-    if distancexy obstacle_x obstacle_y <= obstacle_size and obstacle_y = pycor
+    if obstacle_shape = "line, horizontal"
     [
-    ;;set food-here 0
-    set permeability 1
-    set ph temp_pH
-    ]
-  ]
-  if obstacle_shape = "line, vertical"
-  [
-    if distancexy obstacle_x obstacle_y <= obstacle_size and obstacle_x = pxcor
-    [
-      set food-here 0
-      set permeability 1
-      set ph temp_pH
-    ]
+      if distancexy obstacle_x obstacle_y <= obstacle_size and obstacle_y = pycor
+      [
+        ifelse temp_movable [
+          set permeability 1
+        ]
+        [ set food-here 0
+          set permeability 0
+          ask turtles-here [die]
+        ]
+        set ph random-normal temp_pH 1
+      ]
 
-  ]
+    ]
+    if obstacle_shape = "line, vertical"
+    [
+      if distancexy obstacle_x obstacle_y <= obstacle_size and obstacle_x = pxcor
+      [
+        ifelse temp_movable [
+          set permeability 1
+        ]
+        [ set food-here 0
+          set permeability 0
+          ask turtles-here [die]
+        ]
+        set ph random-normal temp_pH 1 ]
+    ]
   ]
 end
 
@@ -712,7 +721,7 @@ CHOOSER
 obstacle_shape
 obstacle_shape
 "circle" "square" "line, horizontal" "line, vertical"
-1
+3
 
 SLIDER
 5
@@ -723,7 +732,7 @@ obstacle_size
 obstacle_size
 0
 50
-16
+50
 1
 1
 NIL
@@ -738,7 +747,7 @@ obstacle_x
 obstacle_x
 -50
 50
-23
+1
 1
 1
 NIL
