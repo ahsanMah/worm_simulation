@@ -11,7 +11,7 @@ globals [
 
   ;;daily globals
   num-turtles
-  assimilation
+  amount_egested
   consumption-in-period
   periods-in-day
   counter
@@ -105,7 +105,7 @@ to setup
 
   set counter 0
   set num-turtles 40
-  set assimilation 1
+  set amount_egested 1
   set consumption-in-period 1
 
   set organic-regen 0.3 ;;0.004;; / 5
@@ -328,8 +328,8 @@ end
 
 
 to egest
-  ;;set food-consumed-from food-consumed-from - ((1 - assimilation) * food-consumed-last / steps-per-ie)
-  set food-here food-here + ((1 - assimilation) * food-consumed-last)
+  set food-consumed-from food-consumed-from - ((1 - amount_egested) * food-consumed-last / steps-per-ie)
+  ;;set food-here food-here + ((1 - amount_egested) * food-consumed-last)
   set food-consumed-last food-consumed-last / steps-per-ie
 end
 

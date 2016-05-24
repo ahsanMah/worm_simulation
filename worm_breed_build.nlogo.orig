@@ -11,7 +11,7 @@ globals [
 
   ;;daily globals
   num-turtles
-  assimilation
+  amount_egested
   consumption-in-period
   periods-in-day
   counter
@@ -35,6 +35,7 @@ globals [
   temp_x
   temp_y
   temp_pH
+  temp_movable
 
   ]
 
@@ -75,12 +76,6 @@ to setup
   set day_num starting_day
   set year 0
   set periods-in-day 10
-<<<<<<< HEAD
-  set current_month int starting_day / 365
-  set next_month current_month + 1 mod 12
-  ;set temperatures (list January February March April May June July August September October November December)
-  calculate_temp
-=======
 
   set temperatures (list January February March April May June July August September October November December)
   set num_days (list 31 28 31 30 31 30 31 31 30 31 30 31)
@@ -99,7 +94,6 @@ to setup
   set day_of_month (var + (item ((current_month - 1) mod 12) num_days))
   ;;set next_month current_month + 1 mod 12
 
->>>>>>> bd92b95f96c1a0430658414dc3b35d574e02b64c
 
   set normal_death_threshold 0.685 / (2 * periods-in-day) ; Simulates a 4 year life span
   set death_threshold normal_death_threshold
@@ -111,7 +105,7 @@ to setup
 
   set counter 0
   set num-turtles 40
-  set assimilation 1
+  set amount_egested 1
   set consumption-in-period 1
 
   set organic-regen 0.3 ;;0.004;; / 5
@@ -214,17 +208,20 @@ to setup-obstacles [one_obstacle]
     set temp_x item 2 one_obstacle
     set temp_y item 3 one_obstacle
     set temp_pH item 4 one_obstacle
+    set temp_movable item 5 one_obstacle
 
 
     if temp_shape = "circle"
     [
       if (distancexy temp_x temp_y) < temp_size [
-        set food-here 0
-        ifelse movement [
+        ifelse temp_movable [
          set permeability 1
-         ask turtles-here [die]
-         ] [set permeability 0]
-        set ph temp_pH
+         ]
+        [ set food-here 0
+          set permeability 0
+          ask turtles-here [die]
+          ]
+        set ph random-normal temp_pH 1
 
       ]
     ]
@@ -232,12 +229,14 @@ to setup-obstacles [one_obstacle]
     [
       if pxcor >= temp_x - temp_size and pxcor <= temp_x + temp_size and pycor >= temp_y - temp_size and pycor <= temp_y + temp_size
       [
-        set food-here 0
-        ifelse movement [
+        ifelse temp_movable [
          set permeability 1
-         ask turtles-here [die]
-         ] [set permeability 0]
-        set ph temp_pH
+         ]
+        [ set food-here 0
+          set permeability 0
+          ask turtles-here [die]
+          ]
+        set ph random-normal temp_pH 1
 
       ]
     ]
@@ -329,8 +328,13 @@ end
 
 
 to egest
+<<<<<<< HEAD
   ;;set food-consumed-from food-consumed-from - ((1 - assimilation) * food-consumed-last / steps-per-ie)
   set food-here food-here + ((1 - assimilation) * food-consumed-last)
+=======
+  set food-consumed-from food-consumed-from - ((1 - amount_egested) * food-consumed-last / steps-per-ie)
+  ;;set food-here food-here + ((1 - amount_egested) * food-consumed-last)
+>>>>>>> 6c548e903e8155db97db3b387e3dd39bafaed6c8
   set food-consumed-last food-consumed-last / steps-per-ie
 end
 
@@ -360,12 +364,8 @@ to check_death
     set local_death_threshold (death_threshold + (random 55) / 5 * var )
   ]
 
-  ifelse (stamina < min_stamina) [
-    ;print "Stamina low"
-    die
-    ] ;; dies if out of energy
-  [if (death_p < local_death_threshold) [
-      die]] ;; dies of cold/natural causes
+  ifelse (stamina < min_stamina) [die] ;; dies if out of energy
+  [if (death_p < local_death_threshold) [die]] ;; dies of cold/natural causes
 
   end
 
@@ -393,7 +393,7 @@ to update_thresholds
     ] [set death_threshold (normal_death_threshold / temperature) ] ; probability of dying decreases as it gets warmer
 
   ;reproduction rate affected by temperature
-  if (temperature > 20) [
+  if (temperature > 10) [
     set reprod_threshold (max_reproduction_rate / (10 * 2 * periods-in-day) * temperature) ] ; probability of reproducing increases as it gets warmer (10 * 2 * periods-in-day)
 
 end
@@ -623,11 +623,7 @@ max_death_rate
 max_death_rate
 0
 100
-<<<<<<< HEAD
 30
-=======
-100
->>>>>>> bd92b95f96c1a0430658414dc3b35d574e02b64c
 1
 1
 NIL
@@ -721,7 +717,7 @@ CHOOSER
 obstacle_shape
 obstacle_shape
 "circle" "square" "line, horizontal" "line, vertical"
-0
+1
 
 SLIDER
 5
@@ -732,7 +728,7 @@ obstacle_size
 obstacle_size
 0
 50
-25
+16
 1
 1
 NIL
@@ -747,7 +743,7 @@ obstacle_x
 obstacle_x
 -50
 50
--40
+23
 1
 1
 NIL
@@ -762,7 +758,7 @@ obstacle_y
 obstacle_y
 -50
 50
-39
+-11
 1
 1
 NIL
@@ -774,7 +770,7 @@ INPUTBOX
 214
 71
 max_temperature
-30
+20
 1
 0
 Number
@@ -788,11 +784,7 @@ obstacle_pH
 obstacle_pH
 0
 14
-<<<<<<< HEAD
-5.5
-=======
-7
->>>>>>> bd92b95f96c1a0430658414dc3b35d574e02b64c
+4.9
 0.1
 1
 NIL
@@ -851,7 +843,6 @@ NIL
 NIL
 1
 
-<<<<<<< HEAD
 SWITCH
 8
 690
@@ -862,7 +853,7 @@ movement
 0
 1
 -1000
-=======
+
 SLIDER
 1093
 690
@@ -872,7 +863,7 @@ January
 January
 -20
 40
--6
+-5
 1
 1
 NIL
@@ -902,7 +893,7 @@ March
 March
 -20
 40
-4
+1
 1
 1
 NIL
@@ -917,7 +908,7 @@ April
 April
 -20
 40
-8
+7
 1
 1
 NIL
@@ -932,7 +923,7 @@ May
 May
 -20
 40
-14
+13
 1
 1
 NIL
@@ -1042,7 +1033,6 @@ December
 1
 NIL
 VERTICAL
->>>>>>> bd92b95f96c1a0430658414dc3b35d574e02b64c
 
 @#$#@#$#@
 ## WHAT IS IT?
