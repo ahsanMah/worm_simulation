@@ -128,12 +128,12 @@ to setup
   ]
  create-adults worm_population[
     move-to one-of patches with [permeability > 0]
-    set size 2
+    set size 1
     set shape "worm"
 
-    set maturation 60
-    set wait_period 7
-    set hatch_temp 10
+    set maturation 70
+    set wait_period 40
+    set hatch_temp 15
     set stamina 6
     set food-consumed-last 0
     set iseating? one-of[true false]
@@ -366,8 +366,8 @@ to check_death
     ;show ph
     set var 5 - ph
     set var abs var
-;    set local_death_threshold (death_threshold + (max_death_rate / 7 * var))
-    set local_death_threshold (death_threshold + (random 55) / 5 * var )
+;   set local_death_threshold (death_threshold + (max_death_rate / 7 * var))
+    set local_death_threshold (death_threshold + (random 55) / 5 * var ) ;55% chance of them dying at lowest pH
   ]
 
   ifelse (stamina < min_stamina) [die] ;; dies if out of energy
@@ -379,14 +379,13 @@ to check_reproduction
   ;;random-seed new-seed
   set reprod_p random-float 100
   if (reprod_p < reprod_threshold) [
-    if (maturation > 999) [
+    if (maturation = 70) [
       hatch-cocoons 3 [
         set maturation 0
-        set wait_period 40
         set color white
         set shape "dot"
         ]
-      set maturation maturation - 100 ;;wait a few days before laying next cocoon
+      ;set maturation maturation - 10 ;;wait a few days before laying next cocoon
       ]
   ]
 end
@@ -394,9 +393,13 @@ end
 ;updates probablities of dying and reproducing
 to update_thresholds
   ;cold reduces survival rate
-  ifelse (temperature < 8) [
-    set death_threshold (random-normal max_death_rate abs (temperature - 8)) - max_death_rate ; max_death_rate
-    ] [set death_threshold (normal_death_threshold / temperature) ] ; probability of dying decreases as it gets warmer
+  ifelse (temperature < 6) [
+    set death_threshold random-normal max_death_rate 5
+    ]
+  [
+    ifelse (temperature > 25)[set death_threshold max_death_rate]
+      [set death_threshold (normal_death_threshold / temperature)]
+   ] ; probability of dying decreases as it gets warmer
 
   ;reproduction rate affected by temperature
   if (temperature > 10) [
@@ -405,8 +408,8 @@ to update_thresholds
 end
 
 to update_maturity
-    if (maturation < 1000) [
-      set maturation maturation + temperature
+    if (maturation < 70) [
+      set maturation maturation + 1
     ]
 end
 
@@ -417,9 +420,9 @@ to check_if_hatch
 
       if (wait_period < 1) [
       set breed adults
-      set size 2
+      set size 1
       set shape "worm"]
-    ] [set wait_period 40]
+    ] [if (wait_period > 37) [set wait_period 40] ] ;to minimize affect by random fluctuations
 end
 
 
@@ -451,6 +454,9 @@ to calculate_temp
 end
 
 
+to update_organic_matter
+end
+
 to go
   calculate_time
 
@@ -461,6 +467,8 @@ to go
   if (ticks mod (2 * periods-in-day) = 0) [
     update_thresholds
     calculate_temp
+    update_organic_matter
+
     ask cocoons [
       check_if_hatch
       ;;show wait_period
@@ -601,7 +609,7 @@ normal_reproduction_rate
 normal_reproduction_rate
 0
 1
-0.2
+0.5
 0.1
 1
 NIL
@@ -615,8 +623,8 @@ SLIDER
 max_reproduction_rate
 max_reproduction_rate
 0
-5
-1.5
+10
+7.7
 0.1
 1
 NIL
@@ -631,7 +639,7 @@ max_death_rate
 max_death_rate
 0
 100
-9
+30
 1
 1
 NIL
@@ -725,7 +733,7 @@ CHOOSER
 obstacle_shape
 obstacle_shape
 "circle" "square" "line, horizontal" "line, vertical"
-0
+1
 
 SLIDER
 5
@@ -736,7 +744,7 @@ obstacle_size
 obstacle_size
 0
 50
-15
+50
 1
 1
 NIL
@@ -751,7 +759,7 @@ obstacle_x
 obstacle_x
 -50
 50
--49
+16
 1
 1
 NIL
@@ -766,7 +774,7 @@ obstacle_y
 obstacle_y
 -50
 50
-50
+-23
 1
 1
 NIL
@@ -832,7 +840,7 @@ CHOOSER
 obstacle_number
 obstacle_number
 1 2 3 4 5 6 7 8 9 10
-0
+2
 
 BUTTON
 8
