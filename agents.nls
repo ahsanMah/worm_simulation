@@ -5,7 +5,6 @@ globals [
 
 
   ;daily globals
-  num-turtles
   amount_egested
   consumption-in-period
   periods-in-day
@@ -14,16 +13,26 @@ globals [
   steps-per-ie
   max_stamina
   min_stamina
+  name
+  species_list
+  species_genetic_diversity 
+  species_hatch_temp
+  species_number
   ]
+
+
 
 breed [cocoons]
 breed [adults]
+;breed [species_2]
 
 turtles-own [
-  death_p     ;probability of death and reproduction of each worm
-  reprod_p
+  death_p     ;probability of death
+  reprod_p    ;probability of reproduction
+  
   maturation
   wait_period ;days taken by cocoon to hatch given optimal temperature considitions
+  wait_days
   hatch_temp  ;minimum temperature required for cocoons to hatch
 
   stamina     ;helps simulate starvation
@@ -31,42 +40,81 @@ turtles-own [
   food-consumed-last
   iseating?
   cycle-counter
-  ;;speed
+  genetic_diversity
+  max_temp_resist
+  low_temp_resist
+  max_ph_resist
+  parent_breed
+  
   ]
 
 to setup_agents
   set normal_death_threshold 0.685 / (2 * periods-in-day) ; Simulates a 4 year life span
   set death_threshold normal_death_threshold
   set reprod_threshold normal_reproduction_rate ; Simulates successful births
-
+  set species_list[[1 0.4 10] [2 0.9 15]]
   set steps-per-ie 5
   set max_stamina (2 * steps-per-ie)
   set min_stamina 1
 
   set counter 0
-  set num-turtles 40
   set amount_egested 1
   set consumption-in-period 1
+  
+  
+  
+  foreach species_list [create_species ?]
+  
+; create-adults worm_population[
+;    move-to one-of patches with [permeability > 0]
+;    set size 1
+;    set shape "worm"
+;
+;    set maturation 70
+;    set wait_period 15 + (random 50) ;simulates a wait period of 15 to 65 days 
+;    set hatch_temp 15
+;    set stamina 6
+;    set food-consumed-last 0
+;    set iseating? one-of[true false]
+;    set cycle-counter (random (steps-per-ie + 1))
+;    ;;set speed 0.3;; / 5
+;    
+;    set parent_breed breed
+;    set genetic_diversity 0.9 ; 0-1 measure of genetic diversity of the species
+;    set max_temp_resist random-normal 25 (2 * genetic_diversity)
+;    set low_temp_resist random-normal 5 (2 * genetic_diversity)
+;    set max_ph_resist random-normal 5 (2 * genetic_diversity)
+;   ]
+end
 
-
+to create_species [species]
+  
+  set species_number item 0 species
+  set species_genetic_diversity item 1 species
+  set species_hatch_temp item 2 species
+  
  create-adults worm_population[
     move-to one-of patches with [permeability > 0]
     set size 1
-    set shape "worm"
+    ifelse (species_number = 1) [set shape "worm"]
+    [set color blue]
 
     set maturation 70
-    set wait_period 40
-    set hatch_temp 15
+    set wait_period 15 + (random 50) ;simulates a wait period of 15 to 65 days 
+    set hatch_temp species_hatch_temp
     set stamina 6
     set food-consumed-last 0
     set iseating? one-of[true false]
     set cycle-counter (random (steps-per-ie + 1))
     ;;set speed 0.3;; / 5
+    
+    set parent_breed species_number
+    set genetic_diversity species_genetic_diversity ; 0-1 measure of genetic diversity of the species
+    set max_temp_resist random-normal 25 (2 * genetic_diversity)
+    set low_temp_resist random-normal 5 (2 * genetic_diversity)
+    set max_ph_resist random-normal 5 (2 * genetic_diversity)
    ]
 end
-
-
-
 
 
 to move
@@ -140,23 +188,18 @@ to egest
   set food-consumed-last food-consumed-last / steps-per-ie
 end
 
-to check_death
+to check_death  
   random-seed new-seed
-  set death_p random-float 100
-  set local_death_threshold death_threshold
-
-  ;;pH of soil also affects survival rate
-  if (ph < 5) [
-    ;show ph
-    set var 6 - ph
-    set var abs var
-;   set local_death_threshold (death_threshold + (max_death_rate / 7 * var))
-    set local_death_threshold (death_threshold + (random 55) / 5 * var ) ;55% chance of them dying at lowest pH
-  ]
-
+  set var random-float 100
+  
   ifelse (stamina < min_stamina) [die] ;; dies if out of energy
-  [if (death_p < local_death_threshold) [die]] ;; dies of cold/natural causes
-
+  [
+    if (var < death_p) [
+      ;show max_temp_resist
+      die
+      ] ;; dies of cold/natural causes
+    ] 
+  
   end
 
 to check_reproduction
@@ -164,12 +207,12 @@ to check_reproduction
   set reprod_p random-float 100
   if (reprod_p < reprod_threshold) [
     if (maturation = 70) [
-      hatch-cocoons 3 [
+      hatch-cocoons 1 [
         set maturation 0
+        set wait_days 0
         set color white
         set shape "dot"
         ]
-      ;set maturation maturation - 10 ;;wait a few days before laying next cocoon
       ]
   ]
 end
@@ -177,13 +220,29 @@ end
 ;updates probablities of dying and reproducing
 to update_thresholds
   ;cold reduces survival rate
-  ifelse (temperature < 6) [
-    set death_threshold max_death_rate
-    ]
+  
+  ;set death_threshold (max_death_rate / 20) * temperature
+  
+  ifelse (temperature > max_temp_resist) [ set death_p max_death_rate / (2 * periods-in-day)]
   [
-    ifelse (temperature > 25)[set death_threshold max_death_rate]
-      [set death_threshold (normal_death_threshold / temperature)]
-   ] ; probability of dying decreases as it gets warmer
+    ifelse (temperature < low_temp_resist) [ set death_p max_death_rate / (2 * periods-in-day)]
+    [set death_p normal_death_threshold]
+  ]
+  
+    ;;pH of soil also affects survival rate
+  if (ph < max_ph_resist) [
+    set var abs (max_ph_resist - ph)
+    set death_p (death_p + (random 55) / max_ph_resist * var ) ; +55% chance of them dying at pH of 0
+  ]
+  
+  
+;  ifelse (temperature < 6) [
+;    set death_threshold max_death_rate
+;    ]
+;  [
+;    ifelse (temperature > 25)[set death_threshold max_death_rate]
+;      [set death_threshold (normal_death_threshold / temperature)]
+;   ] ; probability of dying decreases as it gets warmer
 
   ;reproduction rate affected by temperature
   if (temperature > 10) [
@@ -199,13 +258,15 @@ end
 
 ;;hatches temperature is optimum for birth
 to check_if_hatch
-    ifelse (temperature > hatch_temp) [
-      set wait_period wait_period - 1
-
-      if (wait_period < 1) [
-      set breed adults
-      set size 1
-      set shape "worm"]
-    ] [if (wait_period > 37) [set wait_period 40] ] ;to minimize affect by random fluctuations
+    if (temperature > hatch_temp) [
+      set wait_days wait_days + 1
+      ;show wait_period
+      if (wait_days = wait_period) [
+        set breed adults
+        set size 1
+        ifelse (parent_breed = 1) [set shape "worm"]
+        [set color blue]
+      ]
+    ] ;[if (wait_days < 3) [set wait_period wait_period - 1] ] ;to minimize affect by random fluctuations
 end
 

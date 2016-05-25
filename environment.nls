@@ -90,7 +90,7 @@ to calculate_temp
       set current_month (current_month + 1) mod 12
       set day_of_month 0
     ]
-    set temperature random-normal (item current_month temperatures) (2)
+    set temperature random-normal (item current_month temperatures) (1)
 ;    set temperature (4 * var * (180 - var)) / (40500 - var * (180 - var))
 ;    set temperature temperature * max_temperature ;scales temperature to real world values
 

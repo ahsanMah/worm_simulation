@@ -32,7 +32,6 @@ to go
   if (count turtles = 0) [stop]
 
   if (ticks mod (2 * periods-in-day) = 0) [
-    update_thresholds
     calculate_temp
     update_organic_matter
 
@@ -45,6 +44,7 @@ to go
     ;update_speed
     if (ticks mod (2 * periods-in-day) = 0) [
       update_maturity
+      update_thresholds
       ;show maturation
       ]
     move
@@ -54,7 +54,6 @@ to go
 
   tick
 end
-
 
 
 @#$#@#$#@
@@ -83,7 +82,7 @@ GRAPHICS-WINDOW
 1
 1
 ticks
-60.0
+1000.0
 
 BUTTON
 11
@@ -161,7 +160,7 @@ true
 false
 "" ""
 PENS
-"default" 1.0 0 -16777216 true "" "plotxy day_num count turtles\nif (day_num = 365) [clear-plot]"
+"default" 1.0 0 -16777216 true "" "plotxy day_num count adults\nif (day_num = 365) [clear-plot]"
 
 SLIDER
 8
@@ -235,7 +234,7 @@ true
 false
 "" ""
 PENS
-"default" 1.0 1 -11221820 true "" "plotxy year count turtles"
+"default" 1.0 1 -11221820 true "" "plotxy year count adults"
 
 PLOT
 1094
@@ -307,7 +306,7 @@ obstacle_size
 obstacle_size
 0
 50
-20
+35
 1
 1
 NIL
@@ -322,7 +321,7 @@ obstacle_x
 obstacle_x
 -50
 50
--25
+-35
 1
 1
 NIL
@@ -337,7 +336,7 @@ obstacle_y
 obstacle_y
 -50
 50
--19
+38
 1
 1
 HORIZONTAL
@@ -352,7 +351,7 @@ obstacle_y
 obstacle_y
 -50
 50
--19
+38
 1
 1
 NIL
@@ -378,7 +377,7 @@ obstacle_pH
 obstacle_pH
 0
 14
-5.5
+3.8
 0.1
 1
 NIL
@@ -1025,6 +1024,18 @@ NetLogo 5.3.1
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
+<experiments>
+  <experiment name="experiment" repetitions="1" runMetricsEveryStep="false">
+    <setup>setup</setup>
+    <go>go</go>
+    <metric>year</metric>
+    <enumeratedValueSet variable="starting_day">
+      <value value="190"/>
+      <value value="100"/>
+      <value value="250"/>
+    </enumeratedValueSet>
+  </experiment>
+</experiments>
 @#$#@#$#@
 @#$#@#$#@
 default
