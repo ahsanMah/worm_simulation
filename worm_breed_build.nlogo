@@ -1,4 +1,4 @@
-extensions [array]
+extensions [array csv]
 
 globals [
   ;;annual globals
@@ -159,11 +159,29 @@ to add_obstacle
 
   ;foreach obstacle_list [show ?]
 
-  ask patches [
+ draw_obstacles
+
+end
+
+to draw_obstacles
+    ask patches [
     foreach obstacle_list [setup-obstacles ? ]
+
     recolor-patch
     ]
 
+end
+
+to save
+  let filename (word "myobstacle"  save_number ".csv")
+  csv:to-file filename obstacle_list
+end
+
+to load
+  let filename (word "myobstacle"  save_number ".csv")
+  set obstacle_list csv:from-file filename
+  draw_obstacles
+  show obstacle_list
 end
 
 
@@ -241,7 +259,7 @@ to setup-obstacles [one_obstacle]
       ]
     ]
 
-    if obstacle_shape = "line, horizontal"
+    if obstacle_shape = "horizontal line"
     [
       if distancexy obstacle_x obstacle_y <= obstacle_size and obstacle_y = pycor
       [
@@ -256,7 +274,7 @@ to setup-obstacles [one_obstacle]
       ]
 
     ]
-    if obstacle_shape = "line, vertical"
+    if obstacle_shape = "vertical line"
     [
       if distancexy obstacle_x obstacle_y <= obstacle_size and obstacle_x = pxcor
       [
@@ -732,8 +750,8 @@ CHOOSER
 518
 obstacle_shape
 obstacle_shape
-"circle" "square" "line, horizontal" "line, vertical"
-1
+"circle" "square" "horizontal line" "vertical line"
+2
 
 SLIDER
 5
@@ -744,7 +762,7 @@ obstacle_size
 obstacle_size
 0
 50
-50
+35
 1
 1
 NIL
@@ -759,7 +777,7 @@ obstacle_x
 obstacle_x
 -50
 50
-16
+12
 1
 1
 NIL
@@ -774,7 +792,21 @@ obstacle_y
 obstacle_y
 -50
 50
--23
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+5
+605
+177
+638
+obstacle_y
+obstacle_y
+-50
+50
+30
 1
 1
 NIL
@@ -800,7 +832,7 @@ obstacle_pH
 obstacle_pH
 0
 14
-4.9
+5.9
 0.1
 1
 NIL
@@ -866,7 +898,7 @@ SWITCH
 723
 movement
 movement
-0
+1
 1
 -1000
 
@@ -1049,6 +1081,51 @@ December
 1
 NIL
 VERTICAL
+
+BUTTON
+8
+431
+95
+464
+NIL
+save
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+104
+431
+189
+464
+NIL
+load
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+INPUTBOX
+173
+360
+256
+420
+save_number
+2
+1
+0
+Number
 
 @#$#@#$#@
 ## WHAT IS IT?
