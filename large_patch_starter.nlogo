@@ -1,13 +1,29 @@
+globals
+[
+
+]
+
+turtles-own
+[
+  maturation
+  wait_period
+  hatch_temp
+]
+
 patches-own
 [
  movable?
  pH
 ]
 
+breed [cocoons]
+breed [adults]
+
+
 to setup
   clear-all
   resize-world 0 width 0 height
-  set-patch-size 50
+  set-patch-size 600 / width
   ask patches
   [
    set movable? false
@@ -29,11 +45,49 @@ end
 to recolor_patch
   if pH != 7
   [
-   set pcolor red
+   set pcolor blue
   ]
 end
 
 to populate
+  create-adults starting_population
+  [
+   move-to one-of patches with [movable?]
+   set size 1 / (width * height)
+   set shape "worm"
+
+   set maturation 70
+   set wait_period 40
+   set hatch_temp 15
+   ;;set stamina 6
+
+  ]
+
+end
+
+to go
+  ask cocoons
+  [
+    check_if_hatch
+  ]
+  ask adults
+  [
+    move
+  ]
+end
+
+to check_if_hatch
+
+end
+
+to move
+
+  ;; THESE ARE THE IMPORTANT CHANGES
+  right (random 181) - 90
+  forward 0.0001
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
 
 end
 
@@ -43,11 +97,11 @@ end
 GRAPHICS-WINDOW
 203
 11
-463
-292
+963
+792
 -1
 -1
-50.0
+150.0
 1
 10
 1
@@ -65,7 +119,7 @@ GRAPHICS-WINDOW
 0
 1
 ticks
-30.0
+120.0
 
 SLIDER
 9
@@ -122,8 +176,8 @@ SLIDER
 patch_x
 patch_x
 0
-width - 1
-2
+width
+0
 1
 1
 NIL
@@ -137,7 +191,7 @@ SLIDER
 patch_y
 patch_y
 0
-height - 1
+height
 1
 1
 1
@@ -153,7 +207,7 @@ patch_pH
 patch_pH
 0
 14
-7
+5.7
 0.1
 1
 NIL
@@ -186,6 +240,51 @@ movable
 0
 1
 -1000
+
+BUTTON
+8
+550
+120
+583
+NIL
+populate
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+INPUTBOX
+7
+483
+162
+543
+starting_population
+30
+1
+0
+Number
+
+BUTTON
+982
+12
+1045
+45
+NIL
+go
+T
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -522,6 +621,11 @@ false
 Polygon -16777216 true false 253 133 245 131 245 133
 Polygon -7500403 true true 2 194 13 197 30 191 38 193 38 205 20 226 20 257 27 265 38 266 40 260 31 253 31 230 60 206 68 198 75 209 66 228 65 243 82 261 84 268 100 267 103 261 77 239 79 231 100 207 98 196 119 201 143 202 160 195 166 210 172 213 173 238 167 251 160 248 154 265 169 264 178 247 186 240 198 260 200 271 217 271 219 262 207 258 195 230 192 198 210 184 227 164 242 144 259 145 284 151 277 141 293 140 299 134 297 127 273 119 270 105
 Polygon -7500403 true true -1 195 14 180 36 166 40 153 53 140 82 131 134 133 159 126 188 115 227 108 236 102 238 98 268 86 269 92 281 87 269 103 269 113
+
+worm
+true
+3
+Polygon -2674135 true false 165 210 165 225 135 255 105 270 90 270 75 255 75 240 90 210 120 195 135 165 165 135 165 105 150 75 150 60 135 60 120 45 120 30 135 15 150 15 180 30 180 45 195 45 210 60 225 105 225 135 210 150 210 165 195 195 180 210
 
 x
 false
