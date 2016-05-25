@@ -173,15 +173,20 @@ to draw_obstacles
 end
 
 to save
+  print "Saved: "
+
   let filename (word "myobstacle"  save_number ".csv")
   csv:to-file filename obstacle_list
+  show obstacle_list
 end
 
 to load
   let filename (word "myobstacle"  save_number ".csv")
   set obstacle_list csv:from-file filename
-  draw_obstacles
+  print "Loaded: "
   show obstacle_list
+  draw_obstacles
+
 end
 
 
@@ -259,9 +264,9 @@ to setup-obstacles [one_obstacle]
       ]
     ]
 
-    if obstacle_shape = "horizontal line"
+    if temp_shape = "horizontal-line"
     [
-      if distancexy obstacle_x obstacle_y <= obstacle_size and obstacle_y = pycor
+      if distancexy temp_x temp_y <= temp_size and temp_y = pycor
       [
         ifelse temp_movable [
           set permeability 1
@@ -274,9 +279,9 @@ to setup-obstacles [one_obstacle]
       ]
 
     ]
-    if obstacle_shape = "vertical line"
+    if temp_shape = "vertical-line"
     [
-      if distancexy obstacle_x obstacle_y <= obstacle_size and obstacle_x = pxcor
+      if distancexy temp_x temp_y <= temp_size and temp_x = pxcor
       [
         ifelse temp_movable [
           set permeability 1
@@ -750,8 +755,8 @@ CHOOSER
 518
 obstacle_shape
 obstacle_shape
-"circle" "square" "horizontal line" "vertical line"
-2
+"circle" "square" "horizontal-line" "vertical-line"
+0
 
 SLIDER
 5
@@ -762,7 +767,7 @@ obstacle_size
 obstacle_size
 0
 50
-35
+13
 1
 1
 NIL
@@ -777,7 +782,7 @@ obstacle_x
 obstacle_x
 -50
 50
-12
+36
 1
 1
 NIL
@@ -792,9 +797,10 @@ obstacle_y
 obstacle_y
 -50
 50
+32
 1
 1
-NIL
+HORIZONTAL
 HORIZONTAL
 
 SLIDER
@@ -806,7 +812,7 @@ obstacle_y
 obstacle_y
 -50
 50
-30
+32
 1
 1
 NIL
@@ -859,7 +865,7 @@ INPUTBOX
 124
 372
 number_of_obstacles
-3
+4
 1
 0
 Number
@@ -872,7 +878,7 @@ CHOOSER
 obstacle_number
 obstacle_number
 1 2 3 4 5 6 7 8 9 10
-2
+1
 
 BUTTON
 8

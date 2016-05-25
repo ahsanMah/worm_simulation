@@ -1,4 +1,4 @@
-extensions [array]
+extensions [array csv]
 
 globals [
   ;;annual globals
@@ -128,12 +128,12 @@ to setup
   ]
  create-adults worm_population[
     move-to one-of patches with [permeability > 0]
-    set size 2
+    set size 1
     set shape "worm"
 
-    set maturation 60
-    set wait_period 7
-    set hatch_temp 10
+    set maturation 70
+    set wait_period 40
+    set hatch_temp 15
     set stamina 6
     set food-consumed-last 0
     set iseating? one-of[true false]
@@ -159,11 +159,29 @@ to add_obstacle
 
   ;foreach obstacle_list [show ?]
 
-  ask patches [
+ draw_obstacles
+
+end
+
+to draw_obstacles
+    ask patches [
     foreach obstacle_list [setup-obstacles ? ]
+
     recolor-patch
     ]
 
+end
+
+to save
+  let filename (word "myobstacle"  save_number ".csv")
+  csv:to-file filename obstacle_list
+end
+
+to load
+  let filename (word "myobstacle"  save_number ".csv")
+  set obstacle_list csv:from-file filename
+  draw_obstacles
+  show obstacle_list
 end
 
 
@@ -241,25 +259,34 @@ to setup-obstacles [one_obstacle]
       ]
     ]
 
-  if obstacle_shape = "line, horizontal"
-  [
-    if distancexy obstacle_x obstacle_y <= obstacle_size and obstacle_y = pycor
+    if obstacle_shape = "horizontal line"
     [
-    ;;set food-here 0
-    set permeability 1
-    set ph temp_pH
-    ]
-  ]
-  if obstacle_shape = "line, vertical"
-  [
-    if distancexy obstacle_x obstacle_y <= obstacle_size and obstacle_x = pxcor
-    [
-      set food-here 0
-      set permeability 1
-      set ph temp_pH
-    ]
+      if distancexy obstacle_x obstacle_y <= obstacle_size and obstacle_y = pycor
+      [
+        ifelse temp_movable [
+          set permeability 1
+        ]
+        [ set food-here 0
+          set permeability 0
+          ask turtles-here [die]
+        ]
+        set ph random-normal temp_pH 1
+      ]
 
-  ]
+    ]
+    if obstacle_shape = "vertical line"
+    [
+      if distancexy obstacle_x obstacle_y <= obstacle_size and obstacle_x = pxcor
+      [
+        ifelse temp_movable [
+          set permeability 1
+        ]
+        [ set food-here 0
+          set permeability 0
+          ask turtles-here [die]
+        ]
+        set ph random-normal temp_pH 1 ]
+    ]
   ]
 end
 
@@ -270,7 +297,8 @@ to move
   ifelse iseating?
   [
     ;; uphill [food-here]
-    face max-one-of potential-destinations [food-here]
+    ;;face max-one-of potential-destinations [food-here]
+    right (random 181) - 90
     forward speed * permeability
     eat
 
@@ -283,7 +311,8 @@ to move
   [
     ;; downhill [food-here]
     ;;face max-one-of potential-destinations [food-consumed-from]
-    face min-one-of potential-destinations [food-here]
+    ;;face min-one-of potential-destinations [food-here]
+    right (random 181) - 90
     forward speed * permeability
     egest
     if cycle-counter >= steps-per-ie
@@ -328,25 +357,20 @@ end
 
 
 to egest
-<<<<<<< HEAD
-  ;;set food-consumed-from food-consumed-from - ((1 - assimilation) * food-consumed-last / steps-per-ie)
-  set food-here food-here + ((1 - assimilation) * food-consumed-last)
-=======
   set food-consumed-from food-consumed-from - ((1 - amount_egested) * food-consumed-last / steps-per-ie)
   ;;set food-here food-here + ((1 - amount_egested) * food-consumed-last)
->>>>>>> 6c548e903e8155db97db3b387e3dd39bafaed6c8
   set food-consumed-last food-consumed-last / steps-per-ie
 end
 
 
-to-report food-count
-  let food-total 0
-  ask patches
-  [
-    set food-total food-total + food-here
-  ]
-  report food-total
-end
+;to-report food-count
+;  let food-total 0
+;  ask patches
+;  [
+;    set food-total food-total + food-here
+;  ]
+;  report food-total
+;end
 
 
 
@@ -360,8 +384,8 @@ to check_death
     ;show ph
     set var 5 - ph
     set var abs var
-;    set local_death_threshold (death_threshold + (max_death_rate / 7 * var))
-    set local_death_threshold (death_threshold + (random 55) / 5 * var )
+;   set local_death_threshold (death_threshold + (max_death_rate / 7 * var))
+    set local_death_threshold (death_threshold + (random 55) / 5 * var ) ;55% chance of them dying at lowest pH
   ]
 
   ifelse (stamina < min_stamina) [die] ;; dies if out of energy
@@ -373,14 +397,13 @@ to check_reproduction
   ;;random-seed new-seed
   set reprod_p random-float 100
   if (reprod_p < reprod_threshold) [
-    if (maturation > 999) [
+    if (maturation = 70) [
       hatch-cocoons 3 [
         set maturation 0
-        set wait_period 7
         set color white
         set shape "dot"
         ]
-      set maturation maturation - 100 ;;wait a few days before laying next cocoon
+      ;set maturation maturation - 10 ;;wait a few days before laying next cocoon
       ]
   ]
 end
@@ -388,9 +411,13 @@ end
 ;updates probablities of dying and reproducing
 to update_thresholds
   ;cold reduces survival rate
-  ifelse (temperature < 8) [
-    set death_threshold (max_death_rate)
-    ] [set death_threshold (normal_death_threshold / temperature) ] ; probability of dying decreases as it gets warmer
+  ifelse (temperature < 6) [
+    set death_threshold random-normal max_death_rate 5
+    ]
+  [
+    ifelse (temperature > 25)[set death_threshold max_death_rate]
+      [set death_threshold (normal_death_threshold / temperature)]
+   ] ; probability of dying decreases as it gets warmer
 
   ;reproduction rate affected by temperature
   if (temperature > 10) [
@@ -399,21 +426,21 @@ to update_thresholds
 end
 
 to update_maturity
-    if (maturation < 1000) [
-      set maturation maturation + temperature
+    if (maturation < 70) [
+      set maturation maturation + 1
     ]
 end
 
 ;;hatches temperature is optimum for birth
 to check_if_hatch
-    if (temperature > hatch_temp) [
+    ifelse (temperature > hatch_temp) [
       set wait_period wait_period - 1
 
       if (wait_period < 1) [
       set breed adults
-      set size 2
+      set size 1
       set shape "worm"]
-    ]
+    ] [if (wait_period > 37) [set wait_period 40] ] ;to minimize affect by random fluctuations
 end
 
 
@@ -432,9 +459,11 @@ to calculate_time
 ;Calcualtes temperature for every day based on Bhaskar I's sine approxiamtion formula
 ;Roughly simulates a temperature curve
 to calculate_temp
+  set day_of_month day_of_month + 1
     if day_of_month > item current_month num_days
     [
       set current_month (current_month + 1) mod 12
+      set day_of_month 0
     ]
     set temperature random-normal (item current_month temperatures) (2)
 ;    set temperature (4 * var * (180 - var)) / (40500 - var * (180 - var))
@@ -442,6 +471,9 @@ to calculate_temp
 
 end
 
+
+to update_organic_matter
+end
 
 to go
   calculate_time
@@ -453,6 +485,8 @@ to go
   if (ticks mod (2 * periods-in-day) = 0) [
     update_thresholds
     calculate_temp
+    update_organic_matter
+
     ask cocoons [
       check_if_hatch
       ;;show wait_period
@@ -593,7 +627,7 @@ normal_reproduction_rate
 normal_reproduction_rate
 0
 1
-0.2
+0.5
 0.1
 1
 NIL
@@ -607,8 +641,8 @@ SLIDER
 max_reproduction_rate
 max_reproduction_rate
 0
-5
-1.5
+10
+7.7
 0.1
 1
 NIL
@@ -693,7 +727,7 @@ INPUTBOX
 88
 70
 starting_day
-180
+190
 1
 0
 Number
@@ -716,8 +750,13 @@ CHOOSER
 518
 obstacle_shape
 obstacle_shape
+<<<<<<< HEAD
 "circle" "square" "line, horizontal" "line, vertical"
 1
+=======
+"circle" "square" "horizontal line" "vertical line"
+2
+>>>>>>> 2d2457ad0b3eb1546ef3ff3044c78759f9514279
 
 SLIDER
 5
@@ -728,7 +767,11 @@ obstacle_size
 obstacle_size
 0
 50
-16
+<<<<<<< HEAD
+50
+=======
+35
+>>>>>>> 2d2457ad0b3eb1546ef3ff3044c78759f9514279
 1
 1
 NIL
@@ -743,7 +786,11 @@ obstacle_x
 obstacle_x
 -50
 50
-23
+<<<<<<< HEAD
+16
+=======
+12
+>>>>>>> 2d2457ad0b3eb1546ef3ff3044c78759f9514279
 1
 1
 NIL
@@ -758,7 +805,11 @@ obstacle_y
 obstacle_y
 -50
 50
--11
+<<<<<<< HEAD
+-23
+=======
+30
+>>>>>>> 2d2457ad0b3eb1546ef3ff3044c78759f9514279
 1
 1
 NIL
@@ -784,7 +835,7 @@ obstacle_pH
 obstacle_pH
 0
 14
-4.9
+5.9
 0.1
 1
 NIL
@@ -799,7 +850,7 @@ speed
 speed
 0
 1
-0.3
+0.1
 0.1
 1
 NIL
@@ -811,20 +862,20 @@ INPUTBOX
 124
 372
 number_of_obstacles
-12
+3
 1
 0
 Number
 
 CHOOSER
-117
-474
-209
-519
+155
+472
+260
+517
 obstacle_number
 obstacle_number
-1 2 3 4 5 6
-3
+1 2 3 4 5 6 7 8 9 10
+2
 
 BUTTON
 8
@@ -850,7 +901,7 @@ SWITCH
 723
 movement
 movement
-0
+1
 1
 -1000
 
@@ -938,7 +989,7 @@ June
 June
 -20
 40
-16
+18
 1
 1
 NIL
@@ -953,7 +1004,7 @@ July
 July
 -20
 40
-18
+21
 1
 1
 NIL
@@ -983,7 +1034,7 @@ September
 September
 -20
 40
-16
+15
 1
 1
 NIL
@@ -1033,6 +1084,51 @@ December
 1
 NIL
 VERTICAL
+
+BUTTON
+8
+431
+95
+464
+NIL
+save
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+104
+431
+189
+464
+NIL
+load
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+INPUTBOX
+173
+360
+256
+420
+save_number
+2
+1
+0
+Number
 
 @#$#@#$#@
 ## WHAT IS IT?
