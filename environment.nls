@@ -1,0 +1,247 @@
+extensions [array csv]
+
+globals [
+  ;;annual globals
+  day_num ;;day number
+  year
+  temperature ;temperature in a given day
+  var ;multi-use temporary variable
+
+  current_month
+  next_month
+  num_days
+  temperatures
+  day_of_month
+
+
+  obstacle
+  obstacle_list
+  temp_arr
+
+  temp_shape
+  temp_size
+  temp_x
+  temp_y
+  temp_pH
+  temp_movable
+
+  ]
+
+
+patches-own
+[
+  ph        ;pH values ranging from 0-14
+  food-here ;amount of food on this patch
+  permeability ;; 0 - 1, 0 being completely impermeable, 1 meaning complete freedom of movement
+  local_death_threshold
+  food-consumed-from
+
+]
+
+to setup_environment
+  
+  set day_num starting_day
+  set year 0
+  set periods-in-day 10
+
+  set temperatures (list January February March April May June July August September October November December)
+  set num_days (list 31 28 31 30 31 30 31 31 30 31 30 31)
+  set current_month 0
+  set var starting_day
+  while [var > 0]
+  [
+    if var > item current_month num_days
+    [
+     set current_month current_month + 1
+
+    ]
+    set var var - item current_month num_days
+  ]
+  calculate_temp
+  set day_of_month (var + (item ((current_month - 1) mod 12) num_days))
+  ;;set next_month current_month + 1 mod 12
+
+  set organic-regen 0.3 ;;0.004;; / 5
+  set temp_arr array:from-list n-values 6 [0] ;array used to temporarily store obstacle parameters
+  set obstacle array:to-list temp_arr
+
+  ;print obstacle
+  set obstacle_list n-values number_of_obstacles [obstacle]
+  show obstacle_list
+
+
+  ask patches
+  [
+    set permeability 1
+    set ph 7
+    set local_death_threshold death_threshold
+
+    setup-initial-food
+    ;foreach obstacle_list [setup-obstacles ? ]
+    recolor-patch
+  ]
+end
+
+
+to calculate_temp
+  set day_of_month day_of_month + 1
+    if day_of_month > item current_month num_days
+    [
+      set current_month (current_month + 1) mod 12
+      set day_of_month 0
+    ]
+    set temperature random-normal (item current_month temperatures) (2)
+;    set temperature (4 * var * (180 - var)) / (40500 - var * (180 - var))
+;    set temperature temperature * max_temperature ;scales temperature to real world values
+
+end
+
+to add_obstacle
+  array:set temp_arr 0 obstacle_shape
+  array:set temp_arr 1 obstacle_size
+  array:set temp_arr 2 obstacle_x
+  array:set temp_arr 3 obstacle_y
+  array:set temp_arr 4 obstacle_pH
+  array:set temp_arr 5 movement
+
+  set obstacle array:to-list temp_arr
+  set obstacle_list replace-item (obstacle_number - 1) obstacle_list obstacle
+  show obstacle_list
+
+  ;foreach obstacle_list [show ?]
+
+ draw_obstacles
+
+end
+
+to draw_obstacles
+    ask patches [
+    foreach obstacle_list [setup-obstacles ? ]
+
+    recolor-patch
+    ]
+
+end
+
+
+to calculate_time
+  ;; two ticks to simulate one gestation cycle
+  ;; worm completes 10 cycles in one day
+  if (ticks mod (2 * periods-in-day) = 0) [
+    set day_num day_num + 1
+    ]
+  if (day_num = 366) [
+    set year year + 1
+    set day_num day_num mod 365 ;;reset for every year
+  ]
+  end
+
+to setup-initial-food
+;  let setup-patch one-of patches
+;  if (distancexy 0 60) < 30
+;  [
+;    set food-here 400
+;  ]
+;
+;  let setup-patch2 one-of patches
+;  if (distancexy 0 -60) < 30
+;  [
+;    set food-here 400
+;  ]
+
+;set food-here (random 251 + 250)
+  set food-here 500
+end
+
+to recolor-patch
+  ifelse (permeability != 0)
+  [
+    set pcolor scale-color green food-here 600 0
+    if (ph != 7) [ set pcolor scale-color violet food-here 600 0]
+
+  ]
+  [
+    set pcolor blue
+  ]
+end
+
+
+to setup-obstacles [one_obstacle]
+  ;if obstacle parameters given
+
+  if (item 0 one_obstacle != 0) [
+    ;looks at items in the array to setup the obstacle
+
+    set temp_shape item 0 one_obstacle
+    set temp_size item 1 one_obstacle
+    set temp_x item 2 one_obstacle
+    set temp_y item 3 one_obstacle
+    set temp_pH item 4 one_obstacle
+    set temp_movable item 5 one_obstacle
+
+
+    if temp_shape = "circle"
+    [
+      if (distancexy temp_x temp_y) < temp_size [
+        ifelse temp_movable [
+         set permeability 1
+         ]
+        [ set food-here 0
+          set permeability 0
+          ask turtles-here [die]
+          ]
+        set ph random-normal temp_pH 1
+
+      ]
+    ]
+    if temp_shape = "square"
+    [
+      if pxcor >= temp_x - temp_size and pxcor <= temp_x + temp_size and pycor >= temp_y - temp_size and pycor <= temp_y + temp_size
+      [
+        ifelse temp_movable [
+         set permeability 1
+         ]
+        [ set food-here 0
+          set permeability 0
+          ask turtles-here [die]
+          ]
+        set ph random-normal temp_pH 1
+
+      ]
+    ]
+
+    if temp_shape = "horizontal-line"
+    [
+      if distancexy temp_x temp_y <= temp_size and temp_y = pycor
+      [
+        ifelse temp_movable [
+          set permeability 1
+        ]
+        [ set food-here 0
+          set permeability 0
+          ask turtles-here [die]
+        ]
+        set ph random-normal temp_pH 1
+      ]
+
+    ]
+    if temp_shape = "vertical-line"
+    [
+      if distancexy temp_x temp_y <= temp_size and temp_x = pxcor
+      [
+        ifelse temp_movable [
+          set permeability 1
+        ]
+        [ set food-here 0
+          set permeability 0
+          ask turtles-here [die]
+        ]
+        set ph random-normal temp_pH 1 ]
+    ]
+  ]
+end
+
+
+
+to update_organic_matter
+end

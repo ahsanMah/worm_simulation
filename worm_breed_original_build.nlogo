@@ -173,15 +173,20 @@ to draw_obstacles
 end
 
 to save
+  print "Saved: "
+
   let filename (word "myobstacle"  save_number ".csv")
   csv:to-file filename obstacle_list
+  show obstacle_list
 end
 
 to load
   let filename (word "myobstacle"  save_number ".csv")
   set obstacle_list csv:from-file filename
-  draw_obstacles
+  print "Loaded: "
   show obstacle_list
+  draw_obstacles
+
 end
 
 
@@ -198,8 +203,8 @@ to setup-initial-food
 ;    set food-here 400
 ;  ]
 
-set food-here (random 251 + 250)
-  ;;set food-here 500
+;set food-here (random 251 + 250)
+  set food-here 500
 end
 
 to recolor-patch
@@ -259,9 +264,9 @@ to setup-obstacles [one_obstacle]
       ]
     ]
 
-    if obstacle_shape = "horizontal line"
+    if temp_shape = "horizontal-line"
     [
-      if distancexy obstacle_x obstacle_y <= obstacle_size and obstacle_y = pycor
+      if distancexy temp_x temp_y <= temp_size and temp_y = pycor
       [
         ifelse temp_movable [
           set permeability 1
@@ -274,9 +279,9 @@ to setup-obstacles [one_obstacle]
       ]
 
     ]
-    if obstacle_shape = "vertical line"
+    if temp_shape = "vertical-line"
     [
-      if distancexy obstacle_x obstacle_y <= obstacle_size and obstacle_x = pxcor
+      if distancexy temp_x temp_y <= temp_size and temp_x = pxcor
       [
         ifelse temp_movable [
           set permeability 1
@@ -382,7 +387,7 @@ to check_death
   ;;pH of soil also affects survival rate
   if (ph < 5) [
     ;show ph
-    set var 5 - ph
+    set var 6 - ph
     set var abs var
 ;   set local_death_threshold (death_threshold + (max_death_rate / 7 * var))
     set local_death_threshold (death_threshold + (random 55) / 5 * var ) ;55% chance of them dying at lowest pH
@@ -412,7 +417,7 @@ end
 to update_thresholds
   ;cold reduces survival rate
   ifelse (temperature < 6) [
-    set death_threshold random-normal max_death_rate 5
+    set death_threshold max_death_rate
     ]
   [
     ifelse (temperature > 25)[set death_threshold max_death_rate]
@@ -750,13 +755,8 @@ CHOOSER
 518
 obstacle_shape
 obstacle_shape
-<<<<<<< HEAD
-"circle" "square" "line, horizontal" "line, vertical"
-1
-=======
-"circle" "square" "horizontal line" "vertical line"
+"circle" "square" "horizontal-line" "vertical-line"
 2
->>>>>>> 2d2457ad0b3eb1546ef3ff3044c78759f9514279
 
 SLIDER
 5
@@ -767,11 +767,7 @@ obstacle_size
 obstacle_size
 0
 50
-<<<<<<< HEAD
-50
-=======
-35
->>>>>>> 2d2457ad0b3eb1546ef3ff3044c78759f9514279
+20
 1
 1
 NIL
@@ -786,11 +782,7 @@ obstacle_x
 obstacle_x
 -50
 50
-<<<<<<< HEAD
-16
-=======
-12
->>>>>>> 2d2457ad0b3eb1546ef3ff3044c78759f9514279
+-25
 1
 1
 NIL
@@ -805,11 +797,22 @@ obstacle_y
 obstacle_y
 -50
 50
-<<<<<<< HEAD
--23
-=======
-30
->>>>>>> 2d2457ad0b3eb1546ef3ff3044c78759f9514279
+-19
+1
+1
+HORIZONTAL
+HORIZONTAL
+
+SLIDER
+5
+605
+177
+638
+obstacle_y
+obstacle_y
+-50
+50
+-19
 1
 1
 NIL
@@ -835,7 +838,7 @@ obstacle_pH
 obstacle_pH
 0
 14
-5.9
+5.5
 0.1
 1
 NIL
@@ -862,7 +865,7 @@ INPUTBOX
 124
 372
 number_of_obstacles
-3
+4
 1
 0
 Number
@@ -875,7 +878,7 @@ CHOOSER
 obstacle_number
 obstacle_number
 1 2 3 4 5 6 7 8 9 10
-2
+0
 
 BUTTON
 8
@@ -901,7 +904,7 @@ SWITCH
 723
 movement
 movement
-1
+0
 1
 -1000
 

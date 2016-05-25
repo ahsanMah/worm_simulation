@@ -1,489 +1,33 @@
 extensions [array csv]
-
-globals [
-  ;;annual globals
-  day_num ;;day number
-  year
-  normal_death_threshold death_threshold ;;probability of death
-  reprod_threshold ;;probablity of reproducing
-  temperature ;temperature in a given day
-  var ;multi-use temporary variable
-
-  ;;daily globals
-  num-turtles
-  amount_egested
-  consumption-in-period
-  periods-in-day
-  counter
-  organic-regen
-  steps-per-ie
-  max_stamina
-  min_stamina
-  current_month
-  next_month
-  num_days
-  temperatures
-  day_of_month
-
-
-  obstacle
-  obstacle_list
-  temp_arr
-
-  temp_shape
-  temp_size
-  temp_x
-  temp_y
-  temp_pH
-  temp_movable
-
-  ]
-
-breed [cocoons]
-breed [adults]
-
-turtles-own [
-  death_p     ;probability of death and reproduction of each worm
-  reprod_p
-  maturation
-  wait_period ;days taken by cocoon to hatch given optimal temperature considitions
-  hatch_temp  ;minimum temperature required for cocoons to hatch
-
-  stamina     ;helps simulate starvation
-  time-since-eaten
-  food-consumed-last
-  iseating?
-  cycle-counter
-  ;;speed
-
-
-
-  ]
-
-patches-own
-[
-  ph        ;pH values ranging from 0-14
-  food-here ;amount of food on this patch
-  permeability ;; 0 - 1, 0 being completely impermeable, 1 meaning complete freedom of movement
-  local_death_threshold
-  food-consumed-from
-
-]
+__includes["environment.nls" "agents.nls"]
 
 to setup
   clear-all
 
-  set day_num starting_day
-  set year 0
-  set periods-in-day 10
+  setup_environment
+  setup_agents
 
-  set temperatures (list January February March April May June July August September October November December)
-  set num_days (list 31 28 31 30 31 30 31 31 30 31 30 31)
-  set current_month 0
-  set var starting_day
-  while [var > 0]
-  [
-    if var > item current_month num_days
-    [
-     set current_month current_month + 1
-
-    ]
-    set var var - item current_month num_days
-  ]
-  calculate_temp
-  set day_of_month (var + (item ((current_month - 1) mod 12) num_days))
-  ;;set next_month current_month + 1 mod 12
-
-
-  set normal_death_threshold 0.685 / (2 * periods-in-day) ; Simulates a 4 year life span
-  set death_threshold normal_death_threshold
-  set reprod_threshold normal_reproduction_rate ; Simulates successful births
-
-  set steps-per-ie 5
-  set max_stamina (2 * steps-per-ie)
-  set min_stamina 1
-
-  set counter 0
-  set num-turtles 40
-  set amount_egested 1
-  set consumption-in-period 1
-
-  set organic-regen 0.3 ;;0.004;; / 5
-  set temp_arr array:from-list n-values 6 [0] ;array used to temporarily store obstacle parameters
-  set obstacle array:to-list temp_arr
-
-  ;print obstacle
-  set obstacle_list n-values number_of_obstacles [obstacle]
-  show obstacle_list
-
-  ask patches
-  [
-    set permeability 1
-    set ph 7
-    set local_death_threshold death_threshold
-
-    setup-initial-food
-    ;foreach obstacle_list [setup-obstacles ? ]
-    recolor-patch
-  ]
- create-adults worm_population[
-    move-to one-of patches with [permeability > 0]
-    set size 1
-    set shape "worm"
-
-    set maturation 70
-    set wait_period 40
-    set hatch_temp 15
-    set stamina 6
-    set food-consumed-last 0
-    set iseating? one-of[true false]
-    set cycle-counter (random (steps-per-ie + 1))
-    ;;set speed 0.3;; / 5
-
-   ]
  reset-ticks
 end
 
-
-to add_obstacle
-  array:set temp_arr 0 obstacle_shape
-  array:set temp_arr 1 obstacle_size
-  array:set temp_arr 2 obstacle_x
-  array:set temp_arr 3 obstacle_y
-  array:set temp_arr 4 obstacle_pH
-  array:set temp_arr 5 movement
-
-  set obstacle array:to-list temp_arr
-  set obstacle_list replace-item (obstacle_number - 1) obstacle_list obstacle
-  show obstacle_list
-
-  ;foreach obstacle_list [show ?]
-
- draw_obstacles
-
-end
-
-to draw_obstacles
-    ask patches [
-    foreach obstacle_list [setup-obstacles ? ]
-
-    recolor-patch
-    ]
-
-end
-
 to save
-  print "Saved: "
-
   let filename (word "myobstacle"  save_number ".csv")
   csv:to-file filename obstacle_list
-  show obstacle_list
+  print "Saved to file"
 end
 
 to load
   let filename (word "myobstacle"  save_number ".csv")
   set obstacle_list csv:from-file filename
-  print "Loaded: "
-  show obstacle_list
+  print "Loaded from file: "
+  print obstacle_list
   draw_obstacles
-
 end
 
-
-to setup-initial-food
-;  let setup-patch one-of patches
-;  if (distancexy 0 60) < 30
-;  [
-;    set food-here 400
-;  ]
-;
-;  let setup-patch2 one-of patches
-;  if (distancexy 0 -60) < 30
-;  [
-;    set food-here 400
-;  ]
-
-set food-here (random 251 + 250)
-  ;;set food-here 500
-end
-
-to recolor-patch
-  ifelse (permeability != 0)
-  [
-    set pcolor scale-color green food-here 600 0
-    if (ph != 7) [ set pcolor scale-color violet food-here 600 0]
-
-  ]
-  [
-    set pcolor blue
-  ]
-end
-
-
-to setup-obstacles [one_obstacle]
-  ;if obstacle parameters given
-
-  if (item 0 one_obstacle != 0) [
-    ;looks at items in the array to setup the obstacle
-
-    set temp_shape item 0 one_obstacle
-    set temp_size item 1 one_obstacle
-    set temp_x item 2 one_obstacle
-    set temp_y item 3 one_obstacle
-    set temp_pH item 4 one_obstacle
-    set temp_movable item 5 one_obstacle
-
-
-    if temp_shape = "circle"
-    [
-      if (distancexy temp_x temp_y) < temp_size [
-        ifelse temp_movable [
-         set permeability 1
-         ]
-        [ set food-here 0
-          set permeability 0
-          ask turtles-here [die]
-          ]
-        set ph random-normal temp_pH 1
-
-      ]
-    ]
-    if temp_shape = "square"
-    [
-      if pxcor >= temp_x - temp_size and pxcor <= temp_x + temp_size and pycor >= temp_y - temp_size and pycor <= temp_y + temp_size
-      [
-        ifelse temp_movable [
-         set permeability 1
-         ]
-        [ set food-here 0
-          set permeability 0
-          ask turtles-here [die]
-          ]
-        set ph random-normal temp_pH 1
-
-      ]
-    ]
-
-    if temp_shape = "horizontal-line"
-    [
-      if distancexy temp_x temp_y <= temp_size and temp_y = pycor
-      [
-        ifelse temp_movable [
-          set permeability 1
-        ]
-        [ set food-here 0
-          set permeability 0
-          ask turtles-here [die]
-        ]
-        set ph random-normal temp_pH 1
-      ]
-
-    ]
-    if temp_shape = "vertical-line"
-    [
-      if distancexy temp_x temp_y <= temp_size and temp_x = pxcor
-      [
-        ifelse temp_movable [
-          set permeability 1
-        ]
-        [ set food-here 0
-          set permeability 0
-          ask turtles-here [die]
-        ]
-        set ph random-normal temp_pH 1 ]
-    ]
-  ]
-end
-
-
-to move
-  set stamina stamina - 0.3
-  let potential-destinations (patch-set patch-here neighbors with [permeability != 0])
-  ifelse iseating?
-  [
-    ;; uphill [food-here]
-    ;;face max-one-of potential-destinations [food-here]
-    right (random 181) - 90
-    forward speed * permeability
-    eat
-
-    if cycle-counter >= steps-per-ie
-    [
-      set iseating? false
-      set cycle-counter 0
-    ]
-  ]
-  [
-    ;; downhill [food-here]
-    ;;face max-one-of potential-destinations [food-consumed-from]
-    ;;face min-one-of potential-destinations [food-here]
-    right (random 181) - 90
-    forward speed * permeability
-    egest
-    if cycle-counter >= steps-per-ie
-    [
-      set iseating? true
-      set cycle-counter 0
-    ]
-  ]
-  check_death
-  if not iseating? [check_reproduction]
-  set cycle-counter cycle-counter + 1
-end
-
-
-to eat
-
-  ifelse (food-here < consumption-in-period) ;;prevents consuming more food than on patch
-  [
-    set food-consumed-last food-here
-    set food-here 0
-  ]
-  [
-    set food-consumed-last consumption-in-period
-    set food-here food-here - consumption-in-period
-    set time-since-eaten 0
-  ]
-
-  if (food-here > 0) [
-      if (stamina < max_stamina) [set stamina stamina + food-consumed-last]
-    ]
-
-  set food-consumed-from food-consumed-from + consumption-in-period
-  ;;ifelse (stamina < (max_stamina - food-consumed-last)) [ set stamina stamina + food-consumed-last ]
-  ;;[if stamina < max_stamina [set stamina max_stamina]]
-
-  ;if (stamina < max_stamina) [set stamina stamina + 1]
-
-  ;;if time-since-eaten > 40
-  ;;[die]
-
-end
-
-
-to egest
-  set food-consumed-from food-consumed-from - ((1 - amount_egested) * food-consumed-last / steps-per-ie)
-  ;;set food-here food-here + ((1 - amount_egested) * food-consumed-last)
-  set food-consumed-last food-consumed-last / steps-per-ie
-end
-
-
-;to-report food-count
-;  let food-total 0
-;  ask patches
-;  [
-;    set food-total food-total + food-here
-;  ]
-;  report food-total
-;end
-
-
-
-to check_death
-  random-seed new-seed
-  set death_p random-float 100
-  set local_death_threshold death_threshold
-
-  ;;pH of soil also affects survival rate
-  if (ph < 5) [
-    ;show ph
-    set var 5 - ph
-    set var abs var
-;   set local_death_threshold (death_threshold + (max_death_rate / 7 * var))
-    set local_death_threshold (death_threshold + (random 55) / 5 * var ) ;55% chance of them dying at lowest pH
-  ]
-
-  ifelse (stamina < min_stamina) [die] ;; dies if out of energy
-  [if (death_p < local_death_threshold) [die]] ;; dies of cold/natural causes
-
-  end
-
-to check_reproduction
-  ;;random-seed new-seed
-  set reprod_p random-float 100
-  if (reprod_p < reprod_threshold) [
-    if (maturation = 70) [
-      hatch-cocoons 3 [
-        set maturation 0
-        set color white
-        set shape "dot"
-        ]
-      ;set maturation maturation - 10 ;;wait a few days before laying next cocoon
-      ]
-  ]
-end
-
-;updates probablities of dying and reproducing
-to update_thresholds
-  ;cold reduces survival rate
-  ifelse (temperature < 6) [
-    set death_threshold random-normal max_death_rate 5
-    ]
-  [
-    ifelse (temperature > 25)[set death_threshold max_death_rate]
-      [set death_threshold (normal_death_threshold / temperature)]
-   ] ; probability of dying decreases as it gets warmer
-
-  ;reproduction rate affected by temperature
-  if (temperature > 10) [
-    set reprod_threshold (max_reproduction_rate / (10 * 2 * periods-in-day) * temperature) ] ; probability of reproducing increases as it gets warmer (10 * 2 * periods-in-day)
-
-end
-
-to update_maturity
-    if (maturation < 70) [
-      set maturation maturation + 1
-    ]
-end
-
-;;hatches temperature is optimum for birth
-to check_if_hatch
-    ifelse (temperature > hatch_temp) [
-      set wait_period wait_period - 1
-
-      if (wait_period < 1) [
-      set breed adults
-      set size 1
-      set shape "worm"]
-    ] [if (wait_period > 37) [set wait_period 40] ] ;to minimize affect by random fluctuations
-end
-
-
-to calculate_time
-  ;; two ticks to simulate one gestation cycle
-  ;; worm completes 10 cycles in one day
-  if (ticks mod (2 * periods-in-day) = 0) [
-    set day_num day_num + 1
-    ]
-  if (day_num = 366) [
-    set year year + 1
-    set day_num day_num mod 365 ;;reset for every year
-  ]
-  end
-
-;Calcualtes temperature for every day based on Bhaskar I's sine approxiamtion formula
-;Roughly simulates a temperature curve
-to calculate_temp
-  set day_of_month day_of_month + 1
-    if day_of_month > item current_month num_days
-    [
-      set current_month (current_month + 1) mod 12
-      set day_of_month 0
-    ]
-    set temperature random-normal (item current_month temperatures) (2)
-;    set temperature (4 * var * (180 - var)) / (40500 - var * (180 - var))
-;    set temperature temperature * max_temperature ;scales temperature to real world values
-
-end
-
-
-to update_organic_matter
-end
 
 to go
-  calculate_time
 
-  ;show temperature
+  calculate_time
   if (year = 10) [stop]
   if (count turtles = 0) [stop]
 
@@ -494,7 +38,6 @@ to go
 
     ask cocoons [
       check_if_hatch
-      ;;show wait_period
     ]
   ]
 
@@ -509,14 +52,11 @@ to go
     set food-here food-here + organic-regen
   ]
 
-  ;;foreach obstacle show
-  ;;ask patches [recolor-patch]
-  ;;ask patches [set food-here food-here + organic-regen]
-  ;;show food-count
-
-
   tick
 end
+
+
+
 @#$#@#$#@
 GRAPHICS-WINDOW
 267
@@ -767,7 +307,7 @@ obstacle_size
 obstacle_size
 0
 50
-13
+20
 1
 1
 NIL
@@ -782,7 +322,7 @@ obstacle_x
 obstacle_x
 -50
 50
-36
+-25
 1
 1
 NIL
@@ -797,7 +337,7 @@ obstacle_y
 obstacle_y
 -50
 50
-32
+-19
 1
 1
 HORIZONTAL
@@ -812,7 +352,7 @@ obstacle_y
 obstacle_y
 -50
 50
-32
+-19
 1
 1
 NIL
@@ -838,7 +378,7 @@ obstacle_pH
 obstacle_pH
 0
 14
-5.9
+5.5
 0.1
 1
 NIL
@@ -878,7 +418,7 @@ CHOOSER
 obstacle_number
 obstacle_number
 1 2 3 4 5 6 7 8 9 10
-1
+0
 
 BUTTON
 8
@@ -904,7 +444,7 @@ SWITCH
 723
 movement
 movement
-1
+0
 1
 -1000
 
