@@ -1,3 +1,5 @@
-vertical line,18,-45,30,5.9,false
-horizontal line,18,-45,-32,5.9,false
-horizontal line,35,12,30,5.9,false
+circle,15,-26,-20,3.7,true
+circle,15,23,-25,7,true
+circle,15,14,26,5.2,false
+square,7,-17,26,3,true
+square,3,0,0,3,false
