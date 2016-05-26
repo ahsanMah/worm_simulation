@@ -22,6 +22,8 @@ globals [
   temp_genetic_diversity 
   temp_hatch_temperature
   temp_population
+  temp_start_x
+  temp_start_y
   
   shape_list
   color_list
@@ -77,12 +79,12 @@ to setup_agents
 end
 
 to add_species
-  set new_species (list species_number species_genetic_diversity species_hatch_temperature worm_population)
+  set new_species (list species_number species_genetic_diversity species_hatch_temperature worm_population start_x start_y)
   set species_list lput new_species species_list
   array:set population_arr (species_number - 1) worm_population
   show species_list
   create_species new_species
-
+  ;show list (count turtles with [stamina = 6]) (count turtles with [maturation < 80])
 end
 
 
@@ -92,10 +94,13 @@ to create_species [species]
   set temp_genetic_diversity item 1 species
   set temp_hatch_temperature item 2 species
   set temp_population item 3 species
+  set temp_start_x item 4 species
+  set temp_start_y item 5 species
   
  create-adults temp_population[
     set parent_breed (temp_number - 1)
-    move-to one-of patches with [permeability > 0]
+    ;move-to one-of patches with [permeability > 0]
+    setxy temp_start_x temp_start_y
     set size 1
 ;    if(temp_number = 1) [set shape "worm"]
 ;    [set color blue]
@@ -216,7 +221,7 @@ to check_reproduction
       hatch-cocoons 1 [
         set maturation 0
         set wait_days 0
-        set color white
+        set color (item parent_breed color_list)
         set shape "dot"
         ]
       ]

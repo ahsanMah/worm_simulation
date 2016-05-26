@@ -11,7 +11,7 @@ to setup
 end
 
 to save_obstacles
-  let filename (word "data/parameters/myobstacle"  save_number ".csv")
+  let filename (word "/data/parameters/myobstacle"  save_number ".csv")
   csv:to-file filename obstacle_list
   print "Saved to file"
 end
@@ -63,6 +63,26 @@ to load_patches
     ]
   ]
   recolor_patches
+end
+
+to save_agents
+  let filename (word "data/parameters/myagents"  save_number ".csv")
+  csv:to-file filename species_list
+  print "Saved to file"
+end
+
+to load_agents
+  let filename (word "data/parameters/myagents"  save_number ".csv")
+  set species_list csv:from-file filename
+  print "Loaded from file: "
+  print species_list
+  foreach species_list [create_species ?]
+end
+
+to save_data
+  let filename (word "data/output/simulation"  save_number ".csv")
+  csv:to-file filename species_list
+  print "Saved to file"
 end
 
 to go
@@ -124,7 +144,7 @@ GRAPHICS-WINDOW
 1
 1
 ticks
-120.0
+1000.0
 
 BUTTON
 12
@@ -172,15 +192,15 @@ day_num
 11
 
 SLIDER
-10
-154
-230
-187
+9
+152
+208
+185
 worm_population
 worm_population
 0
 500
-500
+160
 10
 1
 NIL
@@ -210,10 +230,10 @@ PENS
 "pen-5" 1.0 0 -5825686 true "" "plotxy day_num (array:item population_arr 4)\nif (day_num = 365) [clear-plot]"
 
 SLIDER
-9
-196
-229
-229
+8
+194
+209
+227
 normal_reproduction_rate
 normal_reproduction_rate
 0
@@ -225,10 +245,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-9
-235
-231
-268
+8
+233
+208
+266
 max_reproduction_rate
 max_reproduction_rate
 0
@@ -240,10 +260,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-9
-275
-231
-308
+8
+273
+207
+306
 max_death_rate
 max_death_rate
 0
@@ -342,7 +362,7 @@ CHOOSER
 obstacle_shape
 obstacle_shape
 "circle" "square" "horizontal-line" "vertical-line"
-0
+1
 
 SLIDER
 7
@@ -353,7 +373,7 @@ obstacle_size
 obstacle_size
 0
 50
-16
+19
 1
 1
 NIL
@@ -368,7 +388,7 @@ obstacle_x
 obstacle_x
 min-pxcor
 max-pxcor
-38
+77
 1
 1
 NIL
@@ -383,7 +403,7 @@ obstacle_y
 obstacle_y
 -50
 50
-24
+98
 1
 1
 HORIZONTAL
@@ -398,7 +418,7 @@ obstacle_y
 obstacle_y
 min-pycor
 max-pycor
-24
+98
 1
 1
 NIL
@@ -416,10 +436,10 @@ max_temperature
 Number
 
 SLIDER
-9
-354
-223
-387
+8
+352
+207
+385
 speed
 speed
 0
@@ -672,10 +692,10 @@ NIL
 1
 
 INPUTBOX
-12
-506
-95
-566
+11
+509
+94
+569
 save_number
 4
 1
@@ -736,7 +756,7 @@ patch_y
 patch_y
 1
 patch_height
-1
+4
 1
 1
 NIL
@@ -751,7 +771,7 @@ patch_pH
 patch_pH
 0
 14
-1.7
+3.1
 0.1
 1
 NIL
@@ -806,50 +826,50 @@ Species Control
 1
 
 SLIDER
-10
-313
-226
-346
+9
+311
+205
+344
 species_genetic_diversity
 species_genetic_diversity
 0
 1
-0.9
+0.6
 0.1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-9
-391
-225
-424
+8
+389
+207
+422
 species_hatch_temperature
 species_hatch_temperature
 0
 25
-14
+11
 1
 1
 NIL
 HORIZONTAL
 
 CHOOSER
-13
-431
-113
-476
+10
+459
+110
+504
 species_number
 species_number
 1 2 3 4 5
-1
+2
 
 BUTTON
-131
-439
-194
-472
+128
+467
+191
+500
 Add
 add_species
 NIL
@@ -903,6 +923,70 @@ BUTTON
 646
 Load Patches
 load_patches
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+SLIDER
+9
+423
+101
+456
+start_x
+start_x
+0
+119
+46
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+115
+424
+207
+457
+start_y
+start_y
+0
+119
+97
+1
+1
+NIL
+HORIZONTAL
+
+BUTTON
+130
+505
+193
+538
+Save
+save_agents
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+196
+505
+259
+538
+Load
+load_agents
 NIL
 1
 T
