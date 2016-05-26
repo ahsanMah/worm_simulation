@@ -200,9 +200,9 @@ PENS
 
 SLIDER
 9
-201
+196
 229
-234
+229
 normal_reproduction_rate
 normal_reproduction_rate
 0
@@ -215,9 +215,9 @@ HORIZONTAL
 
 SLIDER
 9
-240
+235
 231
-273
+268
 max_reproduction_rate
 max_reproduction_rate
 0
@@ -230,9 +230,9 @@ HORIZONTAL
 
 SLIDER
 9
-280
+275
 231
-313
+308
 max_death_rate
 max_death_rate
 0
@@ -406,9 +406,9 @@ Number
 
 SLIDER
 9
-359
+354
 223
-392
+387
 speed
 speed
 0
@@ -642,7 +642,7 @@ BUTTON
 555
 134
 588
-NIL
+Save Obstacles
 save_obstacles
 NIL
 1
@@ -657,9 +657,9 @@ NIL
 BUTTON
 137
 555
-261
+263
 588
-NIL
+Load Obstacles
 load_obstacles
 NIL
 1
@@ -807,9 +807,9 @@ Species Control
 
 SLIDER
 10
-318
+313
 226
-351
+346
 species_genetic_diversity
 species_genetic_diversity
 0
@@ -822,14 +822,14 @@ HORIZONTAL
 
 SLIDER
 9
-396
+391
 225
-429
+424
 species_hatch_temperature
 species_hatch_temperature
 0
 25
-15
+14
 1
 1
 NIL
@@ -884,7 +884,7 @@ BUTTON
 593
 132
 626
-NIL
+Save Patches
 save_patches
 NIL
 1
@@ -897,11 +897,11 @@ NIL
 1
 
 BUTTON
-138
+136
 594
 261
 627
-load_patches
+Load Patches
 load_patches
 NIL
 1
