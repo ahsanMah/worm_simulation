@@ -331,7 +331,7 @@ CHOOSER
 obstacle_shape
 obstacle_shape
 "circle" "square" "horizontal-line" "vertical-line"
-3
+0
 
 SLIDER
 7
@@ -342,7 +342,7 @@ obstacle_size
 obstacle_size
 0
 50
-34
+16
 1
 1
 NIL
@@ -357,7 +357,7 @@ obstacle_x
 obstacle_x
 min-pxcor
 max-pxcor
-92
+38
 1
 1
 NIL
@@ -372,7 +372,7 @@ obstacle_y
 obstacle_y
 -50
 50
-105
+24
 1
 1
 HORIZONTAL
@@ -387,7 +387,7 @@ obstacle_y
 obstacle_y
 min-pycor
 max-pycor
-105
+24
 1
 1
 NIL
@@ -413,22 +413,11 @@ speed
 speed
 0
 0.5
-0.05
+0.12
 0.01
 1
 NIL
 HORIZONTAL
-
-INPUTBOX
-8
-485
-129
-547
-number_of_obstacles
-4
-1
-0
-Number
 
 CHOOSER
 157
@@ -638,10 +627,10 @@ NIL
 VERTICAL
 
 BUTTON
-9
-555
-134
-588
+8
+574
+133
+607
 Save Obstacles
 save_obstacles
 NIL
@@ -655,10 +644,10 @@ NIL
 1
 
 BUTTON
-137
-555
-263
-588
+136
+574
+262
+607
 Load Obstacles
 load_obstacles
 NIL
@@ -672,12 +661,12 @@ NIL
 1
 
 INPUTBOX
-169
-486
-252
-546
+12
+506
+95
+566
 save_number
-1
+4
 1
 0
 Number
@@ -691,7 +680,7 @@ patch_width
 patch_width
 4
 12
-4
+6
 2
 1
 NIL
@@ -706,7 +695,7 @@ patch_height
 patch_height
 4
 12
-4
+6
 2
 1
 NIL
@@ -880,10 +869,10 @@ NIL
 1
 
 BUTTON
-9
-593
-132
-626
+8
+612
+131
+645
 Save Patches
 save_patches
 NIL
@@ -897,10 +886,10 @@ NIL
 1
 
 BUTTON
-136
-594
-261
-627
+135
+613
+260
+646
 Load Patches
 load_patches
 NIL

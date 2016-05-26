@@ -62,13 +62,13 @@ to setup_environment
   ;;set next_month current_month + 1 mod 12
 
   set organic-regen 0.3 ;;0.004;; / 5
-  set temp_arr array:from-list n-values 6 [0] ;array used to temporarily store obstacle parameters
-  set obstacle array:to-list temp_arr
+ 
+ ;array used to temporarily store obstacle parameters
+  set obstacle n-values 6 [0]
 
   ;print obstacle
-  set obstacle_list n-values number_of_obstacles [obstacle]
+  set obstacle_list []
   show obstacle_list
-
 
   ask patches
   [
@@ -97,20 +97,11 @@ to calculate_temp
 end
 
 to add_obstacle
-  array:set temp_arr 0 obstacle_shape
-  array:set temp_arr 1 obstacle_size
-  array:set temp_arr 2 obstacle_x
-  array:set temp_arr 3 obstacle_y
-  array:set temp_arr 4 0
-  array:set temp_arr 5 false
-
-  set obstacle array:to-list temp_arr
-  set obstacle_list replace-item (obstacle_number - 1) obstacle_list obstacle
+  
+  set obstacle (list obstacle_shape obstacle_size obstacle_x obstacle_y 0 false) 
+  set obstacle_list lput obstacle obstacle_list
   show obstacle_list
-
-  ;foreach obstacle_list [show ?]
-
- draw_obstacles
+  draw_obstacles
 
 end
 
