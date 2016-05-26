@@ -1,500 +1,71 @@
 extensions [array csv]
-
-globals [
-  ;;annual globals
-  day_num ;;day number
-  year
-  normal_death_threshold death_threshold ;;probability of death
-  reprod_threshold ;;probablity of reproducing
-  temperature ;temperature in a given day
-  var ;multi-use temporary variable
-
-  ;;daily globals
-  num-turtles
-  amount_egested
-  consumption-in-period
-  periods-in-day
-  counter
-  organic-regen
-  steps-per-ie
-  max_stamina
-  min_stamina
-  current_month
-  next_month
-  num_days
-  temperatures
-  day_of_month
-
-
-  obstacle
-  obstacle_list
-  temp_arr
-
-  temp_shape
-  temp_size
-  temp_x
-  temp_y
-  temp_pH
-  temp_movable
-
-  ]
-
-breed [cocoons]
-breed [adults]
-
-turtles-own [
-  death_p     ;probability of death and reproduction of each worm
-  reprod_p
-  maturation
-  wait_period ;days taken by cocoon to hatch given optimal temperature considitions
-  hatch_temp  ;minimum temperature required for cocoons to hatch
-
-  stamina     ;helps simulate starvation
-  time-since-eaten
-  food-consumed-last
-  iseating?
-  cycle-counter
-  ;;speed
-
-
-
-  ]
-
-patches-own
-[
-  ph        ;pH values ranging from 0-14
-  food-here ;amount of food on this patch
-  permeability ;; 0 - 1, 0 being completely impermeable, 1 meaning complete freedom of movement
-  local_death_threshold
-  food-consumed-from
-
-]
+__includes["environment.nls" "agents.nls"]
 
 to setup
   clear-all
 
-  set day_num starting_day
-  set year 0
-  set periods-in-day 10
+  setup_environment
+  setup_agents
 
-  set temperatures (list January February March April May June July August September October November December)
-  set num_days (list 31 28 31 30 31 30 31 31 30 31 30 31)
-  set current_month 0
-  set var starting_day
-  while [var > 0]
-  [
-    if var > item current_month num_days
-    [
-     set current_month current_month + 1
-
-    ]
-    set var var - item current_month num_days
-  ]
-  calculate_temp
-  set day_of_month (var + (item ((current_month - 1) mod 12) num_days))
-  ;;set next_month current_month + 1 mod 12
-
-
-  set normal_death_threshold 0.685 / (2 * periods-in-day) ; Simulates a 4 year life span
-  set death_threshold normal_death_threshold
-  set reprod_threshold normal_reproduction_rate ; Simulates successful births
-
-  set steps-per-ie 5
-  set max_stamina (2 * steps-per-ie)
-  set min_stamina 1
-
-  set counter 0
-  set num-turtles 40
-  set amount_egested 1
-  set consumption-in-period 1
-
-  set organic-regen 0.3 ;;0.004;; / 5
-  set temp_arr array:from-list n-values 6 [0] ;array used to temporarily store obstacle parameters
-  set obstacle array:to-list temp_arr
-
-  ;print obstacle
-  set obstacle_list n-values number_of_obstacles [obstacle]
-  show obstacle_list
-
-  ask patches
-  [
-    set permeability 1
-    set ph 7
-    set local_death_threshold death_threshold
-
-    setup-initial-food
-    ;foreach obstacle_list [setup-obstacles ? ]
-    recolor-patch
-  ]
- create-adults worm_population[
-    move-to one-of patches with [permeability > 0]
-    set size 1
-    set shape "worm"
-
-    set maturation 70
-    set wait_period 40
-    set hatch_temp 15
-    set stamina 6
-    set food-consumed-last 0
-    set iseating? one-of[true false]
-    set cycle-counter (random (steps-per-ie + 1))
-    ;;set speed 0.3;; / 5
-
-   ]
  reset-ticks
 end
 
-
-to add_obstacle
-  array:set temp_arr 0 obstacle_shape
-  array:set temp_arr 1 obstacle_size
-  array:set temp_arr 2 obstacle_x
-  array:set temp_arr 3 obstacle_y
-  array:set temp_arr 4 obstacle_pH
-  array:set temp_arr 5 movement
-
-  set obstacle array:to-list temp_arr
-  set obstacle_list replace-item (obstacle_number - 1) obstacle_list obstacle
-  show obstacle_list
-
-  ;foreach obstacle_list [show ?]
-
- draw_obstacles
-
-end
-
-to draw_obstacles
-    ask patches [
-    foreach obstacle_list [setup-obstacles ? ]
-
-    recolor-patch
-    ]
-
-end
-
-to save
-  print "Saved: "
-
+to save_obstacles
   let filename (word "myobstacle"  save_number ".csv")
   csv:to-file filename obstacle_list
-  show obstacle_list
+  print "Saved to file"
 end
 
-to load
+to load_obstacles
   let filename (word "myobstacle"  save_number ".csv")
   set obstacle_list csv:from-file filename
-  print "Loaded: "
-  show obstacle_list
+  print "Loaded from file: "
+  print obstacle_list
   draw_obstacles
-
 end
 
-
-to setup-initial-food
-;  let setup-patch one-of patches
-;  if (distancexy 0 60) < 30
+to save_patches
+;  let filename (word "mypatches" save_number ".csv")
+;  let i min-pxcor
+;  let j min-pycor
+;  carefully [file-delete filename] []
+;  file-open filename
+;  while [(i <= max-pxcor)]
 ;  [
-;    set food-here 400
+;   while [(j <= max-pycor)]
+;   [
+;     ask patch i j
+;     [
+;       let info (list ph food-here permeability local_death_threshold)
+;       file-open filename
+;       file-print csv:to-row info
+;       file-close
+;     ]
+;   ]
+;   set j min-pycor
 ;  ]
 ;
-;  let setup-patch2 one-of patches
-;  if (distancexy 0 -60) < 30
-;  [
-;    set food-here 400
-;  ]
-
-;set food-here (random 251 + 250)
-  set food-here 500
 end
 
-to recolor-patch
-  ifelse (permeability != 0)
-  [
-    set pcolor scale-color green food-here 600 0
-    if (ph != 7) [ set pcolor scale-color violet food-here 600 0]
+to load_patches
+  let filename (word "mypatches" save_number ".csv")
 
-  ]
-  [
-    set pcolor blue
-  ]
-end
-
-
-to setup-obstacles [one_obstacle]
-  ;if obstacle parameters given
-
-  if (item 0 one_obstacle != 0) [
-    ;looks at items in the array to setup the obstacle
-
-    set temp_shape item 0 one_obstacle
-    set temp_size item 1 one_obstacle
-    set temp_x item 2 one_obstacle
-    set temp_y item 3 one_obstacle
-    set temp_pH item 4 one_obstacle
-    set temp_movable item 5 one_obstacle
-
-
-    if temp_shape = "circle"
-    [
-      if (distancexy temp_x temp_y) < temp_size [
-        ifelse temp_movable [
-         set permeability 1
-         ]
-        [ set food-here 0
-          set permeability 0
-          ask turtles-here [die]
-          ]
-        set ph random-normal temp_pH 1
-
-      ]
-    ]
-    if temp_shape = "square"
-    [
-      if pxcor >= temp_x - temp_size and pxcor <= temp_x + temp_size and pycor >= temp_y - temp_size and pycor <= temp_y + temp_size
-      [
-        ifelse temp_movable [
-         set permeability 1
-         ]
-        [ set food-here 0
-          set permeability 0
-          ask turtles-here [die]
-          ]
-        set ph random-normal temp_pH 1
-
-      ]
-    ]
-
-    if temp_shape = "horizontal-line"
-    [
-      if distancexy temp_x temp_y <= temp_size and temp_y = pycor
-      [
-        ifelse temp_movable [
-          set permeability 1
-        ]
-        [ set food-here 0
-          set permeability 0
-          ask turtles-here [die]
-        ]
-        set ph random-normal temp_pH 1
-      ]
-
-    ]
-    if temp_shape = "vertical-line"
-    [
-      if distancexy temp_x temp_y <= temp_size and temp_x = pxcor
-      [
-        ifelse temp_movable [
-          set permeability 1
-        ]
-        [ set food-here 0
-          set permeability 0
-          ask turtles-here [die]
-        ]
-        set ph random-normal temp_pH 1 ]
-    ]
-  ]
-end
-
-
-to move
-  set stamina stamina - 0.3
-  let potential-destinations (patch-set patch-here neighbors with [permeability != 0])
-  ifelse iseating?
-  [
-    ;; uphill [food-here]
-    ;;face max-one-of potential-destinations [food-here]
-    right (random 181) - 90
-    forward speed * permeability
-    eat
-
-    if cycle-counter >= steps-per-ie
-    [
-      set iseating? false
-      set cycle-counter 0
-    ]
-  ]
-  [
-    ;; downhill [food-here]
-    ;;face max-one-of potential-destinations [food-consumed-from]
-    ;;face min-one-of potential-destinations [food-here]
-    right (random 181) - 90
-    forward speed * permeability
-    egest
-    if cycle-counter >= steps-per-ie
-    [
-      set iseating? true
-      set cycle-counter 0
-    ]
-  ]
-  check_death
-  if not iseating? [check_reproduction]
-  set cycle-counter cycle-counter + 1
-end
-
-
-to eat
-
-  ifelse (food-here < consumption-in-period) ;;prevents consuming more food than on patch
-  [
-    set food-consumed-last food-here
-    set food-here 0
-  ]
-  [
-    set food-consumed-last consumption-in-period
-    set food-here food-here - consumption-in-period
-    set time-since-eaten 0
-  ]
-
-  if (food-here > 0) [
-      if (stamina < max_stamina) [set stamina stamina + food-consumed-last]
-    ]
-
-  set food-consumed-from food-consumed-from + consumption-in-period
-  ;;ifelse (stamina < (max_stamina - food-consumed-last)) [ set stamina stamina + food-consumed-last ]
-  ;;[if stamina < max_stamina [set stamina max_stamina]]
-
-  ;if (stamina < max_stamina) [set stamina stamina + 1]
-
-  ;;if time-since-eaten > 40
-  ;;[die]
 
 end
 
-
-to egest
-  set food-consumed-from food-consumed-from - ((1 - amount_egested) * food-consumed-last / steps-per-ie)
-  ;;set food-here food-here + ((1 - amount_egested) * food-consumed-last)
-  set food-consumed-last food-consumed-last / steps-per-ie
-end
-
-
-;to-report food-count
-;  let food-total 0
-;  ask patches
-;  [
-;    set food-total food-total + food-here
-;  ]
-;  report food-total
-;end
-
-
-
-to check_death
-  random-seed new-seed
-  set death_p random-float 100
-  set local_death_threshold death_threshold
-
-  ;;pH of soil also affects survival rate
-  if (ph < 5) [
-    ;show ph
-    set var 6 - ph
-    set var abs var
-;   set local_death_threshold (death_threshold + (max_death_rate / 7 * var))
-    set local_death_threshold (death_threshold + (random 55) / 5 * var ) ;55% chance of them dying at lowest pH
-  ]
-
-  ifelse (stamina < min_stamina) [die] ;; dies if out of energy
-  [if (death_p < local_death_threshold) [die]] ;; dies of cold/natural causes
-
-  end
-
-to check_reproduction
-  ;;random-seed new-seed
-  set reprod_p random-float 100
-  if (reprod_p < reprod_threshold) [
-    if (maturation = 70) [
-      hatch-cocoons 3 [
-        set maturation 0
-        set color white
-        set shape "dot"
-        ]
-      ;set maturation maturation - 10 ;;wait a few days before laying next cocoon
-      ]
-  ]
-end
-
-;updates probablities of dying and reproducing
-to update_thresholds
-  ;cold reduces survival rate
-  ifelse (temperature < 6) [
-    set death_threshold max_death_rate
-    ]
-  [
-    ifelse (temperature > 25)[set death_threshold max_death_rate]
-      [set death_threshold (normal_death_threshold / temperature)]
-   ] ; probability of dying decreases as it gets warmer
-
-  ;reproduction rate affected by temperature
-  if (temperature > 10) [
-    set reprod_threshold (max_reproduction_rate / (10 * 2 * periods-in-day) * temperature) ] ; probability of reproducing increases as it gets warmer (10 * 2 * periods-in-day)
-
-end
-
-to update_maturity
-    if (maturation < 70) [
-      set maturation maturation + 1
-    ]
-end
-
-;;hatches temperature is optimum for birth
-to check_if_hatch
-    ifelse (temperature > hatch_temp) [
-      set wait_period wait_period - 1
-
-      if (wait_period < 1) [
-      set breed adults
-      set size 1
-      set shape "worm"]
-    ] [if (wait_period > 37) [set wait_period 40] ] ;to minimize affect by random fluctuations
-end
-
-
-to calculate_time
-  ;; two ticks to simulate one gestation cycle
-  ;; worm completes 10 cycles in one day
-  if (ticks mod (2 * periods-in-day) = 0) [
-    set day_num day_num + 1
-    ]
-  if (day_num = 366) [
-    set year year + 1
-    set day_num day_num mod 365 ;;reset for every year
-  ]
-  end
-
-;Calcualtes temperature for every day based on Bhaskar I's sine approxiamtion formula
-;Roughly simulates a temperature curve
-to calculate_temp
-  set day_of_month day_of_month + 1
-    if day_of_month > item current_month num_days
-    [
-      set current_month (current_month + 1) mod 12
-      set day_of_month 0
-    ]
-    set temperature random-normal (item current_month temperatures) (2)
-;    set temperature (4 * var * (180 - var)) / (40500 - var * (180 - var))
-;    set temperature temperature * max_temperature ;scales temperature to real world values
-
-end
-
-
-to update_organic_matter
-end
 
 to go
-  calculate_time
 
-  ;show temperature
+  calculate_time
   if (year = 10) [stop]
   if (count turtles = 0) [stop]
 
   if (ticks mod (2 * periods-in-day) = 0) [
-    update_thresholds
     calculate_temp
     update_organic_matter
 
     ask cocoons [
       check_if_hatch
-      ;;show wait_period
     ]
   ]
 
@@ -502,30 +73,39 @@ to go
     ;update_speed
     if (ticks mod (2 * periods-in-day) = 0) [
       update_maturity
+      update_thresholds
       ;show maturation
       ]
     move
-    recolor-patch
+
     set food-here food-here + organic-regen
   ]
-
-  ;;foreach obstacle show
-  ;;ask patches [recolor-patch]
-  ;;ask patches [set food-here food-here + organic-regen]
-  ;;show food-count
-
+  ask patches
+  [
+   recolor-patch
+  ]
 
   tick
 end
+
 @#$#@#$#@
 GRAPHICS-WINDOW
-267
-10
-1085
-849
+268
+<<<<<<< HEAD
+14
+1086
+853
 50
 50
 8.0
+=======
+10
+1118
+881
+-1
+-1
+7.0
+>>>>>>> fb4d8694caca2bd9ae86843329285816ed3fef73
 1
 10
 1
@@ -535,21 +115,21 @@ GRAPHICS-WINDOW
 0
 0
 1
--50
-50
--50
-50
+0
+119
+0
+119
 1
 1
 1
 ticks
-60.0
+120.0
 
 BUTTON
-11
-383
-77
-416
+13
+10
+79
+43
 Setup
 setup
 NIL
@@ -563,10 +143,10 @@ NIL
 1
 
 BUTTON
-94
-383
-153
-417
+91
+10
+150
+44
 Go
 go
 T
@@ -580,10 +160,10 @@ NIL
 1
 
 MONITOR
-1100
-50
-1208
-95
+1148
+54
+1256
+99
 Day Number
 day_num
 17
@@ -591,25 +171,25 @@ day_num
 11
 
 SLIDER
-9
-86
-229
-119
+14
+168
+228
+201
 worm_population
 worm_population
 0
 500
-500
+300
 10
 1
 NIL
 HORIZONTAL
 
 PLOT
-1099
-156
-1358
-325
+1147
+158
+1406
+327
 Worm Population for Current Year
 Day Number
 Population
@@ -621,28 +201,33 @@ true
 false
 "" ""
 PENS
-"default" 1.0 0 -16777216 true "" "plotxy day_num count turtles\nif (day_num = 365) [clear-plot]"
+"default" 1.0 0 -16777216 true "" "plotxy day_num count adults\nif (day_num = 365) [clear-plot]"
+"pen-1" 1.0 0 -2674135 true "" "plotxy day_num (array:item population_arr 0)\nif (day_num = 365) [clear-plot]"
+"pen-2" 1.0 0 -11221820 true "" "plotxy day_num (array:item population_arr 1)\nif (day_num = 365) [clear-plot]"
+"pen-3" 1.0 0 -2064490 true "" "plotxy day_num (array:item population_arr 2)\nif (day_num = 365) [clear-plot]"
+"pen-4" 1.0 0 -955883 true "" "plotxy day_num (array:item population_arr 3)\nif (day_num = 365) [clear-plot]"
+"pen-5" 1.0 0 -5825686 true "" "plotxy day_num (array:item population_arr 4)\nif (day_num = 365) [clear-plot]"
 
 SLIDER
-8
-133
+14
+214
 228
-166
+247
 normal_reproduction_rate
 normal_reproduction_rate
 0
 1
-0.5
+0.6
 0.1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-8
-172
-230
-205
+13
+254
+227
+287
 max_reproduction_rate
 max_reproduction_rate
 0
@@ -654,10 +239,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-8
-212
-230
-245
+12
+294
+228
+327
 max_death_rate
 max_death_rate
 0
@@ -669,10 +254,10 @@ NIL
 HORIZONTAL
 
 MONITOR
-1101
-101
-1208
-146
+1149
+103
+1256
+148
 Population Count
 count adults
 17
@@ -680,10 +265,10 @@ count adults
 11
 
 PLOT
-1095
-334
-1359
-507
+1143
+336
+1407
+509
 Worm Population over Years
 NIL
 NIL
@@ -695,13 +280,13 @@ true
 false
 "" ""
 PENS
-"default" 1.0 1 -11221820 true "" "plotxy year count turtles"
+"default" 1.0 1 -11221820 true "" "plotxy year count adults"
 
 PLOT
-1094
-510
-1361
-685
+1142
+512
+1409
+687
 Organic Material Over Time
 NIL
 NIL
@@ -716,10 +301,10 @@ PENS
 "default" 1.0 0 -16777216 true "" "plotxy ticks / (periods-in-day * 2 * steps-per-ie) (sum [food-here] of patches)"
 
 MONITOR
-1216
-101
-1314
-146
+1264
+103
+1362
+148
 Cocoon Count
 count cocoons
 17
@@ -728,9 +313,9 @@ count cocoons
 
 INPUTBOX
 9
-10
+58
 88
-70
+118
 starting_day
 190
 1
@@ -738,10 +323,10 @@ starting_day
 Number
 
 MONITOR
-1216
-51
-1311
-96
+1264
+53
+1359
+98
 Daily Temp *C
 temperature
 2
@@ -749,70 +334,100 @@ temperature
 11
 
 CHOOSER
-7
-473
-148
-518
+8
+<<<<<<< HEAD
+578
+149
+623
+=======
+532
+149
+577
+>>>>>>> fb4d8694caca2bd9ae86843329285816ed3fef73
 obstacle_shape
 obstacle_shape
 "circle" "square" "horizontal-line" "vertical-line"
-2
+3
 
 SLIDER
-5
-525
-177
-558
+6
+<<<<<<< HEAD
+630
+178
+663
+=======
+584
+178
+617
+>>>>>>> fb4d8694caca2bd9ae86843329285816ed3fef73
 obstacle_size
 obstacle_size
 0
 50
-20
+34
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-5
-566
-177
-599
+6
+<<<<<<< HEAD
+671
+178
+704
+=======
+625
+178
+658
+>>>>>>> fb4d8694caca2bd9ae86843329285816ed3fef73
 obstacle_x
 obstacle_x
--50
-50
--25
+min-pxcor
+max-pxcor
+92
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-5
-605
-177
-638
+6
+<<<<<<< HEAD
+710
+178
+743
+=======
+664
+178
+697
+>>>>>>> fb4d8694caca2bd9ae86843329285816ed3fef73
 obstacle_y
 obstacle_y
 -50
 50
--19
+105
 1
 1
 HORIZONTAL
 HORIZONTAL
 
 SLIDER
-5
-605
-177
-638
+6
+<<<<<<< HEAD
+710
+178
+743
+=======
+664
+178
+697
+>>>>>>> fb4d8694caca2bd9ae86843329285816ed3fef73
 obstacle_y
 obstacle_y
--50
-50
--19
+min-pycor
+max-pycor
+105
 1
 1
 NIL
@@ -820,9 +435,9 @@ HORIZONTAL
 
 INPUTBOX
 95
-11
+59
 214
-71
+119
 max_temperature
 20
 1
@@ -830,40 +445,52 @@ max_temperature
 Number
 
 SLIDER
-8
-649
-180
-682
+9
+<<<<<<< HEAD
+754
+181
+787
 obstacle_pH
 obstacle_pH
 0
 14
-5.5
+3.8
 0.1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-9
+14
+336
+228
+369
+speed
+speed
+0
+1
+0.2
+0.1
+=======
 258
 181
 291
 speed
 speed
 0
-1
-0.1
-0.1
+0.5
+0.05
+0.01
+>>>>>>> fb4d8694caca2bd9ae86843329285816ed3fef73
 1
 NIL
 HORIZONTAL
 
 INPUTBOX
-3
-310
-124
-372
+185
+631
+235
+693
 number_of_obstacles
 4
 1
@@ -871,20 +498,33 @@ number_of_obstacles
 Number
 
 CHOOSER
-155
-472
-260
-517
+156
+<<<<<<< HEAD
+577
+261
+622
+=======
+531
+261
+576
+>>>>>>> fb4d8694caca2bd9ae86843329285816ed3fef73
 obstacle_number
 obstacle_number
 1 2 3 4 5 6 7 8 9 10
-0
+1
 
 BUTTON
-8
-731
-71
-764
+<<<<<<< HEAD
+9
+836
+72
+869
+=======
+6
+702
+69
+735
+>>>>>>> fb4d8694caca2bd9ae86843329285816ed3fef73
 Add
 add_obstacle
 NIL
@@ -897,22 +537,25 @@ NIL
 NIL
 1
 
+<<<<<<< HEAD
 SWITCH
-8
-690
-118
-723
+9
+795
+119
+828
 movement
 movement
 0
 1
 -1000
 
+=======
+>>>>>>> fb4d8694caca2bd9ae86843329285816ed3fef73
 SLIDER
-1093
-690
-1126
-840
+1146
+692
+1179
+842
 January
 January
 -20
@@ -924,10 +567,10 @@ NIL
 VERTICAL
 
 SLIDER
-1134
-690
-1167
-840
+1187
+692
+1220
+842
 February
 February
 -20
@@ -939,10 +582,10 @@ NIL
 VERTICAL
 
 SLIDER
-1176
-691
-1209
-841
+1226
+692
+1259
+842
 March
 March
 -20
@@ -954,10 +597,10 @@ NIL
 VERTICAL
 
 SLIDER
-1219
-691
-1252
-841
+1267
+693
+1300
+843
 April
 April
 -20
@@ -969,10 +612,10 @@ NIL
 VERTICAL
 
 SLIDER
-1260
-691
-1293
-841
+1308
+693
+1341
+843
 May
 May
 -20
@@ -984,10 +627,10 @@ NIL
 VERTICAL
 
 SLIDER
-1300
-692
-1333
-842
+1348
+694
+1381
+844
 June
 June
 -20
@@ -999,10 +642,10 @@ NIL
 VERTICAL
 
 SLIDER
-1341
-692
-1374
-842
+1389
+694
+1422
+844
 July
 July
 -20
@@ -1014,10 +657,10 @@ NIL
 VERTICAL
 
 SLIDER
-1382
-693
-1415
-843
+1430
+695
+1463
+845
 August
 August
 -20
@@ -1029,10 +672,10 @@ NIL
 VERTICAL
 
 SLIDER
-1422
-694
-1455
-844
+1470
+696
+1503
+846
 September
 September
 -20
@@ -1044,10 +687,10 @@ NIL
 VERTICAL
 
 SLIDER
-1463
-693
-1496
-843
+1511
+695
+1544
+845
 October
 October
 -20
@@ -1059,10 +702,10 @@ NIL
 VERTICAL
 
 SLIDER
-1505
-693
-1538
-843
+1553
+695
+1586
+845
 November
 November
 -20
@@ -1074,10 +717,10 @@ NIL
 VERTICAL
 
 SLIDER
-1546
-693
-1579
-843
+1594
+695
+1627
+845
 December
 December
 -20
@@ -1089,12 +732,19 @@ NIL
 VERTICAL
 
 BUTTON
+<<<<<<< HEAD
+80
+835
+167
+868
+=======
 8
 431
-95
+133
 464
+>>>>>>> fb4d8694caca2bd9ae86843329285816ed3fef73
 NIL
-save
+save_obstacles
 NIL
 1
 T
@@ -1106,12 +756,19 @@ NIL
 1
 
 BUTTON
-104
+<<<<<<< HEAD
+176
+835
+261
+868
+=======
+136
 431
-189
+260
 464
+>>>>>>> fb4d8694caca2bd9ae86843329285816ed3fef73
 NIL
-load
+load_obstacles
 NIL
 1
 T
@@ -1123,15 +780,236 @@ NIL
 1
 
 INPUTBOX
-173
-360
-256
-420
+182
+727
+265
+787
 save_number
-2
+1
 1
 0
 Number
+
+<<<<<<< HEAD
+TEXTBOX
+15
+141
+125
+159
+Species Control
+13
+0.0
+1
+
+SLIDER
+13
+379
+229
+412
+species_genetic_diversity
+species_genetic_diversity
+0
+1
+0.8
+0.1
+=======
+SLIDER
+1420
+54
+1592
+87
+patch_width
+patch_width
+4
+12
+4
+2
+1
+NIL
+HORIZONTAL
+
+SLIDER
+1419
+94
+1591
+127
+patch_height
+patch_height
+4
+12
+4
+2
+1
+NIL
+HORIZONTAL
+
+SLIDER
+1420
+163
+1592
+196
+patch_x
+patch_x
+1
+patch_width
+3
+1
+>>>>>>> fb4d8694caca2bd9ae86843329285816ed3fef73
+1
+NIL
+HORIZONTAL
+
+SLIDER
+<<<<<<< HEAD
+13
+418
+229
+451
+species_hatch_temperature
+species_hatch_temperature
+0
+25
+15
+1
+=======
+1421
+202
+1593
+235
+patch_y
+patch_y
+1
+patch_height
+1
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+1420
+241
+1592
+274
+patch_pH
+patch_pH
+0
+14
+1.7
+0.1
+>>>>>>> fb4d8694caca2bd9ae86843329285816ed3fef73
+1
+NIL
+HORIZONTAL
+
+<<<<<<< HEAD
+CHOOSER
+13
+466
+113
+511
+species_number
+species_number
+1 2 3 4 5
+1
+
+BUTTON
+133
+472
+196
+505
+Add
+add_species
+=======
+BUTTON
+1419
+323
+1515
+356
+NIL
+add_patch
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+SWITCH
+1606
+238
+1738
+271
+change-pH?
+change-pH?
+0
+1
+-1000
+
+CHOOSER
+1423
+370
+1561
+415
+Show:
+Show:
+"pH" "food" "temperature"
+1
+
+BUTTON
+1526
+323
+1658
+356
+NIL
+recolor_patches
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+8
+469
+131
+502
+NIL
+save_patches
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+136
+468
+259
+501
+NIL
+load_patches
+>>>>>>> fb4d8694caca2bd9ae86843329285816ed3fef73
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -1244,6 +1122,15 @@ Polygon -7500403 true true 200 193 197 249 179 249 177 196 166 187 140 189 93 19
 Polygon -7500403 true true 73 210 86 251 62 249 48 208
 Polygon -7500403 true true 25 114 16 195 9 204 23 213 25 200 39 123
 
+cyan_worm
+true
+0
+Polygon -11221820 true false 165 240 165 240 135 255 105 270 90 270 75 255 75 240 105 225 120 195 150 180 180 135 165 105 150 75 150 60 135 60 120 45 120 30 135 15 150 15 180 30 180 45 195 45 210 75 225 105 225 135 225 150 210 165 195 195 180 210
+Line -16777216 false 150 60 180 45
+Line -16777216 false 150 75 195 45
+Line -16777216 false 150 60 150 75
+Line -16777216 false 195 45 180 45
+
 cylinder
 false
 0
@@ -1253,6 +1140,7 @@ dot
 false
 0
 Circle -7500403 true true 90 90 120
+Circle -16777216 false false 90 90 120
 
 face happy
 false
@@ -1336,6 +1224,24 @@ true
 0
 Line -7500403 true 150 0 150 150
 
+magenta_worm
+true
+0
+Polygon -5825686 true false 165 240 165 240 135 255 105 270 90 270 75 255 75 240 105 225 120 195 150 180 180 135 165 105 150 75 150 60 135 60 120 45 120 30 135 15 150 15 180 30 180 45 195 45 210 75 225 105 225 135 225 150 210 165 195 195 180 210
+Line -16777216 false 150 60 180 45
+Line -16777216 false 150 75 195 45
+Line -16777216 false 150 60 150 75
+Line -16777216 false 195 45 180 45
+
+orange_worm
+true
+0
+Polygon -955883 true false 165 240 165 240 135 255 105 270 90 270 75 255 75 240 105 225 120 195 150 180 180 135 165 105 150 75 150 60 135 60 120 45 120 30 135 15 150 15 180 30 180 45 195 45 210 75 225 105 225 135 225 150 210 165 195 195 180 210
+Line -16777216 false 150 60 180 45
+Line -16777216 false 150 75 195 45
+Line -16777216 false 150 60 150 75
+Line -16777216 false 195 45 180 45
+
 pentagon
 false
 0
@@ -1350,6 +1256,15 @@ Rectangle -7500403 true true 127 79 172 94
 Polygon -7500403 true true 195 90 240 150 225 180 165 105
 Polygon -7500403 true true 105 90 60 150 75 180 135 105
 
+pink_worm
+true
+0
+Polygon -2064490 true false 165 240 165 240 135 255 105 270 90 270 75 255 75 240 105 225 120 195 150 180 180 135 165 105 150 75 150 60 135 60 120 45 120 30 135 15 150 15 180 30 180 45 195 45 210 75 225 105 225 135 225 150 210 165 195 195 180 210
+Line -16777216 false 150 60 180 45
+Line -16777216 false 150 75 195 45
+Line -16777216 false 150 60 150 75
+Line -16777216 false 195 45 180 45
+
 plant
 false
 0
@@ -1361,6 +1276,15 @@ Polygon -7500403 true true 165 180 165 210 225 180 255 120 210 135
 Polygon -7500403 true true 135 105 90 60 45 45 75 105 135 135
 Polygon -7500403 true true 165 105 165 135 225 105 255 45 210 60
 Polygon -7500403 true true 135 90 120 45 150 15 180 45 165 90
+
+red_worm
+true
+0
+Polygon -2674135 true false 165 240 165 240 135 255 105 270 90 270 75 255 75 240 105 225 120 195 150 180 180 135 165 105 150 75 150 60 135 60 120 45 120 30 135 15 150 15 180 30 180 45 195 45 210 75 225 105 225 135 225 150 210 165 195 195 180 210
+Line -16777216 false 150 60 180 45
+Line -16777216 false 150 75 195 45
+Line -16777216 false 150 60 150 75
+Line -16777216 false 195 45 180 45
 
 sheep
 false
@@ -1449,6 +1373,15 @@ Polygon -10899396 true false 132 85 134 64 107 51 108 17 150 2 192 18 192 52 169
 Polygon -10899396 true false 85 204 60 233 54 254 72 266 85 252 107 210
 Polygon -7500403 true true 119 75 179 75 209 101 224 135 220 225 175 261 128 261 81 224 74 135 88 99
 
+violet_worm
+true
+0
+Polygon -8630108 true false 165 240 165 240 135 255 105 270 90 270 75 255 75 240 105 225 120 195 150 180 180 135 165 105 150 75 150 60 135 60 120 45 120 30 135 15 150 15 180 30 180 45 195 45 210 75 225 105 225 135 225 150 210 165 195 195 180 210
+Line -16777216 false 150 60 180 45
+Line -16777216 false 150 75 195 45
+Line -16777216 false 150 60 150 75
+Line -16777216 false 195 45 180 45
+
 wheel
 false
 0
@@ -1469,11 +1402,6 @@ Polygon -16777216 true false 253 133 245 131 245 133
 Polygon -7500403 true true 2 194 13 197 30 191 38 193 38 205 20 226 20 257 27 265 38 266 40 260 31 253 31 230 60 206 68 198 75 209 66 228 65 243 82 261 84 268 100 267 103 261 77 239 79 231 100 207 98 196 119 201 143 202 160 195 166 210 172 213 173 238 167 251 160 248 154 265 169 264 178 247 186 240 198 260 200 271 217 271 219 262 207 258 195 230 192 198 210 184 227 164 242 144 259 145 284 151 277 141 293 140 299 134 297 127 273 119 270 105
 Polygon -7500403 true true -1 195 14 180 36 166 40 153 53 140 82 131 134 133 159 126 188 115 227 108 236 102 238 98 268 86 269 92 281 87 269 103 269 113
 
-worm
-true
-0
-Polygon -2674135 true false 150 210 150 225 120 255 90 270 75 270 60 255 60 240 90 225 105 195 135 180 165 135 150 105 135 75 135 60 120 60 105 45 105 30 120 15 135 15 165 30 165 45 180 45 195 75 210 105 210 135 210 150 195 165 180 195 165 210
-
 x
 false
 0
@@ -1485,6 +1413,18 @@ NetLogo 5.3.1
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
+<experiments>
+  <experiment name="experiment" repetitions="1" runMetricsEveryStep="false">
+    <setup>setup</setup>
+    <go>go</go>
+    <metric>year</metric>
+    <enumeratedValueSet variable="starting_day">
+      <value value="190"/>
+      <value value="100"/>
+      <value value="250"/>
+    </enumeratedValueSet>
+  </experiment>
+</experiments>
 @#$#@#$#@
 @#$#@#$#@
 default

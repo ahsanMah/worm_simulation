@@ -10,18 +10,47 @@ to setup
  reset-ticks
 end
 
-to save
+to save_obstacles
   let filename (word "myobstacle"  save_number ".csv")
   csv:to-file filename obstacle_list
   print "Saved to file"
 end
 
-to load
+to load_obstacles
   let filename (word "myobstacle"  save_number ".csv")
   set obstacle_list csv:from-file filename
   print "Loaded from file: "
   print obstacle_list
   draw_obstacles
+end
+
+to save_patches
+;  let filename (word "mypatches" save_number ".csv")
+;  let i min-pxcor
+;  let j min-pycor
+;  carefully [file-delete filename] []
+;  file-open filename
+;  while [(i <= max-pxcor)]
+;  [
+;   while [(j <= max-pycor)]
+;   [
+;     ask patch i j
+;     [
+;       let info (list ph food-here permeability local_death_threshold)
+;       file-open filename
+;       file-print csv:to-row info
+;       file-close
+;     ]
+;   ]
+;   set j min-pycor
+;  ]
+;
+end
+
+to load_patches
+  let filename (word "mypatches" save_number ".csv")
+
+
 end
 
 
@@ -48,22 +77,25 @@ to go
       ;show maturation
       ]
     move
-    recolor-patch
+
     set food-here food-here + organic-regen
+  ]
+  ask patches
+  [
+   recolor-patch
   ]
 
   tick
 end
-
 @#$#@#$#@
 GRAPHICS-WINDOW
 268
-14
-1086
-853
-50
-50
-8.0
+10
+1118
+881
+-1
+-1
+7.0
 1
 10
 1
@@ -73,20 +105,20 @@ GRAPHICS-WINDOW
 0
 0
 1
--50
-50
--50
-50
+0
+119
+0
+119
 1
 1
 1
 ticks
-1000.0
+120.0
 
 BUTTON
-13
+12
 10
-79
+78
 43
 Setup
 setup
@@ -101,9 +133,9 @@ NIL
 1
 
 BUTTON
-91
+95
 10
-150
+154
 44
 Go
 go
@@ -118,10 +150,10 @@ NIL
 1
 
 MONITOR
-1100
-50
-1208
-95
+1148
+54
+1256
+99
 Day Number
 day_num
 17
@@ -129,25 +161,25 @@ day_num
 11
 
 SLIDER
-14
-168
-228
-201
+10
+154
+230
+187
 worm_population
 worm_population
 0
 500
-300
+500
 10
 1
 NIL
 HORIZONTAL
 
 PLOT
-1099
-156
-1358
-325
+1147
+158
+1406
+327
 Worm Population for Current Year
 Day Number
 Population
@@ -167,25 +199,25 @@ PENS
 "pen-5" 1.0 0 -5825686 true "" "plotxy day_num (array:item population_arr 4)\nif (day_num = 365) [clear-plot]"
 
 SLIDER
-14
-214
-228
-247
+9
+201
+229
+234
 normal_reproduction_rate
 normal_reproduction_rate
 0
 1
-0.6
+0.5
 0.1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-13
-254
-227
-287
+9
+240
+231
+273
 max_reproduction_rate
 max_reproduction_rate
 0
@@ -197,10 +229,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-12
-294
-228
-327
+9
+280
+231
+313
 max_death_rate
 max_death_rate
 0
@@ -212,10 +244,10 @@ NIL
 HORIZONTAL
 
 MONITOR
-1101
-101
-1208
-146
+1149
+103
+1256
+148
 Population Count
 count adults
 17
@@ -223,10 +255,10 @@ count adults
 11
 
 PLOT
-1095
-334
-1359
-507
+1143
+336
+1407
+509
 Worm Population over Years
 NIL
 NIL
@@ -241,10 +273,10 @@ PENS
 "default" 1.0 1 -11221820 true "" "plotxy year count adults"
 
 PLOT
-1094
-510
-1361
-685
+1142
+512
+1409
+687
 Organic Material Over Time
 NIL
 NIL
@@ -259,10 +291,10 @@ PENS
 "default" 1.0 0 -16777216 true "" "plotxy ticks / (periods-in-day * 2 * steps-per-ie) (sum [food-here] of patches)"
 
 MONITOR
-1216
-101
-1314
-146
+1264
+103
+1362
+148
 Cocoon Count
 count cocoons
 17
@@ -270,10 +302,10 @@ count cocoons
 11
 
 INPUTBOX
-9
-58
-88
-118
+8
+57
+87
+117
 starting_day
 190
 1
@@ -281,10 +313,10 @@ starting_day
 Number
 
 MONITOR
-1216
-51
-1311
-96
+1264
+53
+1359
+98
 Daily Temp *C
 temperature
 2
@@ -292,80 +324,80 @@ temperature
 11
 
 CHOOSER
-8
-578
-149
-623
+9
+656
+150
+701
 obstacle_shape
 obstacle_shape
 "circle" "square" "horizontal-line" "vertical-line"
-0
+3
 
 SLIDER
-6
-630
-178
-663
+7
+708
+179
+741
 obstacle_size
 obstacle_size
 0
 50
-35
+34
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-6
-671
-178
-704
+7
+749
+179
+782
 obstacle_x
 obstacle_x
--50
-50
--35
+min-pxcor
+max-pxcor
+92
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-6
-710
-178
-743
+7
+788
+179
+821
 obstacle_y
 obstacle_y
 -50
 50
-38
+105
 1
 1
 HORIZONTAL
 HORIZONTAL
 
 SLIDER
-6
-710
-178
-743
+7
+788
+179
+821
 obstacle_y
 obstacle_y
--50
-50
-38
+min-pycor
+max-pycor
+105
 1
 1
 NIL
 HORIZONTAL
 
 INPUTBOX
-95
-59
-214
-119
+94
+58
+213
+118
 max_temperature
 20
 1
@@ -374,39 +406,24 @@ Number
 
 SLIDER
 9
-754
-181
-787
-obstacle_pH
-obstacle_pH
-0
-14
-3.8
-0.1
-1
-NIL
-HORIZONTAL
-
-SLIDER
-14
-336
-228
-369
+359
+223
+392
 speed
 speed
 0
-1
-0.2
-0.1
+0.5
+0.05
+0.01
 1
 NIL
 HORIZONTAL
 
 INPUTBOX
-185
-631
-235
-693
+8
+485
+129
+547
 number_of_obstacles
 4
 1
@@ -414,20 +431,20 @@ number_of_obstacles
 Number
 
 CHOOSER
-156
-577
-261
-622
+157
+655
+262
+700
 obstacle_number
 obstacle_number
 1 2 3 4 5 6 7 8 9 10
-0
+1
 
 BUTTON
-9
-836
-72
-869
+7
+826
+70
+859
 Add
 add_obstacle
 NIL
@@ -440,22 +457,11 @@ NIL
 NIL
 1
 
-SWITCH
-9
-795
-119
-828
-movement
-movement
-0
-1
--1000
-
 SLIDER
-1093
-690
-1126
-840
+1146
+692
+1179
+842
 January
 January
 -20
@@ -467,10 +473,10 @@ NIL
 VERTICAL
 
 SLIDER
-1134
-690
-1167
-840
+1187
+692
+1220
+842
 February
 February
 -20
@@ -482,10 +488,10 @@ NIL
 VERTICAL
 
 SLIDER
-1176
-691
-1209
-841
+1226
+692
+1259
+842
 March
 March
 -20
@@ -497,10 +503,10 @@ NIL
 VERTICAL
 
 SLIDER
-1219
-691
-1252
-841
+1267
+693
+1300
+843
 April
 April
 -20
@@ -512,10 +518,10 @@ NIL
 VERTICAL
 
 SLIDER
-1260
-691
-1293
-841
+1308
+693
+1341
+843
 May
 May
 -20
@@ -527,10 +533,10 @@ NIL
 VERTICAL
 
 SLIDER
-1300
-692
-1333
-842
+1348
+694
+1381
+844
 June
 June
 -20
@@ -542,10 +548,10 @@ NIL
 VERTICAL
 
 SLIDER
-1341
-692
-1374
-842
+1389
+694
+1422
+844
 July
 July
 -20
@@ -557,10 +563,10 @@ NIL
 VERTICAL
 
 SLIDER
-1382
-693
-1415
-843
+1430
+695
+1463
+845
 August
 August
 -20
@@ -572,10 +578,10 @@ NIL
 VERTICAL
 
 SLIDER
-1422
-694
-1455
-844
+1470
+696
+1503
+846
 September
 September
 -20
@@ -587,10 +593,10 @@ NIL
 VERTICAL
 
 SLIDER
-1463
-693
-1496
-843
+1511
+695
+1544
+845
 October
 October
 -20
@@ -602,10 +608,10 @@ NIL
 VERTICAL
 
 SLIDER
-1505
-693
-1538
-843
+1553
+695
+1586
+845
 November
 November
 -20
@@ -617,10 +623,10 @@ NIL
 VERTICAL
 
 SLIDER
-1546
-693
-1579
-843
+1594
+695
+1627
+845
 December
 December
 -20
@@ -632,12 +638,12 @@ NIL
 VERTICAL
 
 BUTTON
-80
-835
-167
-868
+9
+555
+134
+588
 NIL
-save
+save_obstacles
 NIL
 1
 T
@@ -649,12 +655,12 @@ NIL
 1
 
 BUTTON
-176
-835
+137
+555
 261
-868
+588
 NIL
-load
+load_obstacles
 NIL
 1
 T
@@ -666,46 +672,159 @@ NIL
 1
 
 INPUTBOX
-182
-727
-265
-787
+169
+486
+252
+546
 save_number
-2
+1
 1
 0
 Number
 
+SLIDER
+1420
+54
+1592
+87
+patch_width
+patch_width
+4
+12
+4
+2
+1
+NIL
+HORIZONTAL
+
+SLIDER
+1419
+94
+1591
+127
+patch_height
+patch_height
+4
+12
+4
+2
+1
+NIL
+HORIZONTAL
+
+SLIDER
+1420
+163
+1592
+196
+patch_x
+patch_x
+1
+patch_width
+3
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+1421
+202
+1593
+235
+patch_y
+patch_y
+1
+patch_height
+1
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+1420
+241
+1592
+274
+patch_pH
+patch_pH
+0
+14
+1.7
+0.1
+1
+NIL
+HORIZONTAL
+
+BUTTON
+1419
+323
+1515
+356
+NIL
+add_patch
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+SWITCH
+1606
+238
+1738
+271
+change-pH?
+change-pH?
+0
+1
+-1000
+
+CHOOSER
+1423
+370
+1561
+415
+Show:
+Show:
+"pH" "food" "temperature"
+1
+
 TEXTBOX
-15
-141
-125
-159
+10
+129
+120
+147
 Species Control
 13
 0.0
 1
 
 SLIDER
-13
-379
-229
-412
+10
+318
+226
+351
 species_genetic_diversity
 species_genetic_diversity
 0
 1
-0.8
+0.9
 0.1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-13
-418
-229
-451
+9
+396
+225
+429
 species_hatch_temperature
 species_hatch_temperature
 0
@@ -718,21 +837,72 @@ HORIZONTAL
 
 CHOOSER
 13
-466
+431
 113
-511
+476
 species_number
 species_number
 1 2 3 4 5
 1
 
 BUTTON
-133
+131
+439
+194
 472
-196
-505
 Add
 add_species
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+1526
+323
+1658
+356
+NIL
+recolor_patches
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+9
+593
+132
+626
+NIL
+save_patches
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+138
+594
+261
+627
+load_patches
+load_patches
 NIL
 1
 T
@@ -857,7 +1027,7 @@ Polygon -7500403 true true 25 114 16 195 9 204 23 213 25 200 39 123
 cyan_worm
 true
 0
-Polygon -11221820 true false 165 240 165 240 135 255 105 270 90 270 75 255 75 240 105 225 120 195 150 180 180 135 165 105 150 75 150 60 135 60 120 45 120 30 135 15 150 15 180 30 180 45 195 45 210 75 225 105 225 135 225 150 210 165 195 195 180 210
+Polygon -11221820 true false 165 240 135 255 105 270 90 270 75 255 75 240 105 225 120 195 150 180 180 135 165 105 150 75 150 60 135 60 120 45 120 30 135 15 150 15 180 30 180 45 195 45 210 75 225 105 225 135 225 150 210 165 195 195 180 210
 Line -16777216 false 150 60 180 45
 Line -16777216 false 150 75 195 45
 Line -16777216 false 150 60 150 75
@@ -958,7 +1128,7 @@ Line -7500403 true 150 0 150 150
 magenta_worm
 true
 0
-Polygon -5825686 true false 165 240 165 240 135 255 105 270 90 270 75 255 75 240 105 225 120 195 150 180 180 135 165 105 150 75 150 60 135 60 120 45 120 30 135 15 150 15 180 30 180 45 195 45 210 75 225 105 225 135 225 150 210 165 195 195 180 210
+Polygon -5825686 true false 165 240 135 255 105 270 90 270 75 255 75 240 105 225 120 195 150 180 180 135 165 105 150 75 150 60 135 60 120 45 120 30 135 15 150 15 180 30 180 45 195 45 210 75 225 105 225 135 225 150 210 165 195 195 180 210
 Line -16777216 false 150 60 180 45
 Line -16777216 false 150 75 195 45
 Line -16777216 false 150 60 150 75
@@ -967,7 +1137,7 @@ Line -16777216 false 195 45 180 45
 orange_worm
 true
 0
-Polygon -955883 true false 165 240 165 240 135 255 105 270 90 270 75 255 75 240 105 225 120 195 150 180 180 135 165 105 150 75 150 60 135 60 120 45 120 30 135 15 150 15 180 30 180 45 195 45 210 75 225 105 225 135 225 150 210 165 195 195 180 210
+Polygon -955883 true false 165 240 135 255 105 270 90 270 75 255 75 240 105 225 120 195 150 180 180 135 165 105 150 75 150 60 135 60 120 45 120 30 135 15 150 15 180 30 180 45 195 45 210 75 225 105 225 135 225 150 210 165 195 195 180 210
 Line -16777216 false 150 60 180 45
 Line -16777216 false 150 75 195 45
 Line -16777216 false 150 60 150 75
@@ -990,7 +1160,7 @@ Polygon -7500403 true true 105 90 60 150 75 180 135 105
 pink_worm
 true
 0
-Polygon -2064490 true false 165 240 165 240 135 255 105 270 90 270 75 255 75 240 105 225 120 195 150 180 180 135 165 105 150 75 150 60 135 60 120 45 120 30 135 15 150 15 180 30 180 45 195 45 210 75 225 105 225 135 225 150 210 165 195 195 180 210
+Polygon -2064490 true false 165 240 135 255 105 270 90 270 75 255 75 240 105 225 120 195 150 180 180 135 165 105 150 75 150 60 135 60 120 45 120 30 135 15 150 15 180 30 180 45 195 45 210 75 225 105 225 135 225 150 210 165 195 195 180 210
 Line -16777216 false 150 60 180 45
 Line -16777216 false 150 75 195 45
 Line -16777216 false 150 60 150 75
@@ -1011,7 +1181,7 @@ Polygon -7500403 true true 135 90 120 45 150 15 180 45 165 90
 red_worm
 true
 0
-Polygon -2674135 true false 165 240 165 240 135 255 105 270 90 270 75 255 75 240 105 225 120 195 150 180 180 135 165 105 150 75 150 60 135 60 120 45 120 30 135 15 150 15 180 30 180 45 195 45 210 75 225 105 225 135 225 150 210 165 195 195 180 210
+Polygon -2674135 true false 165 240 135 255 105 270 90 270 75 255 75 240 105 225 120 195 150 180 180 135 165 105 150 75 150 60 135 60 120 45 120 30 135 15 150 15 180 30 180 45 195 45 210 75 225 105 225 135 225 150 210 165 195 195 180 210
 Line -16777216 false 150 60 180 45
 Line -16777216 false 150 75 195 45
 Line -16777216 false 150 60 150 75
@@ -1107,7 +1277,7 @@ Polygon -7500403 true true 119 75 179 75 209 101 224 135 220 225 175 261 128 261
 violet_worm
 true
 0
-Polygon -8630108 true false 165 240 165 240 135 255 105 270 90 270 75 255 75 240 105 225 120 195 150 180 180 135 165 105 150 75 150 60 135 60 120 45 120 30 135 15 150 15 180 30 180 45 195 45 210 75 225 105 225 135 225 150 210 165 195 195 180 210
+Polygon -8630108 true false 165 240 135 255 105 270 90 270 75 255 75 240 105 225 120 195 150 180 180 135 165 105 150 75 150 60 135 60 120 45 120 30 135 15 150 15 180 30 180 45 195 45 210 75 225 105 225 135 225 150 210 165 195 195 180 210
 Line -16777216 false 150 60 180 45
 Line -16777216 false 150 75 195 45
 Line -16777216 false 150 60 150 75
