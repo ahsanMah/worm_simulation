@@ -11,7 +11,7 @@ to setup
 end
 
 to save_obstacles
-  let filename (word "data/parameters/myobstacle"  save_number ".csv")
+  let filename (word "myobstacle"  save_number ".csv")
   csv:to-file filename obstacle_list
   print "Saved to file"
 end
@@ -21,10 +21,11 @@ to load_obstacles
   set obstacle_list csv:from-file filename
   print "Loaded from file: "
   print obstacle_list
-  draw_obstacles
+  ;;draw_obstacles
 end
 
 to save_patches
+  save_obstacles
   let filename (word "mypatches" save_number ".csv")
   let i min-pxcor
   let j min-pycor
@@ -50,6 +51,7 @@ to save_patches
 end
 
 to load_patches
+  load_obstacles
   let filename (word "mypatches" save_number ".csv")
   let data csv:from-file filename
   foreach (data)
@@ -58,7 +60,7 @@ to load_patches
     [
       set ph item 2 ?
       set food-here item 3 ?
-      ;;set permeability item 4 ?
+      set permeability item 4 ?
       set local_death_threshold item 5 ?
     ]
   ]
@@ -248,7 +250,7 @@ max_death_rate
 max_death_rate
 0
 100
-30
+12
 1
 1
 NIL
@@ -318,7 +320,7 @@ INPUTBOX
 87
 117
 starting_day
-190
+120
 1
 0
 Number
@@ -335,70 +337,70 @@ temperature
 11
 
 CHOOSER
-9
-656
-150
-701
+6
+618
+147
+663
 obstacle_shape
 obstacle_shape
-"circle" "square" "horizontal-line" "vertical-line"
+"lake" "mountain" "square" "horizontal-line" "vertical-line"
 0
 
 SLIDER
-7
-708
-179
-741
+4
+670
+176
+703
 obstacle_size
 obstacle_size
 0
 50
-16
+6
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-7
-749
-179
-782
+4
+711
+176
+744
 obstacle_x
 obstacle_x
 min-pxcor
 max-pxcor
-38
+101
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-7
-788
-179
-821
+4
+750
+176
+783
 obstacle_y
 obstacle_y
 -50
 50
-24
+20
 1
 1
 HORIZONTAL
 HORIZONTAL
 
 SLIDER
-7
-788
-179
-821
+4
+750
+176
+783
 obstacle_y
 obstacle_y
 min-pycor
 max-pycor
-24
+20
 1
 1
 NIL
@@ -430,21 +432,11 @@ speed
 NIL
 HORIZONTAL
 
-CHOOSER
-157
-655
-262
-700
-obstacle_number
-obstacle_number
-1 2 3 4 5 6 7 8 9 10
-1
-
 BUTTON
-7
+196
+793
+259
 826
-70
-859
 Add
 add_obstacle
 NIL
@@ -637,40 +629,6 @@ December
 NIL
 VERTICAL
 
-BUTTON
-8
-574
-133
-607
-Save Obstacles
-save_obstacles
-NIL
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
-
-BUTTON
-136
-574
-262
-607
-Load Obstacles
-load_obstacles
-NIL
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
-
 INPUTBOX
 12
 506
@@ -683,30 +641,15 @@ save_number
 Number
 
 SLIDER
-1420
-54
-1592
-87
-patch_width
-patch_width
+1421
+56
+1600
+89
+num_patches_horizontal
+num_patches_horizontal
 4
 12
-6
-2
-1
-NIL
-HORIZONTAL
-
-SLIDER
-1419
-94
-1591
-127
-patch_height
-patch_height
 4
-12
-6
 2
 1
 NIL
@@ -714,14 +657,44 @@ HORIZONTAL
 
 SLIDER
 1420
-163
-1592
-196
+96
+1600
+129
+num_patches_vertical
+num_patches_vertical
+4
+12
+4
+2
+1
+NIL
+HORIZONTAL
+
+SLIDER
+1421
+165
+1593
+198
 patch_x
 patch_x
 1
-patch_width
-3
+num_patches_horizontal
+4
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+1422
+204
+1594
+237
+patch_y
+patch_y
+1
+num_patches_vertical
+4
 1
 1
 NIL
@@ -729,40 +702,25 @@ HORIZONTAL
 
 SLIDER
 1421
-202
+243
 1593
-235
-patch_y
-patch_y
-1
-patch_height
-1
-1
-1
-NIL
-HORIZONTAL
-
-SLIDER
-1420
-241
-1592
-274
+276
 patch_pH
 patch_pH
 0
 14
-1.7
+5.3
 0.1
 1
 NIL
 HORIZONTAL
 
 BUTTON
-1419
-323
-1515
-356
-NIL
+1417
+359
+1513
+392
+Add Patch
 add_patch
 NIL
 1
@@ -775,10 +733,10 @@ NIL
 1
 
 SWITCH
-1606
-238
-1738
-271
+1607
+240
+1739
+273
 change-pH?
 change-pH?
 0
@@ -786,14 +744,14 @@ change-pH?
 -1000
 
 CHOOSER
-1423
-370
-1561
-415
+1421
+406
+1559
+451
 Show:
 Show:
 "pH" "food" "temperature"
-1
+0
 
 TEXTBOX
 10
@@ -863,11 +821,11 @@ NIL
 1
 
 BUTTON
-1526
-323
-1658
-356
-NIL
+1524
+359
+1656
+392
+Recolor Patches
 recolor_patches
 NIL
 1
@@ -880,11 +838,11 @@ NIL
 1
 
 BUTTON
-8
-612
-131
-645
-Save Patches
+6
+575
+128
+608
+Save Environment
 save_patches
 NIL
 1
@@ -897,11 +855,11 @@ NIL
 1
 
 BUTTON
-135
-613
-260
-646
-Load Patches
+132
+575
+258
+608
+Load Environment
 load_patches
 NIL
 1
@@ -912,6 +870,21 @@ NIL
 NIL
 NIL
 1
+
+SLIDER
+5
+792
+177
+825
+min_ph
+min_ph
+0
+7
+1.2
+0.1
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
