@@ -70,11 +70,14 @@ end
 to save_agents
   let filename (word "data/parameters/myagents"  save_number ".csv")
   csv:to-file filename species_list
+  ;save_data ;species_list
   print "Saved to file"
+
 end
 
 to load_agents
   let filename (word "data/parameters/myagents"  save_number ".csv")
+
   set species_list csv:from-file filename
   print "Loaded from file: "
   print species_list
@@ -83,14 +86,15 @@ end
 
 to save_data
   let filename (word "data/output/simulation"  save_number ".csv")
-  csv:to-file filename species_list
+  show output_data
+  csv:to-file filename output_data
   print "Saved to file"
 end
 
 to go
 
   calculate_time
-  if (year = 10) [stop]
+  if (year = 10) [stop] ;save data + export-interface
   if (count turtles = 0) [stop]
 
   if (ticks mod (2 * periods-in-day) = 0) [
@@ -107,7 +111,7 @@ to go
     if (ticks mod (2 * periods-in-day) = 0) [
       update_maturity
       update_thresholds
-      ;show maturation
+      show maturation
       ]
     move
 
@@ -115,6 +119,9 @@ to go
   ]
   ask patches
   [
+    ;if month
+      ;if patch belongs to monitor
+      ;concat data_list
    recolor-patch
   ]
 
@@ -821,7 +828,7 @@ CHOOSER
 species_number
 species_number
 1 2 3 4 5
-2
+0
 
 BUTTON
 128
