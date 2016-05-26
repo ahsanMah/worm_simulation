@@ -90,7 +90,7 @@ to calculate_temp
       set current_month (current_month + 1) mod 12
       set day_of_month 0
     ]
-    set temperature random-normal (item current_month temperatures) (1)
+    set temperature random-normal (item current_month temperatures) (2)
 ;    set temperature (4 * var * (180 - var)) / (40500 - var * (180 - var))
 ;    set temperature temperature * max_temperature ;scales temperature to real world values
 
@@ -101,8 +101,8 @@ to add_obstacle
   array:set temp_arr 1 obstacle_size
   array:set temp_arr 2 obstacle_x
   array:set temp_arr 3 obstacle_y
-  array:set temp_arr 4 0
-  array:set temp_arr 5 false
+  array:set temp_arr 4 obstacle_pH
+  array:set temp_arr 5 movement
 
   set obstacle array:to-list temp_arr
   set obstacle_list replace-item (obstacle_number - 1) obstacle_list obstacle
@@ -112,13 +112,6 @@ to add_obstacle
 
  draw_obstacles
 
-end
-
-to recolor_patches
-  ask patches
-  [
-   recolor-patch 
-  ]
 end
 
 to draw_obstacles
@@ -163,55 +156,13 @@ end
 to recolor-patch
   ifelse (permeability != 0)
   [
-    if (Show: = "pH")
-    [
-      if (ph = 7)
-      [
-       set pcolor white 
-      ]
-      if (ph > 7)
-      [
-       set pcolor scale-color violet ph 16 7 
-      ]
-      if (ph < 7)
-      [
-       set pcolor scale-color yellow ph -2 7
-      ]
-    ]
-    if (Show: = "food")
-    [
-      set pcolor scale-color green food-here 600 0
-    ]
+    set pcolor scale-color green food-here 600 0
+    if (ph != 7) [ set pcolor scale-color violet food-here 600 0]
 
   ]
   [
     set pcolor blue
   ]
-end
-
-to add_patch
-  let var_x ((max-pxcor + 1) / patch_width * (patch_x - 1))
-  let var_y ((max-pycor + 1) / patch_height * (patch_y - 1))
-  let i var_x
-  let j var_y
-  while [i < var_x + max-pxcor / patch_width]
-  [
-   while [j < var_y + max-pycor / patch_height]
-   [
-    ask (patch i j)
-    [
-      if change-pH?
-      [
-        set pH patch_pH
-      ]
-      recolor-patch
-    ] 
-    set j j + 1
-   ] 
-   set i i + 1
-   set j var_y
-  ]
-  
 end
 
 
@@ -239,7 +190,7 @@ to setup-obstacles [one_obstacle]
           set permeability 0
           ask turtles-here [die]
           ]
-        ;;set ph random-normal temp_pH 1
+        set ph random-normal temp_pH 1
 
       ]
     ]
@@ -254,7 +205,7 @@ to setup-obstacles [one_obstacle]
           set permeability 0
           ask turtles-here [die]
           ]
-        ;;set ph random-normal temp_pH 1
+        set ph random-normal temp_pH 1
 
       ]
     ]
@@ -270,7 +221,7 @@ to setup-obstacles [one_obstacle]
           set permeability 0
           ask turtles-here [die]
         ]
-        ;;set ph random-normal temp_pH 1
+        set ph random-normal temp_pH 1
       ]
 
     ]
@@ -285,12 +236,10 @@ to setup-obstacles [one_obstacle]
           set permeability 0
           ask turtles-here [die]
         ]
-        ;;set ph random-normal temp_pH 1 
-      ]
+        set ph random-normal temp_pH 1 ]
     ]
   ]
 end
-
 
 
 

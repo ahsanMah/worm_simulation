@@ -10,18 +10,47 @@ to setup
  reset-ticks
 end
 
-to save
+to save_obstacles
   let filename (word "myobstacle"  save_number ".csv")
   csv:to-file filename obstacle_list
   print "Saved to file"
 end
 
-to load
+to load_obstacles
   let filename (word "myobstacle"  save_number ".csv")
   set obstacle_list csv:from-file filename
   print "Loaded from file: "
   print obstacle_list
   draw_obstacles
+end
+
+to save_patches
+;  let filename (word "mypatches" save_number ".csv")
+;  let i min-pxcor
+;  let j min-pycor
+;  carefully [file-delete filename] []
+;  file-open filename
+;  while [(i <= max-pxcor)]
+;  [
+;   while [(j <= max-pycor)]
+;   [
+;     ask patch i j
+;     [
+;       let info (list ph food-here permeability local_death_threshold)
+;       file-open filename
+;       file-print csv:to-row info
+;       file-close
+;     ]
+;   ]
+;   set j min-pycor
+;  ]
+;
+end
+
+to load_patches
+  let filename (word "mypatches" save_number ".csv")
+
+
 end
 
 
@@ -48,23 +77,26 @@ to go
       ;show maturation
       ]
     move
-    recolor-patch
+
     set food-here food-here + organic-regen
+  ]
+  ask patches
+  [
+   recolor-patch
   ]
 
   tick
 end
 
-
 @#$#@#$#@
 GRAPHICS-WINDOW
-267
+268
 10
-1085
-849
-50
-50
-8.0
+1118
+881
+-1
+-1
+7.0
 1
 10
 1
@@ -74,15 +106,15 @@ GRAPHICS-WINDOW
 0
 0
 1
--50
-50
--50
-50
+0
+119
+0
+119
 1
 1
 1
 ticks
-1000.0
+120.0
 
 BUTTON
 11
@@ -119,10 +151,10 @@ NIL
 1
 
 MONITOR
-1100
-50
-1208
-95
+1148
+54
+1256
+99
 Day Number
 day_num
 17
@@ -145,10 +177,10 @@ NIL
 HORIZONTAL
 
 PLOT
-1099
-156
-1358
-325
+1147
+158
+1406
+327
 Worm Population for Current Year
 Day Number
 Population
@@ -208,10 +240,10 @@ NIL
 HORIZONTAL
 
 MONITOR
-1101
-101
-1208
-146
+1149
+103
+1256
+148
 Population Count
 count adults
 17
@@ -219,10 +251,10 @@ count adults
 11
 
 PLOT
-1095
-334
-1359
-507
+1143
+336
+1407
+509
 Worm Population over Years
 NIL
 NIL
@@ -237,10 +269,10 @@ PENS
 "default" 1.0 1 -11221820 true "" "plotxy year count adults"
 
 PLOT
-1094
-510
-1361
-685
+1142
+512
+1409
+687
 Organic Material Over Time
 NIL
 NIL
@@ -255,10 +287,10 @@ PENS
 "default" 1.0 0 -16777216 true "" "plotxy ticks / (periods-in-day * 2 * steps-per-ie) (sum [food-here] of patches)"
 
 MONITOR
-1216
-101
-1314
-146
+1264
+103
+1362
+148
 Cocoon Count
 count cocoons
 17
@@ -277,10 +309,10 @@ starting_day
 Number
 
 MONITOR
-1216
-51
-1311
-96
+1264
+53
+1359
+98
 Daily Temp *C
 temperature
 2
@@ -288,70 +320,70 @@ temperature
 11
 
 CHOOSER
-7
-473
-148
-518
+8
+532
+149
+577
 obstacle_shape
 obstacle_shape
 "circle" "square" "horizontal-line" "vertical-line"
-0
+3
 
 SLIDER
-5
-525
-177
-558
+6
+584
+178
+617
 obstacle_size
 obstacle_size
 0
 50
-35
+34
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-5
-566
-177
-599
+6
+625
+178
+658
 obstacle_x
 obstacle_x
--50
-50
--35
+min-pxcor
+max-pxcor
+92
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-5
-605
-177
-638
+6
+664
+178
+697
 obstacle_y
 obstacle_y
 -50
 50
-38
+105
 1
 1
 HORIZONTAL
 HORIZONTAL
 
 SLIDER
-5
-605
-177
-638
+6
+664
+178
+697
 obstacle_y
 obstacle_y
--50
-50
-38
+min-pycor
+max-pycor
+105
 1
 1
 NIL
@@ -369,21 +401,6 @@ max_temperature
 Number
 
 SLIDER
-8
-649
-180
-682
-obstacle_pH
-obstacle_pH
-0
-14
-3.8
-0.1
-1
-NIL
-HORIZONTAL
-
-SLIDER
 9
 258
 181
@@ -391,9 +408,9 @@ SLIDER
 speed
 speed
 0
-1
-0.1
-0.1
+0.5
+0.05
+0.01
 1
 NIL
 HORIZONTAL
@@ -410,20 +427,20 @@ number_of_obstacles
 Number
 
 CHOOSER
-155
-472
-260
-517
+156
+531
+261
+576
 obstacle_number
 obstacle_number
 1 2 3 4 5 6 7 8 9 10
-0
+1
 
 BUTTON
-8
-731
-71
-764
+6
+702
+69
+735
 Add
 add_obstacle
 NIL
@@ -436,22 +453,11 @@ NIL
 NIL
 1
 
-SWITCH
-8
-690
-118
-723
-movement
-movement
-0
-1
--1000
-
 SLIDER
-1093
-690
-1126
-840
+1146
+692
+1179
+842
 January
 January
 -20
@@ -463,10 +469,10 @@ NIL
 VERTICAL
 
 SLIDER
-1134
-690
-1167
-840
+1187
+692
+1220
+842
 February
 February
 -20
@@ -478,10 +484,10 @@ NIL
 VERTICAL
 
 SLIDER
-1176
-691
-1209
-841
+1226
+692
+1259
+842
 March
 March
 -20
@@ -493,10 +499,10 @@ NIL
 VERTICAL
 
 SLIDER
-1219
-691
-1252
-841
+1267
+693
+1300
+843
 April
 April
 -20
@@ -508,10 +514,10 @@ NIL
 VERTICAL
 
 SLIDER
-1260
-691
-1293
-841
+1308
+693
+1341
+843
 May
 May
 -20
@@ -523,10 +529,10 @@ NIL
 VERTICAL
 
 SLIDER
-1300
-692
-1333
-842
+1348
+694
+1381
+844
 June
 June
 -20
@@ -538,10 +544,10 @@ NIL
 VERTICAL
 
 SLIDER
-1341
-692
-1374
-842
+1389
+694
+1422
+844
 July
 July
 -20
@@ -553,10 +559,10 @@ NIL
 VERTICAL
 
 SLIDER
-1382
-693
-1415
-843
+1430
+695
+1463
+845
 August
 August
 -20
@@ -568,10 +574,10 @@ NIL
 VERTICAL
 
 SLIDER
-1422
-694
-1455
-844
+1470
+696
+1503
+846
 September
 September
 -20
@@ -583,10 +589,10 @@ NIL
 VERTICAL
 
 SLIDER
-1463
-693
-1496
-843
+1511
+695
+1544
+845
 October
 October
 -20
@@ -598,10 +604,10 @@ NIL
 VERTICAL
 
 SLIDER
-1505
-693
-1538
-843
+1553
+695
+1586
+845
 November
 November
 -20
@@ -613,10 +619,10 @@ NIL
 VERTICAL
 
 SLIDER
-1546
-693
-1579
-843
+1594
+695
+1627
+845
 December
 December
 -20
@@ -630,10 +636,10 @@ VERTICAL
 BUTTON
 8
 431
-95
+133
 464
 NIL
-save
+save_obstacles
 NIL
 1
 T
@@ -645,12 +651,12 @@ NIL
 1
 
 BUTTON
-104
+136
 431
-189
+260
 464
 NIL
-load
+load_obstacles
 NIL
 1
 T
@@ -667,10 +673,174 @@ INPUTBOX
 256
 420
 save_number
-2
+1
 1
 0
 Number
+
+SLIDER
+1420
+54
+1592
+87
+patch_width
+patch_width
+4
+12
+4
+2
+1
+NIL
+HORIZONTAL
+
+SLIDER
+1419
+94
+1591
+127
+patch_height
+patch_height
+4
+12
+4
+2
+1
+NIL
+HORIZONTAL
+
+SLIDER
+1420
+163
+1592
+196
+patch_x
+patch_x
+1
+patch_width
+3
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+1421
+202
+1593
+235
+patch_y
+patch_y
+1
+patch_height
+1
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+1420
+241
+1592
+274
+patch_pH
+patch_pH
+0
+14
+1.7
+0.1
+1
+NIL
+HORIZONTAL
+
+BUTTON
+1419
+323
+1515
+356
+NIL
+add_patch
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+SWITCH
+1606
+238
+1738
+271
+change-pH?
+change-pH?
+0
+1
+-1000
+
+CHOOSER
+1423
+370
+1561
+415
+Show:
+Show:
+"pH" "food" "temperature"
+1
+
+BUTTON
+1526
+323
+1658
+356
+NIL
+recolor_patches
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+8
+469
+131
+502
+NIL
+save_patches
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+136
+468
+259
+501
+NIL
+load_patches
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -792,6 +962,7 @@ dot
 false
 0
 Circle -7500403 true true 90 90 120
+Circle -16777216 false false 90 90 120
 
 face happy
 false
