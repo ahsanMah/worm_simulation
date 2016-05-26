@@ -13,18 +13,25 @@ globals [
   steps-per-ie
   max_stamina
   min_stamina
-  name
+  
+  new_species
   species_list
-  species_genetic_diversity 
-  species_hatch_temp
-  species_number
+  population_arr
+
+  temp_number
+  temp_genetic_diversity 
+  temp_hatch_temperature
+  temp_population
+  
+  shape_list
+  color_list
+  
   ]
 
 
 
 breed [cocoons]
 breed [adults]
-;breed [species_2]
 
 turtles-own [
   death_p     ;probability of death
@@ -45,6 +52,7 @@ turtles-own [
   low_temp_resist
   max_ph_resist
   parent_breed
+  ;population
   
   ]
 
@@ -52,7 +60,7 @@ to setup_agents
   set normal_death_threshold 0.685 / (2 * periods-in-day) ; Simulates a 4 year life span
   set death_threshold normal_death_threshold
   set reprod_threshold normal_reproduction_rate ; Simulates successful births
-  set species_list[[1 0.4 10] [2 0.9 15]]
+  
   set steps-per-ie 5
   set max_stamina (2 * steps-per-ie)
   set min_stamina 1
@@ -61,55 +69,50 @@ to setup_agents
   set amount_egested 1
   set consumption-in-period 1
   
-  
-  
-  foreach species_list [create_species ?]
-  
-; create-adults worm_population[
-;    move-to one-of patches with [permeability > 0]
-;    set size 1
-;    set shape "worm"
-;
-;    set maturation 70
-;    set wait_period 15 + (random 50) ;simulates a wait period of 15 to 65 days 
-;    set hatch_temp 15
-;    set stamina 6
-;    set food-consumed-last 0
-;    set iseating? one-of[true false]
-;    set cycle-counter (random (steps-per-ie + 1))
-;    ;;set speed 0.3;; / 5
-;    
-;    set parent_breed breed
-;    set genetic_diversity 0.9 ; 0-1 measure of genetic diversity of the species
-;    set max_temp_resist random-normal 25 (2 * genetic_diversity)
-;    set low_temp_resist random-normal 5 (2 * genetic_diversity)
-;    set max_ph_resist random-normal 5 (2 * genetic_diversity)
-;   ]
+  set species_list []
+  set population_arr array:from-list n-values 5 [0]
+  set shape_list (list "red_worm" "cyan_worm" "pink_worm" "orange_worm" "magenta_worm" "violet_worm")
+  set color_list (list red cyan pink orange magenta violet)
+  ;foreach species_list [create_species ?]
 end
+
+to add_species
+  set new_species (list species_number species_genetic_diversity species_hatch_temperature worm_population)
+  set species_list lput new_species species_list
+  array:set population_arr (species_number - 1) worm_population
+  show species_list
+  create_species new_species
+
+end
+
 
 to create_species [species]
   
-  set species_number item 0 species
-  set species_genetic_diversity item 1 species
-  set species_hatch_temp item 2 species
+  set temp_number item 0 species
+  set temp_genetic_diversity item 1 species
+  set temp_hatch_temperature item 2 species
+  set temp_population item 3 species
   
- create-adults worm_population[
+ create-adults temp_population[
+    set parent_breed (temp_number - 1)
     move-to one-of patches with [permeability > 0]
     set size 1
-    ifelse (species_number = 1) [set shape "worm"]
-    [set color blue]
+;    if(temp_number = 1) [set shape "worm"]
+;    [set color blue]
+    
+    set shape (item parent_breed shape_list)
 
     set maturation 70
     set wait_period 15 + (random 50) ;simulates a wait period of 15 to 65 days 
-    set hatch_temp species_hatch_temp
+    set hatch_temp temp_hatch_temperature
     set stamina 6
     set food-consumed-last 0
     set iseating? one-of[true false]
     set cycle-counter (random (steps-per-ie + 1))
     ;;set speed 0.3;; / 5
     
-    set parent_breed species_number
-    set genetic_diversity species_genetic_diversity ; 0-1 measure of genetic diversity of the species
+    ;set population temp_population
+    set genetic_diversity temp_genetic_diversity ; 0-1 measure of genetic diversity of the species
     set max_temp_resist random-normal 25 (2 * genetic_diversity)
     set low_temp_resist random-normal 5 (2 * genetic_diversity)
     set max_ph_resist random-normal 5 (2 * genetic_diversity)
@@ -190,14 +193,17 @@ end
 
 to check_death  
   random-seed new-seed
-  set var random-float 100
+  set death_p random-float 100
   
-  ifelse (stamina < min_stamina) [die] ;; dies if out of energy
+  ifelse (stamina < min_stamina) [
+    array:set population_arr parent_breed ((array:item population_arr parent_breed) - 1)
+    die
+    ] ;; dies if out of energy
   [
-    if (var < death_p) [
-      ;show max_temp_resist
+    if (death_p < death_threshold) [
+      array:set population_arr parent_breed ((array:item population_arr parent_breed) - 1)
       die
-      ] ;; dies of cold/natural causes
+      ] ;; dies of cold/pH/natural causes
     ] 
   
   end
@@ -223,16 +229,16 @@ to update_thresholds
   
   ;set death_threshold (max_death_rate / 20) * temperature
   
-  ifelse (temperature > max_temp_resist) [ set death_p max_death_rate / (2 * periods-in-day)]
+  ifelse (temperature > max_temp_resist) [ set death_threshold max_death_rate / (2 * periods-in-day)]
   [
-    ifelse (temperature < low_temp_resist) [ set death_p max_death_rate / (2 * periods-in-day)]
-    [set death_p normal_death_threshold]
+    ifelse (temperature < low_temp_resist) [ set death_threshold max_death_rate / (2 * periods-in-day)]
+    [set death_threshold normal_death_threshold]
   ]
   
     ;;pH of soil also affects survival rate
   if (ph < max_ph_resist) [
     set var abs (max_ph_resist - ph)
-    set death_p (death_p + (random 55) / max_ph_resist * var ) ; +55% chance of them dying at pH of 0
+    set death_threshold (death_threshold + (random 55) / max_ph_resist * var ) ; +55% chance of them dying at pH of 0
   ]
   
   
@@ -264,8 +270,8 @@ to check_if_hatch
       if (wait_days = wait_period) [
         set breed adults
         set size 1
-        ifelse (parent_breed = 1) [set shape "worm"]
-        [set color blue]
+        set shape (item parent_breed shape_list)
+        array:set population_arr parent_breed ((array:item population_arr parent_breed) + 1)
       ]
     ] ;[if (wait_days < 3) [set wait_period wait_period - 1] ] ;to minimize affect by random fluctuations
 end

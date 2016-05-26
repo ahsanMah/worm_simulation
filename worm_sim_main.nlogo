@@ -55,13 +55,12 @@ to go
   tick
 end
 
-
 @#$#@#$#@
 GRAPHICS-WINDOW
-267
-10
-1085
-849
+268
+14
+1086
+853
 50
 50
 8.0
@@ -85,10 +84,10 @@ ticks
 1000.0
 
 BUTTON
-11
-383
-77
-416
+13
+10
+79
+43
 Setup
 setup
 NIL
@@ -102,10 +101,10 @@ NIL
 1
 
 BUTTON
-94
-383
-153
-417
+91
+10
+150
+44
 Go
 go
 T
@@ -130,15 +129,15 @@ day_num
 11
 
 SLIDER
-9
-86
-229
-119
+14
+168
+228
+201
 worm_population
 worm_population
 0
 500
-500
+300
 10
 1
 NIL
@@ -161,27 +160,32 @@ false
 "" ""
 PENS
 "default" 1.0 0 -16777216 true "" "plotxy day_num count adults\nif (day_num = 365) [clear-plot]"
+"pen-1" 1.0 0 -2674135 true "" "plotxy day_num (array:item population_arr 0)\nif (day_num = 365) [clear-plot]"
+"pen-2" 1.0 0 -11221820 true "" "plotxy day_num (array:item population_arr 1)\nif (day_num = 365) [clear-plot]"
+"pen-3" 1.0 0 -2064490 true "" "plotxy day_num (array:item population_arr 2)\nif (day_num = 365) [clear-plot]"
+"pen-4" 1.0 0 -955883 true "" "plotxy day_num (array:item population_arr 3)\nif (day_num = 365) [clear-plot]"
+"pen-5" 1.0 0 -5825686 true "" "plotxy day_num (array:item population_arr 4)\nif (day_num = 365) [clear-plot]"
 
 SLIDER
-8
-133
+14
+214
 228
-166
+247
 normal_reproduction_rate
 normal_reproduction_rate
 0
 1
-0.5
+0.6
 0.1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-8
-172
-230
-205
+13
+254
+227
+287
 max_reproduction_rate
 max_reproduction_rate
 0
@@ -193,10 +197,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-8
-212
-230
-245
+12
+294
+228
+327
 max_death_rate
 max_death_rate
 0
@@ -267,9 +271,9 @@ count cocoons
 
 INPUTBOX
 9
-10
+58
 88
-70
+118
 starting_day
 190
 1
@@ -288,20 +292,20 @@ temperature
 11
 
 CHOOSER
-7
-473
-148
-518
+8
+578
+149
+623
 obstacle_shape
 obstacle_shape
 "circle" "square" "horizontal-line" "vertical-line"
 0
 
 SLIDER
-5
-525
-177
-558
+6
+630
+178
+663
 obstacle_size
 obstacle_size
 0
@@ -313,10 +317,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-5
-566
-177
-599
+6
+671
+178
+704
 obstacle_x
 obstacle_x
 -50
@@ -328,10 +332,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-5
-605
-177
-638
+6
+710
+178
+743
 obstacle_y
 obstacle_y
 -50
@@ -343,10 +347,10 @@ HORIZONTAL
 HORIZONTAL
 
 SLIDER
-5
-605
-177
-638
+6
+710
+178
+743
 obstacle_y
 obstacle_y
 -50
@@ -359,9 +363,9 @@ HORIZONTAL
 
 INPUTBOX
 95
-11
+59
 214
-71
+119
 max_temperature
 20
 1
@@ -369,10 +373,10 @@ max_temperature
 Number
 
 SLIDER
-8
-649
-180
-682
+9
+754
+181
+787
 obstacle_pH
 obstacle_pH
 0
@@ -384,25 +388,25 @@ NIL
 HORIZONTAL
 
 SLIDER
-9
-258
-181
-291
+14
+336
+228
+369
 speed
 speed
 0
 1
-0.1
+0.2
 0.1
 1
 NIL
 HORIZONTAL
 
 INPUTBOX
-3
-310
-124
-372
+185
+631
+235
+693
 number_of_obstacles
 4
 1
@@ -410,20 +414,20 @@ number_of_obstacles
 Number
 
 CHOOSER
-155
-472
-260
-517
+156
+577
+261
+622
 obstacle_number
 obstacle_number
 1 2 3 4 5 6 7 8 9 10
 0
 
 BUTTON
-8
-731
-71
-764
+9
+836
+72
+869
 Add
 add_obstacle
 NIL
@@ -437,10 +441,10 @@ NIL
 1
 
 SWITCH
-8
-690
-118
-723
+9
+795
+119
+828
 movement
 movement
 0
@@ -628,10 +632,10 @@ NIL
 VERTICAL
 
 BUTTON
-8
-431
-95
-464
+80
+835
+167
+868
 NIL
 save
 NIL
@@ -645,10 +649,10 @@ NIL
 1
 
 BUTTON
-104
-431
-189
-464
+176
+835
+261
+868
 NIL
 load
 NIL
@@ -662,15 +666,82 @@ NIL
 1
 
 INPUTBOX
-173
-360
-256
-420
+182
+727
+265
+787
 save_number
 2
 1
 0
 Number
+
+TEXTBOX
+15
+141
+125
+159
+Species Control
+13
+0.0
+1
+
+SLIDER
+13
+379
+229
+412
+species_genetic_diversity
+species_genetic_diversity
+0
+1
+0.8
+0.1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+13
+418
+229
+451
+species_hatch_temperature
+species_hatch_temperature
+0
+25
+15
+1
+1
+NIL
+HORIZONTAL
+
+CHOOSER
+13
+466
+113
+511
+species_number
+species_number
+1 2 3 4 5
+1
+
+BUTTON
+133
+472
+196
+505
+Add
+add_species
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -783,6 +854,15 @@ Polygon -7500403 true true 200 193 197 249 179 249 177 196 166 187 140 189 93 19
 Polygon -7500403 true true 73 210 86 251 62 249 48 208
 Polygon -7500403 true true 25 114 16 195 9 204 23 213 25 200 39 123
 
+cyan_worm
+true
+0
+Polygon -11221820 true false 165 240 165 240 135 255 105 270 90 270 75 255 75 240 105 225 120 195 150 180 180 135 165 105 150 75 150 60 135 60 120 45 120 30 135 15 150 15 180 30 180 45 195 45 210 75 225 105 225 135 225 150 210 165 195 195 180 210
+Line -16777216 false 150 60 180 45
+Line -16777216 false 150 75 195 45
+Line -16777216 false 150 60 150 75
+Line -16777216 false 195 45 180 45
+
 cylinder
 false
 0
@@ -875,6 +955,24 @@ true
 0
 Line -7500403 true 150 0 150 150
 
+magenta_worm
+true
+0
+Polygon -5825686 true false 165 240 165 240 135 255 105 270 90 270 75 255 75 240 105 225 120 195 150 180 180 135 165 105 150 75 150 60 135 60 120 45 120 30 135 15 150 15 180 30 180 45 195 45 210 75 225 105 225 135 225 150 210 165 195 195 180 210
+Line -16777216 false 150 60 180 45
+Line -16777216 false 150 75 195 45
+Line -16777216 false 150 60 150 75
+Line -16777216 false 195 45 180 45
+
+orange_worm
+true
+0
+Polygon -955883 true false 165 240 165 240 135 255 105 270 90 270 75 255 75 240 105 225 120 195 150 180 180 135 165 105 150 75 150 60 135 60 120 45 120 30 135 15 150 15 180 30 180 45 195 45 210 75 225 105 225 135 225 150 210 165 195 195 180 210
+Line -16777216 false 150 60 180 45
+Line -16777216 false 150 75 195 45
+Line -16777216 false 150 60 150 75
+Line -16777216 false 195 45 180 45
+
 pentagon
 false
 0
@@ -889,6 +987,15 @@ Rectangle -7500403 true true 127 79 172 94
 Polygon -7500403 true true 195 90 240 150 225 180 165 105
 Polygon -7500403 true true 105 90 60 150 75 180 135 105
 
+pink_worm
+true
+0
+Polygon -2064490 true false 165 240 165 240 135 255 105 270 90 270 75 255 75 240 105 225 120 195 150 180 180 135 165 105 150 75 150 60 135 60 120 45 120 30 135 15 150 15 180 30 180 45 195 45 210 75 225 105 225 135 225 150 210 165 195 195 180 210
+Line -16777216 false 150 60 180 45
+Line -16777216 false 150 75 195 45
+Line -16777216 false 150 60 150 75
+Line -16777216 false 195 45 180 45
+
 plant
 false
 0
@@ -900,6 +1007,15 @@ Polygon -7500403 true true 165 180 165 210 225 180 255 120 210 135
 Polygon -7500403 true true 135 105 90 60 45 45 75 105 135 135
 Polygon -7500403 true true 165 105 165 135 225 105 255 45 210 60
 Polygon -7500403 true true 135 90 120 45 150 15 180 45 165 90
+
+red_worm
+true
+0
+Polygon -2674135 true false 165 240 165 240 135 255 105 270 90 270 75 255 75 240 105 225 120 195 150 180 180 135 165 105 150 75 150 60 135 60 120 45 120 30 135 15 150 15 180 30 180 45 195 45 210 75 225 105 225 135 225 150 210 165 195 195 180 210
+Line -16777216 false 150 60 180 45
+Line -16777216 false 150 75 195 45
+Line -16777216 false 150 60 150 75
+Line -16777216 false 195 45 180 45
 
 sheep
 false
@@ -988,6 +1104,15 @@ Polygon -10899396 true false 132 85 134 64 107 51 108 17 150 2 192 18 192 52 169
 Polygon -10899396 true false 85 204 60 233 54 254 72 266 85 252 107 210
 Polygon -7500403 true true 119 75 179 75 209 101 224 135 220 225 175 261 128 261 81 224 74 135 88 99
 
+violet_worm
+true
+0
+Polygon -8630108 true false 165 240 165 240 135 255 105 270 90 270 75 255 75 240 105 225 120 195 150 180 180 135 165 105 150 75 150 60 135 60 120 45 120 30 135 15 150 15 180 30 180 45 195 45 210 75 225 105 225 135 225 150 210 165 195 195 180 210
+Line -16777216 false 150 60 180 45
+Line -16777216 false 150 75 195 45
+Line -16777216 false 150 60 150 75
+Line -16777216 false 195 45 180 45
+
 wheel
 false
 0
@@ -1007,11 +1132,6 @@ false
 Polygon -16777216 true false 253 133 245 131 245 133
 Polygon -7500403 true true 2 194 13 197 30 191 38 193 38 205 20 226 20 257 27 265 38 266 40 260 31 253 31 230 60 206 68 198 75 209 66 228 65 243 82 261 84 268 100 267 103 261 77 239 79 231 100 207 98 196 119 201 143 202 160 195 166 210 172 213 173 238 167 251 160 248 154 265 169 264 178 247 186 240 198 260 200 271 217 271 219 262 207 258 195 230 192 198 210 184 227 164 242 144 259 145 284 151 277 141 293 140 299 134 297 127 273 119 270 105
 Polygon -7500403 true true -1 195 14 180 36 166 40 153 53 140 82 131 134 133 159 126 188 115 227 108 236 102 238 98 268 86 269 92 281 87 269 103 269 113
-
-worm
-true
-0
-Polygon -2674135 true false 150 210 150 225 120 255 90 270 75 270 60 255 60 240 90 225 105 195 135 180 165 135 150 105 135 75 135 60 120 60 105 45 105 30 120 15 135 15 165 30 165 45 180 45 195 75 210 105 210 135 210 150 195 165 180 195 165 210
 
 x
 false
