@@ -25,34 +25,45 @@ to load_obstacles
 end
 
 to save_patches
-;  let filename (word "mypatches" save_number ".csv")
-;  let i min-pxcor
-;  let j min-pycor
-;  carefully [file-delete filename] []
-;  file-open filename
-;  while [(i <= max-pxcor)]
-;  [
-;   while [(j <= max-pycor)]
-;   [
-;     ask patch i j
-;     [
-;       let info (list ph food-here permeability local_death_threshold)
-;       file-open filename
-;       file-print csv:to-row info
-;       file-close
-;     ]
-;   ]
-;   set j min-pycor
-;  ]
-;
+  let filename (word "mypatches" save_number ".csv")
+  let i min-pxcor
+  let j min-pycor
+  carefully [file-delete filename] []
+  file-open filename
+  while [(i <= max-pxcor)]
+  [
+   while [(j <= max-pycor)]
+   [
+     ask patch i j
+     [
+       let info (list i j ph food-here permeability local_death_threshold)
+       file-open filename
+       file-print csv:to-row info
+       file-close
+       set j j + 1
+     ]
+   ]
+   set j min-pycor
+   set i i + 1
+  ]
+
 end
 
 to load_patches
   let filename (word "mypatches" save_number ".csv")
-
-
+  let data csv:from-file filename
+  foreach (data)
+  [
+    ask patch (item 0 ?) (item 1 ?)
+    [
+      set ph item 2 ?
+      set food-here item 3 ?
+      ;;set permeability item 4 ?
+      set local_death_threshold item 5 ?
+    ]
+  ]
+  recolor_patches
 end
-
 
 to go
 
