@@ -11,7 +11,7 @@ to setup
 end
 
 to save_obstacles
-  let filename (word "myobstacle"  save_number ".csv")
+  let filename (word "data/parameters/myobstacle"  save_number ".csv")
   csv:to-file filename obstacle_list
   print "Saved to file"
 end
