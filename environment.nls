@@ -42,7 +42,7 @@ to setup_environment
   
   set day_num starting_day
   set year 0
-  set periods-in-day 10
+  set periods-in-day 4;;0
 
   set temperatures (list January February March April May June July August September October November December)
   set num_days (list 31 28 31 30 31 30 31 31 30 31 30 31)
@@ -101,7 +101,10 @@ to add_obstacle
   set obstacle (list obstacle_shape obstacle_size obstacle_x obstacle_y 0 false) 
   set obstacle_list lput obstacle obstacle_list
   show obstacle_list
-  draw_obstacles
+  
+  ask patches [setup-obstacles obstacle]
+  recolor_patches
+  ;draw_obstacles
 
 end
 
@@ -115,9 +118,8 @@ end
 to draw_obstacles
     ask patches [
     foreach obstacle_list [setup-obstacles ? ]
-
-    recolor-patch
     ]
+    recolor_patches
 
 end
 
@@ -152,7 +154,7 @@ to setup-initial-food
 end
 
 to recolor-patch
-  ifelse (permeability != 0)
+  ifelse (permeability  > 0.05)
   [
     if (Show: = "pH")
     [
@@ -181,13 +183,13 @@ to recolor-patch
 end
 
 to add_patch
-  let var_x ((max-pxcor + 1) / patch_width * (patch_x - 1))
-  let var_y ((max-pycor + 1) / patch_height * (patch_y - 1))
+  let var_x ((max-pxcor + 1) / num_patches_horizontal * (patch_x - 1))
+  let var_y ((max-pycor + 1) / num_patches_vertical * (patch_y - 1))
   let i var_x
   let j var_y
-  while [i < var_x + max-pxcor / patch_width]
+  while [i < var_x + max-pxcor / num_patches_horizontal]
   [
-   while [j < var_y + max-pycor / patch_height]
+   while [j < var_y + max-pycor / num_patches_vertical]
    [
     ask (patch i j)
     [
@@ -220,26 +222,35 @@ to setup-obstacles [one_obstacle]
     set temp_movable item 5 one_obstacle
 
 
-    if temp_shape = "circle"
+    if temp_shape = "mountain"
     [
-      if (distancexy temp_x temp_y) < temp_size [
-        ifelse temp_movable [
-         set permeability 1
-         ]
-        [ set food-here 0
-          set permeability 0
-          ask turtles-here [die]
-          ]
-        ;;set ph random-normal temp_pH 1
-
+      if (distancexy temp_x temp_y) < temp_size 
+      [
+          set permeability 1
+          set ph (ph - ((ph - min_ph) / temp_size) * (temp_size - distancexy temp_x temp_y) )
+          ;; set temperature later 
       ]
     ]
+    
+    if temp_shape = "lake"
+    [
+      if (distancexy temp_x temp_y) < temp_size 
+      [
+        set permeability 0.05
+        set food-here 0
+        set ph 7
+        ask turtles-here [die]
+        
+      ]
+    ]
+    
+    
     if temp_shape = "square"
     [
       if pxcor >= temp_x - temp_size and pxcor <= temp_x + temp_size and pycor >= temp_y - temp_size and pycor <= temp_y + temp_size
       [
         ifelse temp_movable [
-         set permeability 1
+         set permeability 0.05
          ]
         [ set food-here 0
           set permeability 0
@@ -255,7 +266,7 @@ to setup-obstacles [one_obstacle]
       if distancexy temp_x temp_y <= temp_size and temp_y = pycor
       [
         ifelse temp_movable [
-          set permeability 1
+          set permeability 0.05
         ]
         [ set food-here 0
           set permeability 0
@@ -270,7 +281,7 @@ to setup-obstacles [one_obstacle]
       if distancexy temp_x temp_y <= temp_size and temp_x = pxcor
       [
         ifelse temp_movable [
-          set permeability 1
+          set permeability 0.05
         ]
         [ set food-here 0
           set permeability 0

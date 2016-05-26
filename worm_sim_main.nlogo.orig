@@ -11,7 +11,11 @@ to setup
 end
 
 to save_obstacles
+<<<<<<< HEAD
+  let filename (word "/data/parameters/myobstacle"  save_number ".csv")
+=======
   let filename (word "myobstacle"  save_number ".csv")
+>>>>>>> 6aebccf614ebf72321f17e2bba26a839fa6469d5
   csv:to-file filename obstacle_list
   print "Saved to file"
 end
@@ -21,38 +25,71 @@ to load_obstacles
   set obstacle_list csv:from-file filename
   print "Loaded from file: "
   print obstacle_list
-  draw_obstacles
+  ;;draw_obstacles
 end
 
 to save_patches
-;  let filename (word "mypatches" save_number ".csv")
-;  let i min-pxcor
-;  let j min-pycor
-;  carefully [file-delete filename] []
-;  file-open filename
-;  while [(i <= max-pxcor)]
-;  [
-;   while [(j <= max-pycor)]
-;   [
-;     ask patch i j
-;     [
-;       let info (list ph food-here permeability local_death_threshold)
-;       file-open filename
-;       file-print csv:to-row info
-;       file-close
-;     ]
-;   ]
-;   set j min-pycor
-;  ]
-;
+  save_obstacles
+  let filename (word "mypatches" save_number ".csv")
+  let i min-pxcor
+  let j min-pycor
+  carefully [file-delete filename] []
+  file-open filename
+  while [(i <= max-pxcor)]
+  [
+   while [(j <= max-pycor)]
+   [
+     ask patch i j
+     [
+       let info (list i j ph food-here permeability local_death_threshold)
+       file-open filename
+       file-print csv:to-row info
+       file-close
+       set j j + 1
+     ]
+   ]
+   set j min-pycor
+   set i i + 1
+  ]
+
 end
 
 to load_patches
+  load_obstacles
   let filename (word "mypatches" save_number ".csv")
-
-
+  let data csv:from-file filename
+  foreach (data)
+  [
+    ask patch (item 0 ?) (item 1 ?)
+    [
+      set ph item 2 ?
+      set food-here item 3 ?
+      set permeability item 4 ?
+      set local_death_threshold item 5 ?
+    ]
+  ]
+  recolor_patches
 end
 
+to save_agents
+  let filename (word "data/parameters/myagents"  save_number ".csv")
+  csv:to-file filename species_list
+  print "Saved to file"
+end
+
+to load_agents
+  let filename (word "data/parameters/myagents"  save_number ".csv")
+  set species_list csv:from-file filename
+  print "Loaded from file: "
+  print species_list
+  foreach species_list [create_species ?]
+end
+
+to save_data
+  let filename (word "data/output/simulation"  save_number ".csv")
+  csv:to-file filename species_list
+  print "Saved to file"
+end
 
 to go
 
@@ -87,25 +124,15 @@ to go
 
   tick
 end
-
 @#$#@#$#@
 GRAPHICS-WINDOW
 268
-<<<<<<< HEAD
-14
-1086
-853
-50
-50
-8.0
-=======
 10
 1118
 881
 -1
 -1
 7.0
->>>>>>> fb4d8694caca2bd9ae86843329285816ed3fef73
 1
 10
 1
@@ -123,12 +150,12 @@ GRAPHICS-WINDOW
 1
 1
 ticks
-120.0
+1000.0
 
 BUTTON
-13
+12
 10
-79
+78
 43
 Setup
 setup
@@ -143,9 +170,9 @@ NIL
 1
 
 BUTTON
-91
+95
 10
-150
+154
 44
 Go
 go
@@ -171,15 +198,15 @@ day_num
 11
 
 SLIDER
-14
-168
-228
-201
+9
+152
+208
+185
 worm_population
 worm_population
 0
 500
-300
+160
 10
 1
 NIL
@@ -209,25 +236,25 @@ PENS
 "pen-5" 1.0 0 -5825686 true "" "plotxy day_num (array:item population_arr 4)\nif (day_num = 365) [clear-plot]"
 
 SLIDER
-14
-214
-228
-247
+8
+194
+209
+227
 normal_reproduction_rate
 normal_reproduction_rate
 0
 1
-0.6
+0.5
 0.1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-13
-254
-227
-287
+8
+233
+208
+266
 max_reproduction_rate
 max_reproduction_rate
 0
@@ -239,15 +266,15 @@ NIL
 HORIZONTAL
 
 SLIDER
-12
-294
-228
-327
+8
+273
+207
+306
 max_death_rate
 max_death_rate
 0
 100
-30
+12
 1
 1
 NIL
@@ -312,12 +339,12 @@ count cocoons
 11
 
 INPUTBOX
-9
-58
-88
-118
+8
+57
+87
+117
 starting_day
-190
+120
 1
 0
 Number
@@ -334,110 +361,101 @@ temperature
 11
 
 CHOOSER
-8
+6
+618
+147
+663
+obstacle_shape
+obstacle_shape
 <<<<<<< HEAD
-578
-149
-623
-=======
-532
-149
-577
->>>>>>> fb4d8694caca2bd9ae86843329285816ed3fef73
-obstacle_shape
-obstacle_shape
 "circle" "square" "horizontal-line" "vertical-line"
-3
+1
+=======
+"lake" "mountain" "square" "horizontal-line" "vertical-line"
+0
+>>>>>>> 6aebccf614ebf72321f17e2bba26a839fa6469d5
 
 SLIDER
-6
-<<<<<<< HEAD
-630
-178
-663
-=======
-584
-178
-617
->>>>>>> fb4d8694caca2bd9ae86843329285816ed3fef73
+4
+670
+176
+703
 obstacle_size
 obstacle_size
 0
 50
-34
+<<<<<<< HEAD
+19
+=======
+6
+>>>>>>> 6aebccf614ebf72321f17e2bba26a839fa6469d5
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-6
-<<<<<<< HEAD
-671
-178
-704
-=======
-625
-178
-658
->>>>>>> fb4d8694caca2bd9ae86843329285816ed3fef73
+4
+711
+176
+744
 obstacle_x
 obstacle_x
 min-pxcor
 max-pxcor
-92
+<<<<<<< HEAD
+77
+=======
+101
+>>>>>>> 6aebccf614ebf72321f17e2bba26a839fa6469d5
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-6
-<<<<<<< HEAD
-710
-178
-743
-=======
-664
-178
-697
->>>>>>> fb4d8694caca2bd9ae86843329285816ed3fef73
+4
+750
+176
+783
 obstacle_y
 obstacle_y
 -50
 50
-105
+<<<<<<< HEAD
+98
+=======
+20
+>>>>>>> 6aebccf614ebf72321f17e2bba26a839fa6469d5
 1
 1
 HORIZONTAL
 HORIZONTAL
 
 SLIDER
-6
-<<<<<<< HEAD
-710
-178
-743
-=======
-664
-178
-697
->>>>>>> fb4d8694caca2bd9ae86843329285816ed3fef73
+4
+750
+176
+783
 obstacle_y
 obstacle_y
 min-pycor
 max-pycor
-105
+<<<<<<< HEAD
+98
+=======
+20
+>>>>>>> 6aebccf614ebf72321f17e2bba26a839fa6469d5
 1
 1
 NIL
 HORIZONTAL
 
 INPUTBOX
-95
-59
-214
-119
+94
+58
+213
+118
 max_temperature
 20
 1
@@ -445,86 +463,25 @@ max_temperature
 Number
 
 SLIDER
-9
-<<<<<<< HEAD
-754
-181
-787
-obstacle_pH
-obstacle_pH
-0
-14
-3.8
-0.1
-1
-NIL
-HORIZONTAL
-
-SLIDER
-14
-336
-228
-369
-speed
-speed
-0
-1
-0.2
-0.1
-=======
-258
-181
-291
+8
+352
+207
+385
 speed
 speed
 0
 0.5
-0.05
+0.12
 0.01
->>>>>>> fb4d8694caca2bd9ae86843329285816ed3fef73
 1
 NIL
 HORIZONTAL
 
-INPUTBOX
-185
-631
-235
-693
-number_of_obstacles
-4
-1
-0
-Number
-
-CHOOSER
-156
-<<<<<<< HEAD
-577
-261
-622
-=======
-531
-261
-576
->>>>>>> fb4d8694caca2bd9ae86843329285816ed3fef73
-obstacle_number
-obstacle_number
-1 2 3 4 5 6 7 8 9 10
-1
-
 BUTTON
-<<<<<<< HEAD
-9
-836
-72
-869
-=======
-6
-702
-69
-735
->>>>>>> fb4d8694caca2bd9ae86843329285816ed3fef73
+196
+793
+259
+826
 Add
 add_obstacle
 NIL
@@ -537,20 +494,6 @@ NIL
 NIL
 1
 
-<<<<<<< HEAD
-SWITCH
-9
-795
-119
-828
-movement
-movement
-0
-1
--1000
-
-=======
->>>>>>> fb4d8694caca2bd9ae86843329285816ed3fef73
 SLIDER
 1146
 692
@@ -731,202 +674,106 @@ December
 NIL
 VERTICAL
 
-BUTTON
-<<<<<<< HEAD
-80
-835
-167
-868
-=======
-8
-431
-133
-464
->>>>>>> fb4d8694caca2bd9ae86843329285816ed3fef73
-NIL
-save_obstacles
-NIL
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
-
-BUTTON
-<<<<<<< HEAD
-176
-835
-261
-868
-=======
-136
-431
-260
-464
->>>>>>> fb4d8694caca2bd9ae86843329285816ed3fef73
-NIL
-load_obstacles
-NIL
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
-
 INPUTBOX
-182
-727
-265
-787
+11
+509
+94
+569
 save_number
-1
+4
 1
 0
 Number
 
-<<<<<<< HEAD
-TEXTBOX
-15
-141
-125
-159
-Species Control
-13
-0.0
-1
-
 SLIDER
-13
-379
-229
-412
-species_genetic_diversity
-species_genetic_diversity
-0
-1
-0.8
-0.1
-=======
-SLIDER
-1420
-54
-1592
-87
-patch_width
-patch_width
-4
-12
-4
-2
-1
-NIL
-HORIZONTAL
-
-SLIDER
-1419
-94
-1591
-127
-patch_height
-patch_height
-4
-12
-4
-2
-1
-NIL
-HORIZONTAL
-
-SLIDER
-1420
-163
-1592
-196
-patch_x
-patch_x
-1
-patch_width
-3
-1
->>>>>>> fb4d8694caca2bd9ae86843329285816ed3fef73
-1
-NIL
-HORIZONTAL
-
-SLIDER
-<<<<<<< HEAD
-13
-418
-229
-451
-species_hatch_temperature
-species_hatch_temperature
-0
-25
-15
-1
-=======
 1421
-202
-1593
-235
-patch_y
-patch_y
-1
-patch_height
-1
-1
+56
+1600
+89
+num_patches_horizontal
+num_patches_horizontal
+4
+12
+4
+2
 1
 NIL
 HORIZONTAL
 
 SLIDER
 1420
-241
-1592
-274
+96
+1600
+129
+num_patches_vertical
+num_patches_vertical
+4
+12
+4
+2
+1
+NIL
+HORIZONTAL
+
+SLIDER
+1421
+165
+1593
+198
+patch_x
+patch_x
+1
+num_patches_horizontal
+4
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+1422
+204
+1594
+237
+patch_y
+patch_y
+1
+<<<<<<< HEAD
+patch_height
+=======
+num_patches_vertical
+>>>>>>> 6aebccf614ebf72321f17e2bba26a839fa6469d5
+4
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+1421
+243
+1593
+276
 patch_pH
 patch_pH
 0
 14
-1.7
+<<<<<<< HEAD
+3.1
+=======
+5.3
+>>>>>>> 6aebccf614ebf72321f17e2bba26a839fa6469d5
 0.1
->>>>>>> fb4d8694caca2bd9ae86843329285816ed3fef73
 1
 NIL
 HORIZONTAL
 
-<<<<<<< HEAD
-CHOOSER
-13
-466
-113
-511
-species_number
-species_number
-1 2 3 4 5
-1
-
 BUTTON
-133
-472
-196
-505
-Add
-add_species
-=======
-BUTTON
-1419
-323
-1515
-356
-NIL
+1417
+359
+1513
+392
+Add Patch
 add_patch
 NIL
 1
@@ -939,10 +786,10 @@ NIL
 1
 
 SWITCH
-1606
-238
-1738
-271
+1607
+240
+1739
+273
 change-pH?
 change-pH?
 0
@@ -950,21 +797,88 @@ change-pH?
 -1000
 
 CHOOSER
-1423
-370
-1561
-415
+1421
+406
+1559
+451
 Show:
 Show:
 "pH" "food" "temperature"
+0
+
+TEXTBOX
+10
+129
+120
+147
+Species Control
+13
+0.0
+1
+
+SLIDER
+9
+311
+205
+344
+species_genetic_diversity
+species_genetic_diversity
+0
+1
+0.6
+0.1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+8
+389
+207
+422
+species_hatch_temperature
+species_hatch_temperature
+0
+25
+11
+1
+1
+NIL
+HORIZONTAL
+
+CHOOSER
+10
+459
+110
+504
+species_number
+species_number
+1 2 3 4 5
+2
+
+BUTTON
+128
+467
+191
+500
+Add
+add_species
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
 1
 
 BUTTON
-1526
-323
-1658
-356
-NIL
+1524
+359
+1656
+392
+Recolor Patches
 recolor_patches
 NIL
 1
@@ -977,11 +891,11 @@ NIL
 1
 
 BUTTON
-8
-469
-131
-502
-NIL
+6
+575
+128
+608
+Save Environment
 save_patches
 NIL
 1
@@ -994,13 +908,12 @@ NIL
 1
 
 BUTTON
-136
-468
-259
-501
-NIL
+132
+575
+258
+608
+Load Environment
 load_patches
->>>>>>> fb4d8694caca2bd9ae86843329285816ed3fef73
 NIL
 1
 T
@@ -1011,6 +924,86 @@ NIL
 NIL
 1
 
+SLIDER
+<<<<<<< HEAD
+9
+423
+101
+456
+start_x
+start_x
+0
+119
+46
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+115
+424
+207
+457
+start_y
+start_y
+0
+119
+97
+1
+=======
+5
+792
+177
+825
+min_ph
+min_ph
+0
+7
+1.2
+0.1
+>>>>>>> 6aebccf614ebf72321f17e2bba26a839fa6469d5
+1
+NIL
+HORIZONTAL
+
+<<<<<<< HEAD
+BUTTON
+130
+505
+193
+538
+Save
+save_agents
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+196
+505
+259
+538
+Load
+load_agents
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+=======
+>>>>>>> 6aebccf614ebf72321f17e2bba26a839fa6469d5
 @#$#@#$#@
 ## WHAT IS IT?
 
@@ -1125,7 +1118,7 @@ Polygon -7500403 true true 25 114 16 195 9 204 23 213 25 200 39 123
 cyan_worm
 true
 0
-Polygon -11221820 true false 165 240 165 240 135 255 105 270 90 270 75 255 75 240 105 225 120 195 150 180 180 135 165 105 150 75 150 60 135 60 120 45 120 30 135 15 150 15 180 30 180 45 195 45 210 75 225 105 225 135 225 150 210 165 195 195 180 210
+Polygon -11221820 true false 165 240 135 255 105 270 90 270 75 255 75 240 105 225 120 195 150 180 180 135 165 105 150 75 150 60 135 60 120 45 120 30 135 15 150 15 180 30 180 45 195 45 210 75 225 105 225 135 225 150 210 165 195 195 180 210
 Line -16777216 false 150 60 180 45
 Line -16777216 false 150 75 195 45
 Line -16777216 false 150 60 150 75
@@ -1140,7 +1133,6 @@ dot
 false
 0
 Circle -7500403 true true 90 90 120
-Circle -16777216 false false 90 90 120
 
 face happy
 false
@@ -1227,7 +1219,7 @@ Line -7500403 true 150 0 150 150
 magenta_worm
 true
 0
-Polygon -5825686 true false 165 240 165 240 135 255 105 270 90 270 75 255 75 240 105 225 120 195 150 180 180 135 165 105 150 75 150 60 135 60 120 45 120 30 135 15 150 15 180 30 180 45 195 45 210 75 225 105 225 135 225 150 210 165 195 195 180 210
+Polygon -5825686 true false 165 240 135 255 105 270 90 270 75 255 75 240 105 225 120 195 150 180 180 135 165 105 150 75 150 60 135 60 120 45 120 30 135 15 150 15 180 30 180 45 195 45 210 75 225 105 225 135 225 150 210 165 195 195 180 210
 Line -16777216 false 150 60 180 45
 Line -16777216 false 150 75 195 45
 Line -16777216 false 150 60 150 75
@@ -1236,7 +1228,7 @@ Line -16777216 false 195 45 180 45
 orange_worm
 true
 0
-Polygon -955883 true false 165 240 165 240 135 255 105 270 90 270 75 255 75 240 105 225 120 195 150 180 180 135 165 105 150 75 150 60 135 60 120 45 120 30 135 15 150 15 180 30 180 45 195 45 210 75 225 105 225 135 225 150 210 165 195 195 180 210
+Polygon -955883 true false 165 240 135 255 105 270 90 270 75 255 75 240 105 225 120 195 150 180 180 135 165 105 150 75 150 60 135 60 120 45 120 30 135 15 150 15 180 30 180 45 195 45 210 75 225 105 225 135 225 150 210 165 195 195 180 210
 Line -16777216 false 150 60 180 45
 Line -16777216 false 150 75 195 45
 Line -16777216 false 150 60 150 75
@@ -1259,7 +1251,7 @@ Polygon -7500403 true true 105 90 60 150 75 180 135 105
 pink_worm
 true
 0
-Polygon -2064490 true false 165 240 165 240 135 255 105 270 90 270 75 255 75 240 105 225 120 195 150 180 180 135 165 105 150 75 150 60 135 60 120 45 120 30 135 15 150 15 180 30 180 45 195 45 210 75 225 105 225 135 225 150 210 165 195 195 180 210
+Polygon -2064490 true false 165 240 135 255 105 270 90 270 75 255 75 240 105 225 120 195 150 180 180 135 165 105 150 75 150 60 135 60 120 45 120 30 135 15 150 15 180 30 180 45 195 45 210 75 225 105 225 135 225 150 210 165 195 195 180 210
 Line -16777216 false 150 60 180 45
 Line -16777216 false 150 75 195 45
 Line -16777216 false 150 60 150 75
@@ -1280,7 +1272,7 @@ Polygon -7500403 true true 135 90 120 45 150 15 180 45 165 90
 red_worm
 true
 0
-Polygon -2674135 true false 165 240 165 240 135 255 105 270 90 270 75 255 75 240 105 225 120 195 150 180 180 135 165 105 150 75 150 60 135 60 120 45 120 30 135 15 150 15 180 30 180 45 195 45 210 75 225 105 225 135 225 150 210 165 195 195 180 210
+Polygon -2674135 true false 165 240 135 255 105 270 90 270 75 255 75 240 105 225 120 195 150 180 180 135 165 105 150 75 150 60 135 60 120 45 120 30 135 15 150 15 180 30 180 45 195 45 210 75 225 105 225 135 225 150 210 165 195 195 180 210
 Line -16777216 false 150 60 180 45
 Line -16777216 false 150 75 195 45
 Line -16777216 false 150 60 150 75
@@ -1376,7 +1368,7 @@ Polygon -7500403 true true 119 75 179 75 209 101 224 135 220 225 175 261 128 261
 violet_worm
 true
 0
-Polygon -8630108 true false 165 240 165 240 135 255 105 270 90 270 75 255 75 240 105 225 120 195 150 180 180 135 165 105 150 75 150 60 135 60 120 45 120 30 135 15 150 15 180 30 180 45 195 45 210 75 225 105 225 135 225 150 210 165 195 195 180 210
+Polygon -8630108 true false 165 240 135 255 105 270 90 270 75 255 75 240 105 225 120 195 150 180 180 135 165 105 150 75 150 60 135 60 120 45 120 30 135 15 150 15 180 30 180 45 195 45 210 75 225 105 225 135 225 150 210 165 195 195 180 210
 Line -16777216 false 150 60 180 45
 Line -16777216 false 150 75 195 45
 Line -16777216 false 150 60 150 75
