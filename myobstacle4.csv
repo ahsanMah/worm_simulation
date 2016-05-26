@@ -1,3 +1,4 @@
-vertical-line,34,92,105,0,false
-horizontal-line,34,92,105,0,false
-circle,16,38,24,0,false
+mountain,17,43,44,0,false
+mountain,17,43,102,0,false
+mountain,17,64,102,0,false
+lake,6,101,20,0,false
