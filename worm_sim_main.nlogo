@@ -1,29 +1,18 @@
-extensions [array csv table]
+extensions [array csv]
 __includes["environment.nls" "agents.nls"]
-
-globals[
-  current_species
-  current_species_info
-  species_population
-  patch_population
-  species_data
-  has_collected
-]
 
 to setup
   clear-all
 
   setup_environment
   setup_agents
-  set species_data table:make
-  ;species_data array:from-list n-values [0]
-  ;table:put monthly_data"hello" (list "world" 0.2 0.7)
-  ;show monthly_data
+
+
  reset-ticks
 end
 
 to save_obstacles
-  let filename (word "data/parameters/myobstacle"  save_number ".csv")
+  let filename1 (word "data/parameters/myobstacle"  save_number ".csv")
   csv:to-file filename1 obstacle_list
   print "Saved to file"
 end
@@ -84,43 +73,29 @@ end
 to save_agents
   let filename (word "data/parameters/myagents"  save_number ".csv")
   csv:to-file filename species_list
-  ;save_data ;species_list
   print "Saved to file"
-
 end
 
 to load_agents
   let filename (word "data/parameters/myagents"  save_number ".csv")
-
   set species_list csv:from-file filename
   print "Loaded from file: "
   print species_list
   foreach species_list [create_species ?]
 end
 
-to export_data
+to save_data
   let filename (word "data/output/simulation"  save_number ".csv")
-  ;show output_data
-  ;csv:to-file filename output_data
+  csv:to-file filename species_list
   print "Saved to file"
 end
 
 to go
 
   calculate_time
-  if (year = 10) [stop] ;save data + export-interface
+  if (year = 20) [stop]
   if (count turtles = 0) [stop]
 
-  if (day_of_month != 28)[
-
-    foreach species_list [
-      set current_species item 0 ?
-      set current_species_info array:from-list (list 0 (item 1 ?)) ;resets population and saves genetic diversity
-      table:put species_data current_species current_species_info ; hash map of species to its info
-    ]
-    set has_collected false
-    ;show table:get monthly_data 3
-  ]
   if (ticks mod (2 * periods-in-day) = 0) [
     set global_temperature random-normal (item current_month temperatures) (1)
     calculate_temp
@@ -145,28 +120,10 @@ to go
   ]
   ask patches
   [
-    if (day_of_month = 28)[
-      if (has_collected = false)[
-        collect_data
-      ]
-    ]
-      ;if patch belongs to monitor
-      ;concat data_list
    recolor-patch
   ]
 
   show current_month
-    if (day_of_month = 28)[ ;saves monthly data to accumulutor list
-    if (has_collected = false)[
-      show species_data
-      set has_collected true
-      ]
-    ]
-    if (has_collected = false)[
-      show species_data
-      set has_collected true
-      ]
-    ]
   tick
 end
 @#$#@#$#@
@@ -251,7 +208,7 @@ worm_population
 worm_population
 0
 500
-190
+430
 10
 1
 NIL
@@ -412,8 +369,8 @@ CHOOSER
 580
 obstacle_shape
 obstacle_shape
-"lake" "mountain" "square" "horizontal-line" "vertical-line" "monitor"
-5
+"lake" "mountain" "square" "horizontal-line" "vertical-line"
+1
 
 SLIDER
 1418
@@ -454,7 +411,7 @@ obstacle_y
 obstacle_y
 -50
 50
-22
+59
 1
 1
 HORIZONTAL
@@ -819,7 +776,7 @@ CHOOSER
 451
 Show:
 Show:
-"pH" "food" "temperature" "monitor"
+"pH" "food" "temperature"
 1
 
 TEXTBOX
@@ -841,7 +798,7 @@ species_genetic_diversity
 species_genetic_diversity
 0
 1
-1
+0.6
 0.1
 1
 NIL
@@ -856,7 +813,7 @@ species_hatch_temperature
 species_hatch_temperature
 0
 25
-9
+11
 1
 1
 NIL
@@ -964,7 +921,7 @@ start_y
 start_y
 0
 119
-20
+60
 1
 1
 NIL
