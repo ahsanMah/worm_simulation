@@ -7,18 +7,25 @@ globals[
   species_population
   patch_population
   species_data
+  output_data
   has_collected
 ]
 
 to setup
   clear-all
 
+  print "Setting up environment..."
   setup_environment
+  print "Done"
+  print "Setting up agents..."
   setup_agents
+  print "Done"
+
   set species_data table:make
+  set output_data []
   ;species_data array:from-list n-values [0]
   ;table:put monthly_data"hello" (list "world" 0.2 0.7)
-  ;show monthly_data
+
  reset-ticks
 end
 
@@ -113,7 +120,7 @@ to go
 
     foreach species_list [
       set current_species item 0 ?
-      set current_species_info array:from-list (list 0 (item 1 ?)) ;resets population and saves genetic diversity
+      set current_species_info array:from-list (list 0 0 (item 1 ?)) ;resets population, density and saves genetic diversity
       table:put species_data current_species current_species_info ; hash map of species to its info
     ]
     set has_collected false
@@ -144,18 +151,18 @@ to go
       if (has_collected = false)[
         collect_data
       ]
-    ]
-      ;if patch belongs to monitor
+    ] ;if patch belongs to monitor
       ;concat data_list
    recolor-patch
   ]
-
-  if (day_of_month = 28)[ ;saves monthly data to accumulutor list
+   ;saves monthly data to accumulutor list
+  if (day_of_month = 28)[
     if (has_collected = false)[
-      show species_data
+      set output_data lput species_data output_data
+      show output_data
       set has_collected true
-      ]
     ]
+  ]
   tick
 end
 @#$#@#$#@
