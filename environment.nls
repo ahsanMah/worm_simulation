@@ -1,4 +1,3 @@
-extensions [array csv]
 
 globals [
   ;;annual globals
@@ -40,7 +39,8 @@ patches-own
   food-consumed-from
   temperature_difference
   temperature
-
+  being_monitored
+  monitor_size
 ]
 
 to setup_environment
@@ -76,15 +76,15 @@ to setup_environment
 
   ;print obstacle
   set obstacle_list []
-  show obstacle_list
-
+  
   ask patches
   [
     set permeability 1
     set ph 7
+    ;set local_death_threshold death_threshold
     set temperature_variation 0
-    set local_death_threshold death_threshold
-
+    set being_monitored false
+    
     setup-initial-food
     recolor-patch
     ;foreach obstacle_list [setup-obstacles ? ]
@@ -145,11 +145,12 @@ to calculate_time
     [
       set current_month (current_month + 1) mod 12
       set day_of_month 1
-    ]
+
   ]
+  
   if (day_num = 366) [
     set year year + 1
-    set day_num day_num mod 365 ;;reset for every year
+    set day_num 1 ;;reset for every year
   ]
   
 
@@ -208,6 +209,10 @@ to recolor-patch
       [
         set pcolor scale-color violet temperature_difference -10 0
       ]
+    ]
+
+    if (Show: = "monitor") [
+      if (being_monitored) [set pcolor orange]
     ]
   ]
   [
@@ -309,8 +314,8 @@ to setup-obstacles [one_obstacle]
         ]
         ;;set ph random-normal temp_pH 1
       ]
-
     ]
+    
     if temp_shape = "vertical-line"
     [
       if distancexy temp_x temp_y <= temp_size and temp_x = pxcor
@@ -325,10 +330,36 @@ to setup-obstacles [one_obstacle]
         ;;set ph random-normal temp_pH 1 
       ]
     ]
+    
+    if temp_shape = "monitor"
+    [
+      if (distancexy temp_x temp_y) < temp_size 
+        [
+          set being_monitored true
+          set monitor_size temp_size
+        ]
+    ]
+
   ]
 end
 
-
+to collect_data  
+    if (being_monitored)
+    [ ;show count turtles-here with [parent_breed = monitored_breed]
+      
+      foreach species_list [
+        set current_species item 0 ?                                  ;species' breed
+        set current_species_info (table:get species_data current_species)  ;retreives info about specific breed
+        
+        set patch_population (count turtles-here with [parent_breed = (current_species - 1)])
+        ;show patch_population
+        array:set current_species_info 0 ((array:item current_species_info 0) + patch_population) ;updates (increments) species populations
+        
+        table:put species_data current_species current_species_info
+        ]
+    ]
+  
+end
 
 
 to update_organic_matter
