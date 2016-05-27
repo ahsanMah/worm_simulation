@@ -1,4 +1,5 @@
-lake,20,94,92,0,false
-lake,20,94,92,0,false
-square,20,94,92,0,false
-lake,20,64,47,0,false
+mountain,17,43,44,0,false
+mountain,17,43,102,0,false
+mountain,17,64,102,0,false
+lake,6,101,20,0,false
+monitor,3,46,100,0,false

@@ -1,17 +1,22 @@
-extensions [array csv]
+extensions [array csv table]
 __includes["environment.nls" "agents.nls"]
+
+globals[monthly_data current_species current_species_info species_population patch_population species_data]
 
 to setup
   clear-all
 
   setup_environment
   setup_agents
-
+  set monthly_data table:make
+  ;species_data array:from-list n-values [0]
+  ;table:put monthly_data"hello" (list "world" 0.2 0.7)
+  ;show monthly_data
  reset-ticks
 end
 
 to save_obstacles
-  let filename (word "/data/parameters/myobstacle"  save_number ".csv")
+  let filename (word "data/parameters/myobstacle"  save_number ".csv")
   csv:to-file filename obstacle_list
   print "Saved to file"
 end
@@ -84,10 +89,10 @@ to load_agents
   foreach species_list [create_species ?]
 end
 
-to save_data
+to export_data
   let filename (word "data/output/simulation"  save_number ".csv")
-  show output_data
-  csv:to-file filename output_data
+  ;show output_data
+  ;csv:to-file filename output_data
   print "Saved to file"
 end
 
@@ -97,6 +102,15 @@ to go
   if (year = 10) [stop] ;save data + export-interface
   if (count turtles = 0) [stop]
 
+  if (day_of_month != 28)[
+
+    foreach species_list [
+      set current_species item 0 ?
+      set current_species_info array:from-list (list 0 (item 1 ?)) ;resets population and saves genetic diversity
+      table:put monthly_data current_species current_species_info ; hash map of species to its info
+    ]
+    show table:get monthly_data 3
+  ]
   if (ticks mod (2 * periods-in-day) = 0) [
     calculate_temp
     update_organic_matter
@@ -111,7 +125,6 @@ to go
     if (ticks mod (2 * periods-in-day) = 0) [
       update_maturity
       update_thresholds
-      show maturation
       ]
     move
 
@@ -119,11 +132,15 @@ to go
   ]
   ask patches
   [
-    ;if month
+    if (day_of_month = 28)[
+      collect_data
+      ]
       ;if patch belongs to monitor
       ;concat data_list
    recolor-patch
   ]
+  if (day_of_month = 28)[ ;saves monthly data to accumulutor list
+    show monthly_data]
 
   tick
 end
@@ -209,7 +226,7 @@ worm_population
 worm_population
 0
 500
-160
+190
 10
 1
 NIL
@@ -347,7 +364,7 @@ INPUTBOX
 87
 117
 starting_day
-120
+26
 1
 0
 Number
@@ -370,8 +387,8 @@ CHOOSER
 663
 obstacle_shape
 obstacle_shape
-"lake" "mountain" "square" "horizontal-line" "vertical-line"
-1
+"lake" "mountain" "square" "horizontal-line" "vertical-line" "monitor"
+5
 
 SLIDER
 4
@@ -382,7 +399,7 @@ obstacle_size
 obstacle_size
 0
 50
-19
+6
 1
 1
 NIL
@@ -397,7 +414,7 @@ obstacle_x
 obstacle_x
 min-pxcor
 max-pxcor
-101
+30
 1
 1
 NIL
@@ -412,7 +429,7 @@ obstacle_y
 obstacle_y
 -50
 50
-98
+22
 1
 1
 HORIZONTAL
@@ -427,7 +444,7 @@ obstacle_y
 obstacle_y
 min-pycor
 max-pycor
-98
+22
 1
 1
 NIL
@@ -453,7 +470,7 @@ speed
 speed
 0
 0.5
-0.12
+0.17
 0.01
 1
 NIL
@@ -777,8 +794,8 @@ CHOOSER
 451
 Show:
 Show:
-"pH" "food" "temperature"
-0
+"pH" "food" "temperature" "monitor"
+3
 
 TEXTBOX
 10
@@ -799,7 +816,7 @@ species_genetic_diversity
 species_genetic_diversity
 0
 1
-0.6
+1
 0.1
 1
 NIL
@@ -814,7 +831,7 @@ species_hatch_temperature
 species_hatch_temperature
 0
 25
-11
+9
 1
 1
 NIL
@@ -828,7 +845,7 @@ CHOOSER
 species_number
 species_number
 1 2 3 4 5
-0
+2
 
 BUTTON
 128
@@ -907,7 +924,7 @@ start_x
 start_x
 0
 119
-46
+31
 1
 1
 NIL
@@ -922,7 +939,7 @@ start_y
 start_y
 0
 119
-97
+20
 1
 1
 NIL

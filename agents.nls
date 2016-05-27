@@ -3,7 +3,6 @@ globals [
   normal_death_threshold death_threshold ;;probability of death
   reprod_threshold ;;probablity of reproducing
 
-output_data
   ;daily globals
   amount_egested
   consumption-in-period
@@ -29,8 +28,6 @@ output_data
   color_list
   
   ]
-
-
 
 breed [cocoons]
 breed [adults]
@@ -240,7 +237,6 @@ to update_thresholds
     ifelse (temperature < low_temp_resist) [ set death_threshold max_death_rate / (2 * periods-in-day)]
     [set death_threshold normal_death_threshold]
   ]
-  
     ;;pH of soil also affects survival rate
   if (ph < max_ph_resist) [
     set var abs (max_ph_resist - ph)
