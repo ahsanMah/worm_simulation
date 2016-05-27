@@ -35,7 +35,7 @@ patches-own
   local_death_threshold
   food-consumed-from
   being_monitored
-
+  monitor_size
 ]
 
 to setup_environment
@@ -305,6 +305,7 @@ to setup-obstacles [one_obstacle]
       if (distancexy temp_x temp_y) < temp_size 
         [
           set being_monitored true
+          set monitor_size temp_size
         ]
     ]
 
@@ -317,13 +318,13 @@ to collect_data
       
       foreach species_list [
         set current_species item 0 ?                                  ;species' breed
-        set current_species_info (table:get monthly_data current_species)  ;retreives info about specific breed
+        set current_species_info (table:get species_data current_species)  ;retreives info about specific breed
         
         set patch_population (count turtles-here with [parent_breed = (current_species - 1)])
         ;show patch_population
         array:set current_species_info 0 ((array:item current_species_info 0) + patch_population) ;updates (increments) species populations
         
-        table:put monthly_data current_species current_species_info
+        table:put species_data current_species current_species_info
         ]
     ]
   

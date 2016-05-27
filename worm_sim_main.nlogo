@@ -1,14 +1,21 @@
 extensions [array csv table]
 __includes["environment.nls" "agents.nls"]
 
-globals[monthly_data current_species current_species_info species_population patch_population species_data]
+globals[
+  current_species
+  current_species_info
+  species_population
+  patch_population
+  species_data
+  has_collected
+]
 
 to setup
   clear-all
 
   setup_environment
   setup_agents
-  set monthly_data table:make
+  set species_data table:make
   ;species_data array:from-list n-values [0]
   ;table:put monthly_data"hello" (list "world" 0.2 0.7)
   ;show monthly_data
@@ -107,9 +114,10 @@ to go
     foreach species_list [
       set current_species item 0 ?
       set current_species_info array:from-list (list 0 (item 1 ?)) ;resets population and saves genetic diversity
-      table:put monthly_data current_species current_species_info ; hash map of species to its info
+      table:put species_data current_species current_species_info ; hash map of species to its info
     ]
-    show table:get monthly_data 3
+    set has_collected false
+    ;show table:get monthly_data 3
   ]
   if (ticks mod (2 * periods-in-day) = 0) [
     calculate_temp
@@ -133,15 +141,21 @@ to go
   ask patches
   [
     if (day_of_month = 28)[
-      collect_data
+      if (has_collected = false)[
+        collect_data
       ]
+    ]
       ;if patch belongs to monitor
       ;concat data_list
    recolor-patch
   ]
-  if (day_of_month = 28)[ ;saves monthly data to accumulutor list
-    show monthly_data]
 
+  if (day_of_month = 28)[ ;saves monthly data to accumulutor list
+    if (has_collected = false)[
+      show species_data
+      set has_collected true
+      ]
+    ]
   tick
 end
 @#$#@#$#@
