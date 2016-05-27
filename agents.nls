@@ -82,7 +82,7 @@ to add_species
   set new_species (list species_number species_genetic_diversity species_hatch_temperature worm_population start_x start_y)
   set species_list lput new_species species_list
   array:set population_arr (species_number - 1) worm_population
-  show species_list
+  ;;show species_list
   create_species new_species
   ;show list (count turtles with [stamina = 6]) (count turtles with [maturation < 80])
 end
@@ -128,36 +128,36 @@ end
 to move
   set stamina stamina - 0.3
   let potential-destinations (patch-set patch-here neighbors with [permeability != 0])
-  ifelse iseating?
-  [
+  ;ifelse iseating?
+  ;[
     ;; uphill [food-here]
     ;;face max-one-of potential-destinations [food-here]
     right (random 181) - 90
     forward speed * permeability
     eat
 
-    if cycle-counter >= steps-per-ie
-    [
-      set iseating? false
-      set cycle-counter 0
-    ]
-  ]
-  [
-    ;; downhill [food-here]
-    ;;face max-one-of potential-destinations [food-consumed-from]
-    ;;face min-one-of potential-destinations [food-here]
-    right (random 181) - 90
-    forward speed * permeability
-    egest
-    if cycle-counter >= steps-per-ie
-    [
-      set iseating? true
-      set cycle-counter 0
-    ]
-  ]
+;    if cycle-counter >= steps-per-ie
+;    [
+;      set iseating? false
+;      set cycle-counter 0
+;    ]
+;  ]
+;  [
+;    ;; downhill [food-here]
+;    ;;face max-one-of potential-destinations [food-consumed-from]
+;    ;;face min-one-of potential-destinations [food-here]
+;    right (random 181) - 90
+;    forward speed * permeability
+;    egest
+;    if cycle-counter >= steps-per-ie
+;    [
+;      set iseating? true
+;      set cycle-counter 0
+;    ]
+;  ]
   check_death
-  if not iseating? [check_reproduction]
-  set cycle-counter cycle-counter + 1
+  ;if not iseating? [check_reproduction]
+  ;set cycle-counter cycle-counter + 1
 end
 
 

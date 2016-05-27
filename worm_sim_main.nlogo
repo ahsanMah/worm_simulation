@@ -7,17 +7,18 @@ to setup
   setup_environment
   setup_agents
 
+
  reset-ticks
 end
 
 to save_obstacles
-  let filename (word "/data/parameters/myobstacle"  save_number ".csv")
-  csv:to-file filename obstacle_list
+  let filename1 (word "data/parameters/myobstacle"  save_number ".csv")
+  csv:to-file filename1 obstacle_list
   print "Saved to file"
 end
 
 to load_obstacles
-  let filename (word "myobstacle"  save_number ".csv")
+  let filename (word "data/parameters/myobstacle"  save_number ".csv")
   set obstacle_list csv:from-file filename
   print "Loaded from file: "
   print obstacle_list
@@ -37,7 +38,7 @@ to save_patches
    [
      ask patch i j
      [
-       let info (list i j ph food-here permeability local_death_threshold)
+       let info (list i j ph food-here permeability local_death_threshold temperature_difference)
        file-open filename
        file-print csv:to-row info
        file-close
@@ -62,8 +63,10 @@ to load_patches
       set food-here item 3 ?
       set permeability item 4 ?
       set local_death_threshold item 5 ?
+      set temperature_difference item 6 ?
     ]
   ]
+  calculate_temp
   recolor_patches
 end
 
@@ -90,10 +93,11 @@ end
 to go
 
   calculate_time
-  if (year = 10) [stop]
+  if (year = 20) [stop]
   if (count turtles = 0) [stop]
 
   if (ticks mod (2 * periods-in-day) = 0) [
+    set global_temperature random-normal (item current_month temperatures) (1)
     calculate_temp
     update_organic_matter
 
@@ -107,7 +111,8 @@ to go
     if (ticks mod (2 * periods-in-day) = 0) [
       update_maturity
       update_thresholds
-      ;show maturation
+      check_reproduction
+      ;;show maturation
       ]
     move
 
@@ -118,6 +123,7 @@ to go
    recolor-patch
   ]
 
+  show current_month
   tick
 end
 @#$#@#$#@
@@ -202,7 +208,7 @@ worm_population
 worm_population
 0
 500
-160
+430
 10
 1
 NIL
@@ -270,7 +276,7 @@ max_death_rate
 max_death_rate
 0
 100
-12
+31
 1
 1
 NIL
@@ -340,7 +346,7 @@ INPUTBOX
 87
 117
 starting_day
-120
+125
 1
 0
 Number
@@ -351,76 +357,76 @@ MONITOR
 1359
 98
 Daily Temp *C
-temperature
+global_temperature
 2
 1
 11
 
 CHOOSER
-6
-618
-147
-663
+1420
+535
+1561
+580
 obstacle_shape
 obstacle_shape
 "lake" "mountain" "square" "horizontal-line" "vertical-line"
 1
 
 SLIDER
-4
-670
-176
-703
+1418
+587
+1590
+620
 obstacle_size
 obstacle_size
 0
-50
-19
+max-pycor / 2
+28
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-4
-711
-176
-744
+1418
+628
+1590
+661
 obstacle_x
 obstacle_x
 min-pxcor
 max-pxcor
-101
+59
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-4
-750
-176
-783
+1418
+667
+1590
+700
 obstacle_y
 obstacle_y
 -50
 50
-98
+59
 1
 1
 HORIZONTAL
 HORIZONTAL
 
 SLIDER
-4
-750
-176
-783
+1418
+667
+1590
+700
 obstacle_y
 obstacle_y
 min-pycor
 max-pycor
-98
+59
 1
 1
 NIL
@@ -446,17 +452,17 @@ speed
 speed
 0
 0.5
-0.12
+0.1
 0.01
 1
 NIL
 HORIZONTAL
 
 BUTTON
-196
-793
-259
-826
+1608
+750
+1671
+783
 Add
 add_obstacle
 NIL
@@ -470,10 +476,10 @@ NIL
 1
 
 SLIDER
-1146
-692
-1179
-842
+15
+577
+48
+727
 January
 January
 -20
@@ -485,10 +491,10 @@ NIL
 VERTICAL
 
 SLIDER
-1187
-692
-1220
-842
+56
+577
+89
+727
 February
 February
 -20
@@ -500,10 +506,10 @@ NIL
 VERTICAL
 
 SLIDER
-1226
-692
-1259
-842
+95
+577
+128
+727
 March
 March
 -20
@@ -515,10 +521,10 @@ NIL
 VERTICAL
 
 SLIDER
-1267
-693
-1300
-843
+136
+578
+169
+728
 April
 April
 -20
@@ -530,10 +536,10 @@ NIL
 VERTICAL
 
 SLIDER
-1308
-693
-1341
-843
+177
+578
+210
+728
 May
 May
 -20
@@ -545,10 +551,10 @@ NIL
 VERTICAL
 
 SLIDER
-1348
-694
-1381
-844
+217
+579
+250
+729
 June
 June
 -20
@@ -560,10 +566,10 @@ NIL
 VERTICAL
 
 SLIDER
-1389
-694
-1422
-844
+15
+734
+48
+884
 July
 July
 -20
@@ -575,10 +581,10 @@ NIL
 VERTICAL
 
 SLIDER
-1430
-695
-1463
-845
+54
+734
+87
+884
 August
 August
 -20
@@ -590,10 +596,10 @@ NIL
 VERTICAL
 
 SLIDER
-1470
-696
-1503
-846
+94
+735
+127
+885
 September
 September
 -20
@@ -605,10 +611,10 @@ NIL
 VERTICAL
 
 SLIDER
-1511
-695
-1544
-845
+135
+734
+168
+884
 October
 October
 -20
@@ -620,10 +626,10 @@ NIL
 VERTICAL
 
 SLIDER
-1553
-695
-1586
-845
+177
+734
+210
+884
 November
 November
 -20
@@ -635,10 +641,10 @@ NIL
 VERTICAL
 
 SLIDER
-1594
-695
-1627
-845
+218
+734
+251
+884
 December
 December
 -20
@@ -650,15 +656,15 @@ NIL
 VERTICAL
 
 INPUTBOX
-11
-509
-94
-569
+1573
+395
+1656
+455
 save_number
-4
+6
 1
 0
-Number
+String (reporter)
 
 SLIDER
 1421
@@ -721,24 +727,24 @@ NIL
 HORIZONTAL
 
 SLIDER
-1421
-243
-1593
+1422
 276
+1594
+309
 patch_pH
 patch_pH
 0
 14
-3.1
+8.4
 0.1
 1
 NIL
 HORIZONTAL
 
 BUTTON
-1417
+1421
 359
-1513
+1495
 392
 Add Patch
 add_patch
@@ -753,10 +759,10 @@ NIL
 1
 
 SWITCH
-1607
-240
-1739
-273
+1422
+239
+1593
+272
 change-pH?
 change-pH?
 0
@@ -771,7 +777,7 @@ CHOOSER
 Show:
 Show:
 "pH" "food" "temperature"
-0
+1
 
 TEXTBOX
 10
@@ -841,9 +847,9 @@ NIL
 1
 
 BUTTON
-1524
+1497
 359
-1656
+1595
 392
 Recolor Patches
 recolor_patches
@@ -858,10 +864,10 @@ NIL
 1
 
 BUTTON
-6
-575
-128
-608
+1419
+457
+1541
+490
 Save Environment
 save_patches
 NIL
@@ -875,10 +881,10 @@ NIL
 1
 
 BUTTON
-132
-575
-258
-608
+1545
+457
+1671
+490
 Load Environment
 load_patches
 NIL
@@ -900,7 +906,7 @@ start_x
 start_x
 0
 119
-46
+62
 1
 1
 NIL
@@ -915,7 +921,7 @@ start_y
 start_y
 0
 119
-97
+60
 1
 1
 NIL
@@ -956,19 +962,79 @@ NIL
 1
 
 SLIDER
-5
-792
-177
-825
+1419
+709
+1591
+742
 min_ph
 min_ph
 0
 7
-1.2
+1.7
 0.1
 1
 NIL
 HORIZONTAL
+
+SLIDER
+1422
+312
+1595
+345
+temperature_variation
+temperature_variation
+-10
+10
+0
+0.5
+1
+NIL
+HORIZONTAL
+
+SLIDER
+1420
+747
+1591
+780
+max_temp_difference
+max_temp_difference
+-10
+10
+-4.5
+0.5
+1
+NIL
+HORIZONTAL
+
+TEXTBOX
+15
+553
+208
+583
+Global Temperature Control
+12
+0.0
+1
+
+TEXTBOX
+1423
+26
+1573
+44
+Environment Controls\n
+12
+0.0
+1
+
+TEXTBOX
+1422
+511
+1572
+529
+Obstacle Controls\n
+12
+0.0
+1
 
 @#$#@#$#@
 ## WHAT IS IT?
