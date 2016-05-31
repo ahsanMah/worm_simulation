@@ -353,7 +353,7 @@ to collect_data
         set current_species_info (table:get species_data current_species)  ;retreives info about specific breed
         
         set patch_population (count turtles-here with [parent_breed = (current_species - 1)])
-        ;show patch_population
+        ;arrays are mutable don't have to save it again
         array:set current_species_info 0 ((array:item current_species_info 0) + patch_population) ;updates (increments) species populations
         array:set current_species_info 1 ((array:item current_species_info 0) / monitor_size)
         

@@ -88,6 +88,7 @@ end
 to save_agents
   let filename (word "data/parameters/myagents"  save_number ".csv")
   csv:to-file filename species_list
+  show csv:to-row ["one" 2 true ["two" 1 false]]
   print "Saved to file"
 end
 
@@ -102,6 +103,7 @@ end
 to save_data
   let filename (word "data/output/simulation"  save_number ".csv")
   csv:to-file filename species_list
+
   print "Saved to file"
 end
 
@@ -111,7 +113,7 @@ to go
   if (year = 20) [stop]
   if (count turtles = 0) [stop]
 
- if (day_of_month = (item current_month num_days - 1))[
+ if (day_of_month = (item current_month num_days - 1))[ ;cleans arrays a day before collection
 
     foreach species_list [
       set current_species item 0 ?
@@ -156,6 +158,7 @@ to go
    ;saves monthly data to accumulutor list
   if (day_of_month = item current_month num_days)[
     if (has_collected = false) [
+      show species_data
       set output_data lput species_data output_data
       show output_data
       ;foreach output_data [show array:to-list (item 1 table:to-list ?)] ;list of tables --> table --> list of [key species_data] --> species_data -- > list
@@ -246,7 +249,7 @@ worm_population
 worm_population
 0
 500
-430
+500
 10
 1
 NIL
@@ -314,7 +317,7 @@ max_death_rate
 max_death_rate
 0
 100
-31
+30
 1
 1
 NIL
@@ -384,7 +387,7 @@ INPUTBOX
 87
 117
 starting_day
-125
+120
 1
 0
 Number
@@ -490,7 +493,7 @@ speed
 speed
 0
 0.5
-0.1
+0.2
 0.01
 1
 NIL
@@ -773,7 +776,7 @@ patch_pH
 patch_pH
 0
 14
-8.4
+8.5
 0.1
 1
 NIL
@@ -836,7 +839,7 @@ species_genetic_diversity
 species_genetic_diversity
 0
 1
-0.6
+0
 0.1
 1
 NIL
@@ -851,7 +854,7 @@ species_hatch_temperature
 species_hatch_temperature
 0
 25
-11
+12
 1
 1
 NIL

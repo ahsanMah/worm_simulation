@@ -230,8 +230,6 @@ end
 to update_thresholds
   ;cold reduces survival rate
   
-  ;set death_threshold (max_death_rate / 20) * temperature
-  
   ifelse (temperature > max_temp_resist) [ set death_threshold max_death_rate / (2 * periods-in-day)]
   [
     ifelse (temperature < low_temp_resist) [ set death_threshold max_death_rate / (2 * periods-in-day)]
@@ -253,9 +251,10 @@ to update_thresholds
 ;   ] ; probability of dying decreases as it gets warmer
 
   ;reproduction rate affected by temperature
-  if (temperature > 10) [
-    set reprod_threshold (max_reproduction_rate / (10 * 2 * periods-in-day) * temperature) ] ; probability of reproducing increases as it gets warmer (10 * 2 * periods-in-day)
-
+  ifelse (temperature > 10) [
+    set reprod_threshold (max_reproduction_rate / 10 * temperature) ] ; probability of reproducing increases as it gets warmer (10 * 2 * periods-in-day)
+  [set reprod_threshold normal_reproduction_rate]
+  
 end
 
 to update_maturity
