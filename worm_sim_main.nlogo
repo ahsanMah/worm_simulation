@@ -156,7 +156,7 @@ to go
       ]
     move
 
-    set food-here food-here + organic-regen
+    ;set food-here food-here + organic-regen
   ]
   ask patches
   [
@@ -831,7 +831,7 @@ CHOOSER
 Show:
 Show:
 "pH" "food" "temperature" "monitor"
-3
+1
 
 TEXTBOX
 10
@@ -960,7 +960,7 @@ start_x
 start_x
 0
 119
-59
+54
 1
 1
 NIL
@@ -975,7 +975,7 @@ start_y
 start_y
 0
 119
-61
+49
 1
 1
 NIL
@@ -1088,6 +1088,23 @@ TEXTBOX
 Obstacle Controls\n
 12
 0.0
+1
+
+BUTTON
+1168
+731
+1265
+764
+Draw River
+river_draw
+T
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
 1
 
 @#$#@#$#@

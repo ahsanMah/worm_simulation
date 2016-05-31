@@ -280,7 +280,7 @@ to setup-obstacles [one_obstacle]
         set permeability speed_in_water
         set food-here 0
         set ph 7
-        ask turtles-here [die]
+        ;ask turtles-here [die]
         
       ]
     ]
@@ -290,13 +290,9 @@ to setup-obstacles [one_obstacle]
     [
       if pxcor >= temp_x - temp_size and pxcor <= temp_x + temp_size and pycor >= temp_y - temp_size and pycor <= temp_y + temp_size
       [
-        ifelse temp_movable [
          set permeability speed_in_water
-         ]
-        [ set food-here 0
-          set permeability 0
-          ask turtles-here [die]
-          ]
+         set food-here 0
+
         ;;set ph random-normal temp_pH 1
 
       ]
@@ -306,13 +302,9 @@ to setup-obstacles [one_obstacle]
     [
       if distancexy temp_x temp_y <= temp_size and temp_y = pycor
       [
-        ifelse temp_movable [
-          set permeability speed_in_water
-        ]
-        [ set food-here 0
-          set permeability 0
-          ask turtles-here [die]
-        ]
+        set permeability speed_in_water
+        set food-here 0
+
         ;;set ph random-normal temp_pH 1
       ]
     ]
@@ -321,13 +313,9 @@ to setup-obstacles [one_obstacle]
     [
       if distancexy temp_x temp_y <= temp_size and temp_x = pxcor
       [
-        ifelse temp_movable [
           set permeability speed_in_water
-        ]
-        [ set food-here 0
-          set permeability 0
-          ask turtles-here [die]
-        ]
+          set food-here 0
+
         ;;set ph random-normal temp_pH 1 
       ]
     ]
@@ -357,6 +345,17 @@ to collect_data
       ]
     ]
   
+end
+
+to river_draw
+  if mouse-down?
+  [
+    ask patch mouse-xcor mouse-ycor
+    [ set pcolor blue 
+     set food-here 0
+     set permeability speed_in_water
+    ]
+  ]
 end
 
 
