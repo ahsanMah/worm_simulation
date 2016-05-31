@@ -346,19 +346,15 @@ end
 
 to collect_data  
     if (being_monitored)
-    [ ;show count turtles-here with [parent_breed = monitored_breed]
+    [ 
+      let patch_population 0
       
-      foreach species_list [
-        set current_species item 0 ?                                  ;species' breed
-        set current_species_info (table:get species_data current_species)  ;retreives info about specific breed
+      foreach species_data [
+        set patch_population (count turtles-here with [parent_breed = ((array:item ? 1)  - 1)])
         
-        set patch_population (count turtles-here with [parent_breed = (current_species - 1)])
-        ;arrays are mutable don't have to save it again
-        array:set current_species_info 0 ((array:item current_species_info 0) + patch_population) ;updates (increments) species populations
-        array:set current_species_info 1 ((array:item current_species_info 0) / monitor_size)
-        
-        ;table:put species_data current_species current_species_info
-        ]
+        array:set ? 2 ((array:item ? 2) + patch_population) ;updates (increments) species populations
+        array:set ? 3 ((array:item ? 3) / monitor_size)     ;updates density 
+      ]
     ]
   
 end

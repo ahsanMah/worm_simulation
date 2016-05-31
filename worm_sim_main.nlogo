@@ -2,13 +2,15 @@ extensions [array csv table]
 __includes["environment.nls" "agents.nls"]
 
 globals[
-  current_species
-  current_species_info
+  ;current_species
+  ;current_species_info
   species_population
-  patch_population
+  ;patch_population
   species_data
+  monthly_data
   output_data
   has_collected
+  report_month
 ]
 to setup
   clear-all
@@ -20,8 +22,12 @@ to setup
   setup_agents
   print "Done"
 
-  set species_data table:make
-  set output_data []
+  set species_data [true]
+  set species_data lput (array:from-list n-values 3 [0]) species_data;hash map of species to their collected info
+  show species_data
+  set monthly_data []  ;list of tables collected every month
+  set output_data []   ;final list that will be written to a .csv file
+  set report_month 0
 
  reset-ticks
 end
@@ -86,6 +92,7 @@ to load_patches
 end
 
 to save_agents
+  export_data
   let filename (word "data/parameters/myagents"  save_number ".csv")
   csv:to-file filename species_list
   show csv:to-row ["one" 2 true ["two" 1 false]]
@@ -100,12 +107,25 @@ to load_agents
   foreach species_list [create_species ?]
 end
 
-to save_data
+to export_data
   let filename (word "data/output/simulation"  save_number ".csv")
-  csv:to-file filename species_list
-
-  print "Saved to file"
+  csv:to-file filename monthly_data
+  print "Exported simulation data to file"
 end
+
+to clear_arrays
+
+   set species_data []
+   foreach species_list [
+      let current_species_info array:from-list (list report_month (item 0 ?) 0 0 (item 1 ?)) ;resets population, density and saves genetic diversity
+      ;table:put species_data current_species array:from-list (list 0 0 (item 1 ?)) ; hash map of species to its info
+      set species_data lput current_species_info species_data
+    ]
+    print "Monthly data after table is resest: "
+    show monthly_data
+    set has_collected false
+end
+
 
 to go
 
@@ -113,14 +133,8 @@ to go
   if (year = 20) [stop]
   if (count turtles = 0) [stop]
 
- if (day_of_month = (item current_month num_days - 1))[ ;cleans arrays a day before collection
-
-    foreach species_list [
-      set current_species item 0 ?
-      set current_species_info array:from-list (list 0 0 (item 1 ?)) ;resets population, density and saves genetic diversity
-      table:put species_data current_species current_species_info ; hash map of species to its info
-    ]
-    set has_collected false
+ if (day_of_month = (item current_month num_days - 1))[ ;clears arrays a day before collection
+   clear_arrays
   ]
 
   if (ticks mod (2 * periods-in-day) = 0) [
@@ -139,7 +153,6 @@ to go
       update_maturity
       update_thresholds
       check_reproduction
-      ;;show maturation
       ]
     move
 
@@ -159,9 +172,9 @@ to go
   if (day_of_month = item current_month num_days)[
     if (has_collected = false) [
       show species_data
-      set output_data lput species_data output_data
-      show output_data
-      ;foreach output_data [show array:to-list (item 1 table:to-list ?)] ;list of tables --> table --> list of [key species_data] --> species_data -- > list
+      foreach species_data [ set monthly_data lput (array:to-list ?) monthly_data]
+      show monthly_data
+      set report_month report_month + 1
       set has_collected true
     ]
   ]
@@ -249,7 +262,7 @@ worm_population
 worm_population
 0
 500
-500
+90
 10
 1
 NIL
@@ -868,7 +881,7 @@ CHOOSER
 species_number
 species_number
 1 2 3 4 5
-0
+1
 
 BUTTON
 125
