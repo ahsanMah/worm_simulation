@@ -13,7 +13,7 @@ globals[
   report_month
 
   ;index positions of data in arrays
-  ;month monitor species
+  ;month monitor species_number population density genetic diversity
 ]
 to setup
   clear-all
@@ -130,10 +130,6 @@ to clear_arrays
      ]
      set species_data lput monitor_set species_data ;list of matrices
    ]
-
-
-    print "Monthly data after table is resest: "
-    show monthly_data
     set has_collected false
 end
 
@@ -149,6 +145,9 @@ to go
   ]
 
   if (ticks mod (2 * periods-in-day) = 0) [
+
+    print "Species Populations"
+    show population_arr
     set global_temperature random-normal (item current_month temperatures) (1)
     calculate_temp
     update_organic_matter
@@ -165,6 +164,7 @@ to go
       update_thresholds
       check_reproduction
       ]
+
     move
 
     ;set food-here food-here + organic-regen
@@ -187,10 +187,11 @@ to go
         foreach monitor_list [
           set monthly_data lput (array:to-list ?) monthly_data
         ]
-      show monthly_data
+      ]
+      ;print "Monthly data: "
+      ;show monthly_data
       set report_month report_month + 1
       set has_collected true
-      ]
     ]
   ]
   tick
@@ -277,7 +278,7 @@ worm_population
 worm_population
 0
 500
-90
+200
 10
 1
 NIL
@@ -315,7 +316,7 @@ normal_reproduction_rate
 normal_reproduction_rate
 0
 1
-0.5
+0.6
 0.1
 1
 NIL
@@ -330,7 +331,7 @@ max_reproduction_rate
 max_reproduction_rate
 0
 10
-7.7
+8
 0.1
 1
 NIL
@@ -465,7 +466,7 @@ obstacle_x
 obstacle_x
 min-pxcor
 max-pxcor
-80
+83
 1
 1
 NIL
@@ -480,7 +481,7 @@ obstacle_y
 obstacle_y
 -50
 50
-51
+49
 1
 1
 HORIZONTAL
@@ -495,7 +496,7 @@ obstacle_y
 obstacle_y
 min-pycor
 max-pycor
-51
+49
 1
 1
 NIL
@@ -990,7 +991,7 @@ start_y
 start_y
 0
 119
-49
+53
 1
 1
 NIL
