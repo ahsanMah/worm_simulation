@@ -122,6 +122,7 @@ end
 
 to save_agents
   export_data
+  save_monitors
   let filename (word "data/parameters/myagents"  save_number ".csv")
   csv:to-file filename species_list
   ;show csv:to-row ["one" 2 true ["two" 1 false]]
@@ -129,11 +130,52 @@ to save_agents
 end
 
 to load_agents
+  load_monitors
   let filename (word "data/parameters/myagents"  save_number ".csv")
   set species_list csv:from-file filename
   print "Loaded from file: "
   print species_list
   foreach species_list [create_species ?]
+end
+
+to save_monitors
+  let filename (word "data/parameters/mymonitors" save_number ".csv")
+  let i min-pxcor
+  let j min-pycor
+  carefully [file-delete filename] []
+  file-open filename
+  while [(i <= max-pxcor)]
+  [
+   while [(j <= max-pycor)]
+   [
+     ask patch i j
+     [
+       let info (list i j being_monitored monitor_index monitor_size monitor_number)
+       file-open filename
+       file-print csv:to-row info
+       file-close
+       set j j + 1
+     ]
+   ]
+   set j min-pycor
+   set i i + 1
+  ]
+end
+
+to load_monitors
+  let filename (word "data/parameters/mymonitors" save_number ".csv")
+  let data csv:from-file filename
+  foreach (data)
+  [
+    ask patch (item 0 ?) (item 1 ?)
+    [
+      set being_monitored item 2 ?
+      set monitor_index item 3 ?
+      set monitor_size item 4 ?
+    ]
+    set monitor_number item 5 ?
+  ]
+  recolor_patches
 end
 
 to export_data
@@ -492,7 +534,7 @@ obstacle_x
 obstacle_x
 min-pxcor
 max-pxcor
-83
+41
 1
 1
 NIL
@@ -507,7 +549,7 @@ obstacle_y
 obstacle_y
 -50
 50
-49
+21
 1
 1
 HORIZONTAL
@@ -522,7 +564,7 @@ obstacle_y
 obstacle_y
 min-pycor
 max-pycor
-49
+21
 1
 1
 NIL
@@ -757,7 +799,7 @@ INPUTBOX
 1656
 455
 save_number
-ham1
+1
 1
 0
 String (reporter)
@@ -923,7 +965,7 @@ CHOOSER
 species_number
 species_number
 1 2 3 4 5
-1
+0
 
 BUTTON
 125
@@ -1002,7 +1044,7 @@ start_x
 start_x
 0
 119
-88
+80
 1
 1
 NIL
@@ -1017,7 +1059,7 @@ start_y
 start_y
 0
 119
-53
+42
 1
 1
 NIL
