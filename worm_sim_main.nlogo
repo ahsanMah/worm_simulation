@@ -32,6 +32,7 @@ to setup
   ;set output_data n-values 5 [?]   ;final list that will be written to a .csv file
   show output_data
   set report_month 0
+  set-default-shape sides "line"
 
   reset-ticks
 end
@@ -465,8 +466,8 @@ CHOOSER
 580
 obstacle_shape
 obstacle_shape
-"lake" "mountain" "square" "horizontal-line" "vertical-line" "monitor"
-1
+"lake" "mountain" "square" "horizontal-line" "vertical-line" "monitor" "patch"
+6
 
 SLIDER
 1418
@@ -548,7 +549,7 @@ speed
 speed
 0
 0.5
-0.13
+0.2
 0.01
 1
 NIL
@@ -831,7 +832,7 @@ patch_pH
 patch_pH
 0
 14
-6.6
+3.5
 0.1
 1
 NIL
@@ -873,7 +874,7 @@ CHOOSER
 Show:
 Show:
 "pH" "food" "temperature" "monitor"
-1
+0
 
 TEXTBOX
 10
@@ -1002,7 +1003,7 @@ start_x
 start_x
 0
 119
-34
+43
 1
 1
 NIL
@@ -1017,7 +1018,7 @@ start_y
 start_y
 0
 119
-23
+13
 1
 1
 NIL
@@ -1081,7 +1082,7 @@ temperature_variation
 temperature_variation
 -10
 10
-0
+4.5
 0.5
 1
 NIL
@@ -1157,6 +1158,40 @@ BUTTON
 Draw Highway
 draw_highway
 T
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+1311
+795
+1451
+828
+NIL
+edit_environment
+T
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+1281
+720
+1415
+753
+NIL
+recolor-selected
+NIL
 1
 T
 OBSERVER

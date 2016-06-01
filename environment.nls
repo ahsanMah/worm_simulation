@@ -26,9 +26,12 @@ globals [
   temp_y
   temp_pH
   temp_movable
+  
+  selected
 
   ]
 
+breed [sides side]
 
 patches-own
 [
@@ -270,6 +273,83 @@ to change_speed
   ]
 end
 
+to edit_environment
+  if mouse-down? [
+    ifelse selected? mouse-xcor mouse-ycor
+    [
+      deselect
+    ]
+    [
+      handle-select
+    ]
+  ]
+end
+
+to recolor-selected
+  ;; incorporate patch, lake, square water feature, monitor, and mountain.
+  if (obstacle_shape = "patch")[
+  ask patches
+  [
+   if selected? pxcor pycor
+   [
+    set ph patch_ph
+    set temperature_difference temperature_variation
+    recolor-patch
+   ] 
+  ]
+  ]
+  
+  if (obstacle_shape = "mountain")
+  [
+    
+  ]
+end
+
+to handle-select
+  let old-x mouse-xcor
+  let old-y mouse-ycor
+  while [mouse-down?]
+  [
+    select old-x old-y mouse-xcor mouse-ycor
+    display
+  ]
+  if not any? selected [ deselect ]
+end
+
+to-report selected? [x y]
+  if not any? sides [ report false ]
+  let y-max max [ycor] of sides
+  let y-min min [ycor] of sides
+  let x-max max [xcor] of sides
+  let x-min min [xcor] of sides
+  
+  report x >= x-min and x <= x-max and y >= y-min and y <= y-max
+end
+
+to select [x1 y1 x2 y2]
+  deselect
+  make-side x1 y1 x2 y1
+  make-side x1 y1 x1 y2
+  make-side x1 y2 x2 y2
+  make-side x2 y1 x2 y2
+  set selected patches with [selected? pxcor pycor]
+  
+end
+
+to deselect
+  ask sides [die]
+  set selected no-patches
+end
+
+to make-side [x1 y1 x2 y2]
+  create-sides 1 [
+    set color gray
+    setxy (x1 + x2) / 2
+          (y1 + y2) / 2
+    facexy x1 y1
+    set size 2 * distancexy x1 y1
+  ]
+end
 
 to setup-obstacles [one_obstacle]
   ;if obstacle parameters given
