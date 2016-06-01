@@ -36,6 +36,30 @@ to setup
   reset-ticks
 end
 
+to river_draw
+  if mouse-down?
+  [
+    ask patch mouse-xcor mouse-ycor
+    [
+     set food-here 0
+     set permeability speed_in_water
+     set pcolor blue
+    ]
+
+  ]
+end
+
+to draw_highway
+  if mouse-down?
+  [
+    ask patch mouse-xcor mouse-ycor
+    [
+      set permeability road_speed
+      set pcolor grey
+    ]
+  ]
+end
+
 to save_obstacles
   let filename1 (word "data/parameters/myobstacle"  save_number ".csv")
   csv:to-file filename1 obstacle_list
@@ -52,7 +76,7 @@ end
 
 to save_patches
   save_obstacles
-  let filename (word "mypatches" save_number ".csv")
+  let filename (word "data/parameters/mypatches" save_number ".csv")
   let i min-pxcor
   let j min-pycor
   carefully [file-delete filename] []
@@ -78,7 +102,7 @@ end
 
 to load_patches
   load_obstacles
-  let filename (word "mypatches" save_number ".csv")
+  let filename (word "data/parameters/mypatches" save_number ".csv")
   let data csv:from-file filename
   foreach (data)
   [
@@ -89,6 +113,7 @@ to load_patches
       set permeability item 4 ?
       set local_death_threshold item 5 ?
       set temperature_difference item 6 ?
+      set being_monitored false
     ]
   ]
   calculate_temp
@@ -99,7 +124,7 @@ to save_agents
   export_data
   let filename (word "data/parameters/myagents"  save_number ".csv")
   csv:to-file filename species_list
-  show csv:to-row ["one" 2 true ["two" 1 false]]
+  ;show csv:to-row ["one" 2 true ["two" 1 false]]
   print "Saved to file"
 end
 
@@ -132,6 +157,7 @@ to clear_arrays
    ]
     set has_collected false
 end
+
 
 
 to go
@@ -181,7 +207,7 @@ to go
    ;saves monthly data to accumulutor list
   if (day_of_month = item current_month num_days)[
     if (has_collected = false) [
-      show species_data
+      ;show species_data
       foreach species_data [
         let monitor_list (array:to-list ?)
         foreach monitor_list [
@@ -218,8 +244,8 @@ GRAPHICS-WINDOW
 119
 0
 119
-1
-1
+0
+0
 1
 ticks
 1000.0
@@ -522,7 +548,7 @@ speed
 speed
 0
 0.5
-0.2
+0.13
 0.01
 1
 NIL
@@ -731,7 +757,7 @@ INPUTBOX
 1656
 455
 save_number
-6
+ham1
 1
 0
 String (reporter)
@@ -790,7 +816,7 @@ patch_y
 patch_y
 1
 num_patches_vertical
-4
+1
 1
 1
 NIL
@@ -805,7 +831,7 @@ patch_pH
 patch_pH
 0
 14
-8.5
+6.6
 0.1
 1
 NIL
@@ -1113,6 +1139,23 @@ BUTTON
 764
 Draw River
 river_draw
+T
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+1166
+769
+1284
+802
+Draw Highway
+draw_highway
 T
 1
 T

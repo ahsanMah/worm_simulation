@@ -12,13 +12,13 @@ globals [
   num_days
   temperatures
   day_of_month
- 
-
-
+  
+  monitor_number
   obstacle
   obstacle_list
   temp_arr
   speed_in_water
+  road_speed
 
   temp_shape
   temp_size
@@ -37,14 +37,11 @@ patches-own
   permeability ;; 0 - 1, 0 being completely impermeable, 1 meaning complete freedom of movement
   local_death_threshold
   food-consumed-from
-<<<<<<< HEAD
   temperature_difference
   temperature
-
-=======
   being_monitored
   monitor_size
->>>>>>> 52177ed374f18fb2b4d715cc1da8cf91c42c3a8c
+  monitor_index
 ]
 
 to setup_environment
@@ -52,12 +49,15 @@ to setup_environment
   set day_num starting_day
   set year 0
   set periods-in-day 4;;0
-  set speed_in_water 0.05
+  set speed_in_water 0.4
+  set road_speed 2
 
   set temperatures (list January February March April May June July August September October November December)
   set num_days (list 31 28 31 30 31 30 31 31 30 31 30 31)
   set current_month 0
   set var starting_day
+  set monitor_number 0
+  
   while [var > 0]
   [
     if var > item current_month num_days
@@ -85,15 +85,10 @@ to setup_environment
   [
     set permeability 1
     set ph 7
-<<<<<<< HEAD
-    set temperature_variation 0
-    set local_death_threshold death_threshold
-
-=======
     ;set local_death_threshold death_threshold
+    set temperature_variation 0
     set being_monitored false
     
->>>>>>> 52177ed374f18fb2b4d715cc1da8cf91c42c3a8c
     setup-initial-food
     recolor-patch
     ;foreach obstacle_list [setup-obstacles ? ]
@@ -103,15 +98,10 @@ end
 
 
 to calculate_temp
-<<<<<<< HEAD
   ask patches
   [
     set temperature global_temperature + temperature_difference
   ]
-=======
-
-    set temperature random-normal (item current_month temperatures) (1)
->>>>>>> 52177ed374f18fb2b4d715cc1da8cf91c42c3a8c
 ;    set temperature (4 * var * (180 - var)) / (40500 - var * (180 - var))
 ;    set temperature temperature * max_temperature ;scales temperature to real world values
 
@@ -121,6 +111,8 @@ to add_obstacle
   
   set obstacle (list obstacle_shape obstacle_size obstacle_x obstacle_y 0 false) 
   set obstacle_list lput obstacle obstacle_list
+  
+  if (obstacle_shape = "monitor") [set monitor_number monitor_number + 1]
   show obstacle_list
   
   ask patches 
@@ -142,7 +134,7 @@ end
 
 to draw_obstacles
     ask patches [
-    foreach obstacle_list [setup-obstacles ? ]
+      foreach obstacle_list [setup-obstacles ? ]
     ]
     recolor_patches
 
@@ -155,33 +147,20 @@ to calculate_time
   if (ticks mod (2 * periods-in-day) = 0) [
     set day_num day_num + 1
     set day_of_month day_of_month + 1
-<<<<<<< HEAD
+  ]
     if day_of_month > item current_month num_days
     [
       set current_month (current_month + 1) mod 12
       set day_of_month 1
-    ]
-  ]
-=======
+      ;show current_month
   ]
   
-  if day_of_month > item current_month num_days
-    [
-      set current_month (current_month + 1) mod 12
-      set day_of_month 1
-      show current_month
-    ]
-  
->>>>>>> 52177ed374f18fb2b4d715cc1da8cf91c42c3a8c
   if (day_num = 366) [
     set year year + 1
     set day_num 1 ;;reset for every year
   ]
   
-<<<<<<< HEAD
 
-=======
->>>>>>> 52177ed374f18fb2b4d715cc1da8cf91c42c3a8c
   end
 
 to setup-initial-food
@@ -202,13 +181,9 @@ to setup-initial-food
 end
 
 to recolor-patch
-<<<<<<< HEAD
   ifelse (permeability  > speed_in_water)
-=======
-  
-  ifelse (permeability  > 0.05)
->>>>>>> 52177ed374f18fb2b4d715cc1da8cf91c42c3a8c
   [
+
     if (Show: = "pH")
     [
       if (ph = 7)
@@ -243,15 +218,16 @@ to recolor-patch
         set pcolor scale-color violet temperature_difference -10 0
       ]
     ]
-<<<<<<< HEAD
-=======
-    
+
     if (Show: = "monitor") [
       if (being_monitored) [set pcolor orange]
     ]
->>>>>>> 52177ed374f18fb2b4d715cc1da8cf91c42c3a8c
+    if (permeability = road_speed)
+    [
+     set pcolor grey 
+    ]
   ]
-  [
+  [;if water body
     set pcolor blue
   ]
 end
@@ -315,7 +291,7 @@ to setup-obstacles [one_obstacle]
         set permeability speed_in_water
         set food-here 0
         set ph 7
-        ask turtles-here [die]
+        ;ask turtles-here [die]
         
       ]
     ]
@@ -325,13 +301,9 @@ to setup-obstacles [one_obstacle]
     [
       if pxcor >= temp_x - temp_size and pxcor <= temp_x + temp_size and pycor >= temp_y - temp_size and pycor <= temp_y + temp_size
       [
-        ifelse temp_movable [
          set permeability speed_in_water
-         ]
-        [ set food-here 0
-          set permeability 0
-          ask turtles-here [die]
-          ]
+         set food-here 0
+
         ;;set ph random-normal temp_pH 1
 
       ]
@@ -341,13 +313,9 @@ to setup-obstacles [one_obstacle]
     [
       if distancexy temp_x temp_y <= temp_size and temp_y = pycor
       [
-        ifelse temp_movable [
-          set permeability speed_in_water
-        ]
-        [ set food-here 0
-          set permeability 0
-          ask turtles-here [die]
-        ]
+        set permeability speed_in_water
+        set food-here 0
+
         ;;set ph random-normal temp_pH 1
       ]
     ]
@@ -356,13 +324,9 @@ to setup-obstacles [one_obstacle]
     [
       if distancexy temp_x temp_y <= temp_size and temp_x = pxcor
       [
-        ifelse temp_movable [
           set permeability speed_in_water
-        ]
-        [ set food-here 0
-          set permeability 0
-          ask turtles-here [die]
-        ]
+          set food-here 0
+
         ;;set ph random-normal temp_pH 1 
       ]
     ]
@@ -372,6 +336,7 @@ to setup-obstacles [one_obstacle]
       if (distancexy temp_x temp_y) < temp_size 
         [
           set being_monitored true
+          set monitor_index monitor_number - 1
           set monitor_size temp_size
         ]
     ]
@@ -379,23 +344,35 @@ to setup-obstacles [one_obstacle]
   ]
 end
 
-to collect_data  
-    if (being_monitored)
-    [ ;show count turtles-here with [parent_breed = monitored_breed]
+to collect_data
+    if (being_monitored) [
+      let patch_population 0
       
-      foreach species_list [
-        set current_species item 0 ?                                  ;species' breed
-        set current_species_info (table:get species_data current_species)  ;retreives info about specific breed
+      foreach species_data [
+        set patch_population (count turtles-here with [parent_breed = ((array:item (array:item ? monitor_index) 2)  - 1)])
         
-        set patch_population (count turtles-here with [parent_breed = (current_species - 1)])
-        ;show patch_population
-        array:set current_species_info 0 ((array:item current_species_info 0) + patch_population) ;updates (increments) species populations
-        
-        table:put species_data current_species current_species_info
-        ]
+        array:set (array:item ? monitor_index) 3 ((array:item (array:item ? monitor_index) 3) + patch_population) ;updates (increments) species populations
+        array:set (array:item ? monitor_index) 4 ((array:item (array:item ? monitor_index) 3) / monitor_size)     ;updates density 
+      ]
     ]
   
 end
+
+<<<<<<< HEAD
+to river_draw
+  if mouse-down?
+  [
+    ask patch mouse-xcor mouse-ycor
+    [ set pcolor blue 
+     set food-here 0
+     set permeability speed_in_water
+    ]
+  ]
+  
+end
+=======
+
+>>>>>>> 8f826d69e347528ee227ac82d8242f3c83150e12
 
 
 to update_organic_matter

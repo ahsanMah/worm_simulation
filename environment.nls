@@ -18,6 +18,7 @@ globals [
   obstacle_list
   temp_arr
   speed_in_water
+  road_speed
 
   temp_shape
   temp_size
@@ -48,7 +49,8 @@ to setup_environment
   set day_num starting_day
   set year 0
   set periods-in-day 4;;0
-  set speed_in_water 0.05
+  set speed_in_water 0.4
+  set road_speed 2
 
   set temperatures (list January February March April May June July August September October November December)
   set num_days (list 31 28 31 30 31 30 31 31 30 31 30 31)
@@ -150,7 +152,7 @@ to calculate_time
     [
       set current_month (current_month + 1) mod 12
       set day_of_month 1
-      show current_month
+      ;show current_month
   ]
   
   if (day_num = 366) [
@@ -181,6 +183,7 @@ end
 to recolor-patch
   ifelse (permeability  > speed_in_water)
   [
+
     if (Show: = "pH")
     [
       if (ph = 7)
@@ -218,6 +221,10 @@ to recolor-patch
 
     if (Show: = "monitor") [
       if (being_monitored) [set pcolor orange]
+    ]
+    if (permeability = road_speed)
+    [
+     set pcolor grey 
     ]
   ]
   [;if water body
@@ -351,17 +358,8 @@ to collect_data
   
 end
 
-to river_draw
-  if mouse-down?
-  [
-    ask patch mouse-xcor mouse-ycor
-    [ set pcolor blue 
-     set food-here 0
-     set permeability speed_in_water
-    ]
-  ]
+
   
-end
 
 
 to update_organic_matter

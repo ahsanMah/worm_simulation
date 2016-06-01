@@ -1,19 +1,20 @@
-extensions [array csv]
+extensions [array csv table]
 __includes["environment.nls" "agents.nls"]
 
-<<<<<<< HEAD
 globals[
-  current_species
-  current_species_info
+  ;current_species
+  ;current_species_info
   species_population
-  patch_population
+  ;patch_population
   species_data
+  monthly_data
   output_data
   has_collected
-]
+  report_month
 
-=======
->>>>>>> e5d76cbefaf8bd2cf40941e87f6f9946833c3612
+  ;index positions of data in arrays
+  ;month monitor species_number population density genetic diversity
+]
 to setup
   clear-all
 
@@ -22,18 +23,41 @@ to setup
   print "Done"
   print "Setting up agents..."
   setup_agents
-<<<<<<< HEAD
   print "Done"
 
-  set species_data table:make
-  set output_data []
-  ;species_data array:from-list n-values [0]
-  ;table:put monthly_data"hello" (list "world" 0.2 0.7)
-=======
+  set species_data [true]
+  set species_data lput (array:from-list n-values 3 [0]) species_data;hash map of species to their collected info
 
->>>>>>> e5d76cbefaf8bd2cf40941e87f6f9946833c3612
+  set monthly_data []  ;list of tables collected every month
+  ;set output_data n-values 5 [?]   ;final list that will be written to a .csv file
+  show output_data
+  set report_month 0
 
- reset-ticks
+  reset-ticks
+end
+
+to river_draw
+  if mouse-down?
+  [
+    ask patch mouse-xcor mouse-ycor
+    [
+     set food-here 0
+     set permeability speed_in_water
+     set pcolor blue
+    ]
+
+  ]
+end
+
+to draw_highway
+  if mouse-down?
+  [
+    ask patch mouse-xcor mouse-ycor
+    [
+      set permeability road_speed
+      set pcolor grey
+    ]
+  ]
 end
 
 to save_obstacles
@@ -52,7 +76,7 @@ end
 
 to save_patches
   save_obstacles
-  let filename (word "mypatches" save_number ".csv")
+  let filename (word "data/parameters/mypatches" save_number ".csv")
   let i min-pxcor
   let j min-pycor
   carefully [file-delete filename] []
@@ -78,7 +102,7 @@ end
 
 to load_patches
   load_obstacles
-  let filename (word "mypatches" save_number ".csv")
+  let filename (word "data/parameters/mypatches" save_number ".csv")
   let data csv:from-file filename
   foreach (data)
   [
@@ -96,8 +120,10 @@ to load_patches
 end
 
 to save_agents
+  export_data
   let filename (word "data/parameters/myagents"  save_number ".csv")
   csv:to-file filename species_list
+  ;show csv:to-row ["one" 2 true ["two" 1 false]]
   print "Saved to file"
 end
 
@@ -109,11 +135,38 @@ to load_agents
   foreach species_list [create_species ?]
 end
 
-to save_data
+to export_data
   let filename (word "data/output/simulation"  save_number ".csv")
-  csv:to-file filename species_list
-  print "Saved to file"
+  csv:to-file filename monthly_data
+  print "Exported simulation data to file"
 end
+
+to clear_arrays
+
+   set species_data []
+   let monitor_list n-values monitor_number [?] ;(?) allows to create a list from 0 to monitor number
+   foreach species_list [
+<<<<<<< HEAD
+     let current_species ?
+     let monitor_set array:from-list monitor_list
+     foreach monitor_list [ ;m*n matrix of species data for every monitor
+       let current_species_info array:from-list (list report_month ? (item 0 current_species) 0 0 (item 1 current_species)) ;resets population, density and saves genetic diversity
+       array:set monitor_set ? current_species_info
+     ]
+     set species_data lput monitor_set species_data ;list of matrices
+   ]
+=======
+      let current_species_info array:from-list (list report_month (item 0 ?) 0 0 (item 1 ?)) ;resets population, density and saves genetic diversity
+      ;table:put species_data current_species array:from-list (list 0 0 (item 1 ?)) ; hash map of species to its info
+      set species_data lput current_species_info species_data
+    ]
+    ;print "Monthly data after table is resest: "
+    ;show monthly_data
+>>>>>>> 8f826d69e347528ee227ac82d8242f3c83150e12
+    set has_collected false
+end
+
+
 
 to go
 
@@ -121,20 +174,14 @@ to go
   if (year = 20) [stop]
   if (count turtles = 0) [stop]
 
-<<<<<<< HEAD
-  if (day_of_month != 28)[
-
-    foreach species_list [
-      set current_species item 0 ?
-      set current_species_info array:from-list (list 0 0 (item 1 ?)) ;resets population, density and saves genetic diversity
-      table:put species_data current_species current_species_info ; hash map of species to its info
-    ]
-    set has_collected false
-    ;show table:get monthly_data 3
+ if (day_of_month = (item current_month num_days - 1))[ ;clears arrays a day before collection
+   clear_arrays
   ]
-=======
->>>>>>> e5d76cbefaf8bd2cf40941e87f6f9946833c3612
+
   if (ticks mod (2 * periods-in-day) = 0) [
+
+    print "Species Populations"
+    show population_arr
     set global_temperature random-normal (item current_month temperatures) (1)
     calculate_temp
     update_organic_matter
@@ -150,37 +197,42 @@ to go
       update_maturity
       update_thresholds
       check_reproduction
-      ;;show maturation
       ]
+
     move
 
-    set food-here food-here + organic-regen
+    ;set food-here food-here + organic-regen
   ]
   ask patches
   [
-<<<<<<< HEAD
-    if (day_of_month = 28)[
+    if (day_of_month = item current_month num_days)[
       if (has_collected = false)[
         collect_data
       ]
-    ] ;if patch belongs to monitor
-      ;concat data_list
+    ]
    recolor-patch
   ]
    ;saves monthly data to accumulutor list
-  if (day_of_month = 28)[
-    if (has_collected = false)[
-      set output_data lput species_data output_data
-      show output_data
+  if (day_of_month = item current_month num_days)[
+    if (has_collected = false) [
+<<<<<<< HEAD
+      show species_data
+      foreach species_data [
+        let monitor_list (array:to-list ?)
+        foreach monitor_list [
+          set monthly_data lput (array:to-list ?) monthly_data
+        ]
+      ]
+      ;print "Monthly data: "
+=======
+      ;show species_data
+      foreach species_data [ set monthly_data lput (array:to-list ?) monthly_data]
+>>>>>>> 8f826d69e347528ee227ac82d8242f3c83150e12
+      ;show monthly_data
+      set report_month report_month + 1
       set has_collected true
     ]
   ]
-=======
-   recolor-patch
-  ]
-
-  show current_month
->>>>>>> e5d76cbefaf8bd2cf40941e87f6f9946833c3612
   tick
 end
 @#$#@#$#@
@@ -205,8 +257,8 @@ GRAPHICS-WINDOW
 119
 0
 119
-1
-1
+0
+0
 1
 ticks
 1000.0
@@ -265,7 +317,7 @@ worm_population
 worm_population
 0
 500
-430
+200
 10
 1
 NIL
@@ -303,7 +355,7 @@ normal_reproduction_rate
 normal_reproduction_rate
 0
 1
-0.5
+0.6
 0.1
 1
 NIL
@@ -318,7 +370,7 @@ max_reproduction_rate
 max_reproduction_rate
 0
 10
-7.7
+8
 0.1
 1
 NIL
@@ -333,7 +385,7 @@ max_death_rate
 max_death_rate
 0
 100
-31
+30
 1
 1
 NIL
@@ -403,7 +455,7 @@ INPUTBOX
 87
 117
 starting_day
-125
+120
 1
 0
 Number
@@ -426,8 +478,8 @@ CHOOSER
 580
 obstacle_shape
 obstacle_shape
-"lake" "mountain" "square" "horizontal-line" "vertical-line"
-1
+"lake" "mountain" "square" "horizontal-line" "vertical-line" "monitor"
+5
 
 SLIDER
 1418
@@ -438,7 +490,7 @@ obstacle_size
 obstacle_size
 0
 max-pycor / 2
-28
+6
 1
 1
 NIL
@@ -453,7 +505,7 @@ obstacle_x
 obstacle_x
 min-pxcor
 max-pxcor
-59
+83
 1
 1
 NIL
@@ -468,7 +520,7 @@ obstacle_y
 obstacle_y
 -50
 50
-59
+49
 1
 1
 HORIZONTAL
@@ -483,7 +535,7 @@ obstacle_y
 obstacle_y
 min-pycor
 max-pycor
-59
+49
 1
 1
 NIL
@@ -509,7 +561,7 @@ speed
 speed
 0
 0.5
-0.1
+0.13
 0.01
 1
 NIL
@@ -718,7 +770,7 @@ INPUTBOX
 1656
 455
 save_number
-6
+ham1
 1
 0
 String (reporter)
@@ -777,7 +829,7 @@ patch_y
 patch_y
 1
 num_patches_vertical
-4
+1
 1
 1
 NIL
@@ -792,7 +844,7 @@ patch_pH
 patch_pH
 0
 14
-8.4
+6.6
 0.1
 1
 NIL
@@ -833,8 +885,8 @@ CHOOSER
 451
 Show:
 Show:
-"pH" "food" "temperature"
-1
+"pH" "food" "temperature" "monitor"
+3
 
 TEXTBOX
 10
@@ -855,7 +907,7 @@ species_genetic_diversity
 species_genetic_diversity
 0
 1
-0.6
+0
 0.1
 1
 NIL
@@ -870,7 +922,7 @@ species_hatch_temperature
 species_hatch_temperature
 0
 25
-11
+12
 1
 1
 NIL
@@ -884,13 +936,13 @@ CHOOSER
 species_number
 species_number
 1 2 3 4 5
-2
+1
 
 BUTTON
-128
-467
-191
-500
+125
+469
+206
+502
 Add
 add_species
 NIL
@@ -963,7 +1015,11 @@ start_x
 start_x
 0
 119
-62
+<<<<<<< HEAD
+88
+=======
+32
+>>>>>>> 8f826d69e347528ee227ac82d8242f3c83150e12
 1
 1
 NIL
@@ -978,17 +1034,21 @@ start_y
 start_y
 0
 119
-60
+<<<<<<< HEAD
+53
+=======
+12
+>>>>>>> 8f826d69e347528ee227ac82d8242f3c83150e12
 1
 1
 NIL
 HORIZONTAL
 
 BUTTON
-130
-505
-193
-538
+12
+511
+101
+544
 Save
 save_agents
 NIL
@@ -1002,10 +1062,10 @@ NIL
 1
 
 BUTTON
-196
-505
-259
-538
+122
+511
+208
+544
 Load
 load_agents
 NIL
@@ -1091,6 +1151,40 @@ TEXTBOX
 Obstacle Controls\n
 12
 0.0
+1
+
+BUTTON
+1168
+731
+1265
+764
+Draw River
+river_draw
+T
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+1166
+769
+1284
+802
+Draw Highway
+draw_highway
+T
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
 1
 
 @#$#@#$#@
