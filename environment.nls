@@ -12,9 +12,8 @@ globals [
   num_days
   temperatures
   day_of_month
- 
-
-
+  
+  monitor_number
   obstacle
   obstacle_list
   temp_arr
@@ -41,6 +40,7 @@ patches-own
   temperature
   being_monitored
   monitor_size
+  monitor_index
 ]
 
 to setup_environment
@@ -54,6 +54,8 @@ to setup_environment
   set num_days (list 31 28 31 30 31 30 31 31 30 31 30 31)
   set current_month 0
   set var starting_day
+  set monitor_number -1
+  
   while [var > 0]
   [
     if var > item current_month num_days
@@ -334,9 +336,11 @@ to setup-obstacles [one_obstacle]
     
     if temp_shape = "monitor"
     [
+      set monitor_number monitor_number + 1
       if (distancexy temp_x temp_y) < temp_size 
         [
           set being_monitored true
+          set monitor_index monitor_number
           set monitor_size temp_size
         ]
     ]
@@ -344,9 +348,8 @@ to setup-obstacles [one_obstacle]
   ]
 end
 
-to collect_data  
-    if (being_monitored)
-    [ 
+to collect_data
+    if (being_monitored) [
       let patch_population 0
       
       foreach species_data [

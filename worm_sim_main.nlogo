@@ -24,12 +24,13 @@ to setup
 
   set species_data [true]
   set species_data lput (array:from-list n-values 3 [0]) species_data;hash map of species to their collected info
-  show species_data
+
   set monthly_data []  ;list of tables collected every month
-  set output_data []   ;final list that will be written to a .csv file
+  ;set output_data n-values 5 [?]   ;final list that will be written to a .csv file
+  show output_data
   set report_month 0
 
- reset-ticks
+  reset-ticks
 end
 
 to save_obstacles
@@ -116,9 +117,11 @@ end
 to clear_arrays
 
    set species_data []
+   let monitor_list n-values monitor_number [?] ;(?) allows to create a list from 0 to monitor number
    foreach species_list [
-      let current_species_info array:from-list (list report_month (item 0 ?) 0 0 (item 1 ?)) ;resets population, density and saves genetic diversity
-      ;table:put species_data current_species array:from-list (list 0 0 (item 1 ?)) ; hash map of species to its info
+     let current_species ?
+     foreach monitor_list [] ;creates array --> {month, monitor number, species number, population, density, genetic diversity}
+      let current_species_info array:from-list (list report_month (item 0 current_species) 0 0 (item 1 current_species)) ;resets population, density and saves genetic diversity
       set species_data lput current_species_info species_data
     ]
     print "Monthly data after table is resest: "
@@ -164,8 +167,7 @@ to go
       if (has_collected = false)[
         collect_data
       ]
-    ] ;if patch belongs to monitor
-      ;concat data_list
+    ]
    recolor-patch
   ]
    ;saves monthly data to accumulutor list
