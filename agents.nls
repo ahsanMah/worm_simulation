@@ -124,7 +124,8 @@ end
 
 
 to move
-  set stamina stamina - 0.3
+  if (food-here <= 0)
+  [set stamina stamina - 0.3]
   let potential-destinations (patch-set patch-here neighbors with [permeability != 0])
   ;ifelse iseating?
   ;[
@@ -161,22 +162,28 @@ end
 
 to eat
 
-  ifelse (food-here < consumption-in-period) ;;prevents consuming more food than on patch
-  [
-    set food-consumed-last food-here
-    set food-here 0
-  ]
-  [
-    set food-consumed-last consumption-in-period
-    set food-here food-here - consumption-in-period
-    set time-since-eaten 0
-  ]
-
-  if (food-here > 0) [
-      if (stamina < max_stamina) [set stamina stamina + food-consumed-last]
-    ]
-
-  set food-consumed-from food-consumed-from + consumption-in-period
+;;  ifelse (food-here < consumption-in-period) ;;prevents consuming more food than on patch
+;;  [
+;;    set food-consumed-last food-here
+;;    set food-here 0
+;;  ]
+;;  [
+;;    set food-consumed-last consumption-in-period
+;;    set food-here food-here - consumption-in-period
+;;    set time-since-eaten 0
+;;  ]
+;;
+;;  if (food-here > 0) [
+;;      if (stamina < max_stamina) [set stamina stamina + food-consumed-last]
+;;    ]
+;;
+;;  set food-consumed-from food-consumed-from + consumption-in-period
+  
+  
+  
+  
+  
+  
   ;;ifelse (stamina < (max_stamina - food-consumed-last)) [ set stamina stamina + food-consumed-last ]
   ;;[if stamina < max_stamina [set stamina max_stamina]]
 
@@ -241,15 +248,6 @@ to update_thresholds
     set death_threshold (death_threshold + (random 55) / max_ph_resist * var ) ; +55% chance of them dying at pH of 0
   ]
   
-  
-;  ifelse (temperature < 6) [
-;    set death_threshold max_death_rate
-;    ]
-;  [
-;    ifelse (temperature > 25)[set death_threshold max_death_rate]
-;      [set death_threshold (normal_death_threshold / temperature)]
-;   ] ; probability of dying decreases as it gets warmer
-
   ;reproduction rate affected by temperature
   ifelse (temperature > 10) [
     set reprod_threshold (max_reproduction_rate / 10 * temperature) ] ; probability of reproducing increases as it gets warmer (10 * 2 * periods-in-day)

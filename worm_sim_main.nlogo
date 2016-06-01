@@ -11,6 +11,9 @@ globals[
   output_data
   has_collected
   report_month
+
+  ;index positions of data in arrays
+  ;month monitor species
 ]
 to setup
   clear-all
@@ -120,10 +123,15 @@ to clear_arrays
    let monitor_list n-values monitor_number [?] ;(?) allows to create a list from 0 to monitor number
    foreach species_list [
      let current_species ?
-     foreach monitor_list [] ;creates array --> {month, monitor number, species number, population, density, genetic diversity}
-      let current_species_info array:from-list (list report_month (item 0 current_species) 0 0 (item 1 current_species)) ;resets population, density and saves genetic diversity
-      set species_data lput current_species_info species_data
-    ]
+     let monitor_set array:from-list monitor_list
+     foreach monitor_list [ ;m*n matrix of species data for every monitor
+       let current_species_info array:from-list (list report_month ? (item 0 current_species) 0 0 (item 1 current_species)) ;resets population, density and saves genetic diversity
+       array:set monitor_set ? current_species_info
+     ]
+     set species_data lput monitor_set species_data ;list of matrices
+   ]
+
+
     print "Monthly data after table is resest: "
     show monthly_data
     set has_collected false
@@ -159,7 +167,7 @@ to go
       ]
     move
 
-    set food-here food-here + organic-regen
+    ;set food-here food-here + organic-regen
   ]
   ask patches
   [
@@ -174,10 +182,15 @@ to go
   if (day_of_month = item current_month num_days)[
     if (has_collected = false) [
       show species_data
-      foreach species_data [ set monthly_data lput (array:to-list ?) monthly_data]
+      foreach species_data [
+        let monitor_list (array:to-list ?)
+        foreach monitor_list [
+          set monthly_data lput (array:to-list ?) monthly_data
+        ]
       show monthly_data
       set report_month report_month + 1
       set has_collected true
+      ]
     ]
   ]
   tick
@@ -452,7 +465,7 @@ obstacle_x
 obstacle_x
 min-pxcor
 max-pxcor
-59
+80
 1
 1
 NIL
@@ -467,7 +480,7 @@ obstacle_y
 obstacle_y
 -50
 50
-59
+51
 1
 1
 HORIZONTAL
@@ -482,7 +495,7 @@ obstacle_y
 obstacle_y
 min-pycor
 max-pycor
-59
+51
 1
 1
 NIL
@@ -962,7 +975,7 @@ start_x
 start_x
 0
 119
-59
+88
 1
 1
 NIL
@@ -977,7 +990,7 @@ start_y
 start_y
 0
 119
-61
+49
 1
 1
 NIL
@@ -1090,6 +1103,23 @@ TEXTBOX
 Obstacle Controls\n
 12
 0.0
+1
+
+BUTTON
+1168
+731
+1265
+764
+Draw River
+river_draw
+T
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
 1
 
 @#$#@#$#@

@@ -54,7 +54,7 @@ to setup_environment
   set num_days (list 31 28 31 30 31 30 31 31 30 31 30 31)
   set current_month 0
   set var starting_day
-  set monitor_number -1
+  set monitor_number 0
   
   while [var > 0]
   [
@@ -109,6 +109,8 @@ to add_obstacle
   
   set obstacle (list obstacle_shape obstacle_size obstacle_x obstacle_y 0 false) 
   set obstacle_list lput obstacle obstacle_list
+  
+  if (obstacle_shape = "monitor") [set monitor_number monitor_number + 1]
   show obstacle_list
   
   ask patches 
@@ -130,7 +132,7 @@ end
 
 to draw_obstacles
     ask patches [
-    foreach obstacle_list [setup-obstacles ? ]
+      foreach obstacle_list [setup-obstacles ? ]
     ]
     recolor_patches
 
@@ -218,7 +220,7 @@ to recolor-patch
       if (being_monitored) [set pcolor orange]
     ]
   ]
-  [
+  [;if water body
     set pcolor blue
   ]
 end
@@ -282,7 +284,7 @@ to setup-obstacles [one_obstacle]
         set permeability speed_in_water
         set food-here 0
         set ph 7
-        ask turtles-here [die]
+        ;ask turtles-here [die]
         
       ]
     ]
@@ -292,13 +294,9 @@ to setup-obstacles [one_obstacle]
     [
       if pxcor >= temp_x - temp_size and pxcor <= temp_x + temp_size and pycor >= temp_y - temp_size and pycor <= temp_y + temp_size
       [
-        ifelse temp_movable [
          set permeability speed_in_water
-         ]
-        [ set food-here 0
-          set permeability 0
-          ask turtles-here [die]
-          ]
+         set food-here 0
+
         ;;set ph random-normal temp_pH 1
 
       ]
@@ -308,13 +306,9 @@ to setup-obstacles [one_obstacle]
     [
       if distancexy temp_x temp_y <= temp_size and temp_y = pycor
       [
-        ifelse temp_movable [
-          set permeability speed_in_water
-        ]
-        [ set food-here 0
-          set permeability 0
-          ask turtles-here [die]
-        ]
+        set permeability speed_in_water
+        set food-here 0
+
         ;;set ph random-normal temp_pH 1
       ]
     ]
@@ -323,24 +317,19 @@ to setup-obstacles [one_obstacle]
     [
       if distancexy temp_x temp_y <= temp_size and temp_x = pxcor
       [
-        ifelse temp_movable [
           set permeability speed_in_water
-        ]
-        [ set food-here 0
-          set permeability 0
-          ask turtles-here [die]
-        ]
+          set food-here 0
+
         ;;set ph random-normal temp_pH 1 
       ]
     ]
     
     if temp_shape = "monitor"
     [
-      set monitor_number monitor_number + 1
       if (distancexy temp_x temp_y) < temp_size 
         [
           set being_monitored true
-          set monitor_index monitor_number
+          set monitor_index monitor_number - 1
           set monitor_size temp_size
         ]
     ]
@@ -353,12 +342,24 @@ to collect_data
       let patch_population 0
       
       foreach species_data [
-        set patch_population (count turtles-here with [parent_breed = ((array:item ? 1)  - 1)])
+        set patch_population (count turtles-here with [parent_breed = ((array:item (array:item ? monitor_index) 2)  - 1)])
         
-        array:set ? 2 ((array:item ? 2) + patch_population) ;updates (increments) species populations
-        array:set ? 3 ((array:item ? 3) / monitor_size)     ;updates density 
+        array:set (array:item ? monitor_index) 3 ((array:item (array:item ? monitor_index) 3) + patch_population) ;updates (increments) species populations
+        array:set (array:item ? monitor_index) 4 ((array:item (array:item ? monitor_index) 3) / monitor_size)     ;updates density 
       ]
     ]
+  
+end
+
+to river_draw
+  if mouse-down?
+  [
+    ask patch mouse-xcor mouse-ycor
+    [ set pcolor blue 
+     set food-here 0
+     set permeability speed_in_water
+    ]
+  ]
   
 end
 
