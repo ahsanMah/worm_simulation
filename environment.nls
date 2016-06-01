@@ -222,14 +222,16 @@ to recolor-patch
     if (Show: = "monitor") [
       if (being_monitored) [set pcolor orange]
     ]
-    if (permeability = road_speed)
-    [
-     set pcolor grey 
-    ]
+
+    
   ]
   [;if water body
     set pcolor blue
   ]
+      if (permeability = road_speed)
+    [
+     set pcolor grey 
+    ]
 end
 
 to add_patch
@@ -258,6 +260,16 @@ to add_patch
   
 end
 
+to change_speed
+  ask patches
+  [
+   if (permeability = 0.05) 
+   [
+    set permeability speed_in_water 
+   ]
+  ]
+end
+
 
 to setup-obstacles [one_obstacle]
   ;if obstacle parameters given
@@ -277,7 +289,10 @@ to setup-obstacles [one_obstacle]
     [
       if (distancexy temp_x temp_y) < temp_size 
       [
+        if (permeability != speed_in_water and permeability != road_speed)
+        [
           set permeability 1
+        ]
           set ph (ph - ((ph - min_ph) / temp_size) * (temp_size - distancexy temp_x temp_y) )
           set temperature_difference (temperature_difference + ((max_temp_difference) / temp_size) * (temp_size - distancexy temp_x temp_y))
           ;; set temperature later 

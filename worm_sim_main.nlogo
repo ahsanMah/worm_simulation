@@ -466,7 +466,7 @@ CHOOSER
 obstacle_shape
 obstacle_shape
 "lake" "mountain" "square" "horizontal-line" "vertical-line" "monitor"
-5
+1
 
 SLIDER
 1418
@@ -873,7 +873,7 @@ CHOOSER
 Show:
 Show:
 "pH" "food" "temperature" "monitor"
-3
+1
 
 TEXTBOX
 10
@@ -1002,7 +1002,7 @@ start_x
 start_x
 0
 119
-88
+34
 1
 1
 NIL
@@ -1017,7 +1017,7 @@ start_y
 start_y
 0
 119
-53
+23
 1
 1
 NIL
