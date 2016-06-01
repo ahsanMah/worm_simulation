@@ -113,6 +113,7 @@ to load_patches
       set permeability item 4 ?
       set local_death_threshold item 5 ?
       set temperature_difference item 6 ?
+      set being_monitored false
     ]
   ]
   calculate_temp
@@ -121,6 +122,7 @@ end
 
 to save_agents
   export_data
+  save_monitors
   let filename (word "data/parameters/myagents"  save_number ".csv")
   csv:to-file filename species_list
   ;show csv:to-row ["one" 2 true ["two" 1 false]]
@@ -128,11 +130,52 @@ to save_agents
 end
 
 to load_agents
+  load_monitors
   let filename (word "data/parameters/myagents"  save_number ".csv")
   set species_list csv:from-file filename
   print "Loaded from file: "
   print species_list
   foreach species_list [create_species ?]
+end
+
+to save_monitors
+  let filename (word "data/parameters/mymonitors" save_number ".csv")
+  let i min-pxcor
+  let j min-pycor
+  carefully [file-delete filename] []
+  file-open filename
+  while [(i <= max-pxcor)]
+  [
+   while [(j <= max-pycor)]
+   [
+     ask patch i j
+     [
+       let info (list i j being_monitored monitor_index monitor_size monitor_number)
+       file-open filename
+       file-print csv:to-row info
+       file-close
+       set j j + 1
+     ]
+   ]
+   set j min-pycor
+   set i i + 1
+  ]
+end
+
+to load_monitors
+  let filename (word "data/parameters/mymonitors" save_number ".csv")
+  let data csv:from-file filename
+  foreach (data)
+  [
+    ask patch (item 0 ?) (item 1 ?)
+    [
+      set being_monitored item 2 ?
+      set monitor_index item 3 ?
+      set monitor_size item 4 ?
+    ]
+    set monitor_number item 5 ?
+  ]
+  recolor_patches
 end
 
 to export_data
@@ -146,7 +189,6 @@ to clear_arrays
    set species_data []
    let monitor_list n-values monitor_number [?] ;(?) allows to create a list from 0 to monitor number
    foreach species_list [
-<<<<<<< HEAD
      let current_species ?
      let monitor_set array:from-list monitor_list
      foreach monitor_list [ ;m*n matrix of species data for every monitor
@@ -155,14 +197,6 @@ to clear_arrays
      ]
      set species_data lput monitor_set species_data ;list of matrices
    ]
-=======
-      let current_species_info array:from-list (list report_month (item 0 ?) 0 0 (item 1 ?)) ;resets population, density and saves genetic diversity
-      ;table:put species_data current_species array:from-list (list 0 0 (item 1 ?)) ; hash map of species to its info
-      set species_data lput current_species_info species_data
-    ]
-    ;print "Monthly data after table is resest: "
-    ;show monthly_data
->>>>>>> 8f826d69e347528ee227ac82d8242f3c83150e12
     set has_collected false
 end
 
@@ -215,8 +249,7 @@ to go
    ;saves monthly data to accumulutor list
   if (day_of_month = item current_month num_days)[
     if (has_collected = false) [
-<<<<<<< HEAD
-      show species_data
+      ;show species_data
       foreach species_data [
         let monitor_list (array:to-list ?)
         foreach monitor_list [
@@ -224,10 +257,6 @@ to go
         ]
       ]
       ;print "Monthly data: "
-=======
-      ;show species_data
-      foreach species_data [ set monthly_data lput (array:to-list ?) monthly_data]
->>>>>>> 8f826d69e347528ee227ac82d8242f3c83150e12
       ;show monthly_data
       set report_month report_month + 1
       set has_collected true
@@ -317,7 +346,7 @@ worm_population
 worm_population
 0
 500
-200
+500
 10
 1
 NIL
@@ -479,7 +508,7 @@ CHOOSER
 obstacle_shape
 obstacle_shape
 "lake" "mountain" "square" "horizontal-line" "vertical-line" "monitor"
-5
+1
 
 SLIDER
 1418
@@ -505,7 +534,7 @@ obstacle_x
 obstacle_x
 min-pxcor
 max-pxcor
-83
+41
 1
 1
 NIL
@@ -520,7 +549,7 @@ obstacle_y
 obstacle_y
 -50
 50
-49
+21
 1
 1
 HORIZONTAL
@@ -535,7 +564,7 @@ obstacle_y
 obstacle_y
 min-pycor
 max-pycor
-49
+21
 1
 1
 NIL
@@ -770,7 +799,7 @@ INPUTBOX
 1656
 455
 save_number
-ham1
+1
 1
 0
 String (reporter)
@@ -886,7 +915,7 @@ CHOOSER
 Show:
 Show:
 "pH" "food" "temperature" "monitor"
-3
+1
 
 TEXTBOX
 10
@@ -936,7 +965,7 @@ CHOOSER
 species_number
 species_number
 1 2 3 4 5
-1
+0
 
 BUTTON
 125
@@ -1016,10 +1045,10 @@ start_x
 0
 119
 <<<<<<< HEAD
-88
+93
 =======
-32
->>>>>>> 8f826d69e347528ee227ac82d8242f3c83150e12
+34
+>>>>>>> 2513dba85a85c1267e6200d0555676ba900e5b0e
 1
 1
 NIL
@@ -1035,10 +1064,10 @@ start_y
 0
 119
 <<<<<<< HEAD
-53
+42
 =======
-12
->>>>>>> 8f826d69e347528ee227ac82d8242f3c83150e12
+23
+>>>>>>> 2513dba85a85c1267e6200d0555676ba900e5b0e
 1
 1
 NIL

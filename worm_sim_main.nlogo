@@ -2,15 +2,12 @@ extensions [array csv table]
 __includes["environment.nls" "agents.nls"]
 
 globals[
-  ;current_species
-  ;current_species_info
-  species_population
-  ;patch_population
   species_data
   monthly_data
   output_data
   has_collected
   report_month
+  area_list
 
   ;index positions of data in arrays
   ;month monitor species_number population density genetic diversity
@@ -26,14 +23,24 @@ to setup
   print "Done"
 
   set species_data [true]
-  set species_data lput (array:from-list n-values 3 [0]) species_data;hash map of species to their collected info
-
-  set monthly_data []  ;list of tables collected every month
-  ;set output_data n-values 5 [?]   ;final list that will be written to a .csv file
-  show output_data
+  set species_data lput (array:from-list n-values 3 [0]) species_data ;hash map of species to their collected info
+  set monthly_data []                                                 ;list of tables collected every month
+  set area_list []
   set report_month 0
+  setup_sim
 
   reset-ticks
+end
+
+
+to setup_sim
+  ;setup
+
+  print "Loading from simulation files..."
+  load_patches "ham1"
+  load_agents "ham1"
+  load_monitors "ham1"
+  print "Done Loading"
 end
 
 to river_draw
@@ -60,23 +67,23 @@ to draw_highway
   ]
 end
 
-to save_obstacles
-  let filename1 (word "data/parameters/myobstacle"  save_number ".csv")
+to save_obstacles [name]
+  let filename1 (word "data/parameters/myobstacle"  name ".csv")
   csv:to-file filename1 obstacle_list
   print "Saved to file"
 end
 
-to load_obstacles
-  let filename (word "data/parameters/myobstacle"  save_number ".csv")
+to load_obstacles [name]
+  let filename (word "data/parameters/myobstacle"  name ".csv")
   set obstacle_list csv:from-file filename
   print "Loaded from file: "
   print obstacle_list
   ;;draw_obstacles
 end
 
-to save_patches
-  save_obstacles
-  let filename (word "data/parameters/mypatches" save_number ".csv")
+to save_patches [name]
+  save_obstacles name
+  let filename (word "data/parameters/mypatches" name ".csv")
   let i min-pxcor
   let j min-pycor
   carefully [file-delete filename] []
@@ -100,9 +107,9 @@ to save_patches
 
 end
 
-to load_patches
-  load_obstacles
-  let filename (word "data/parameters/mypatches" save_number ".csv")
+to load_patches [name]
+  load_obstacles name
+  let filename (word "data/parameters/mypatches" name ".csv")
   let data csv:from-file filename
   foreach (data)
   [
@@ -120,26 +127,26 @@ to load_patches
   recolor_patches
 end
 
-to save_agents
-  export_data
-  save_monitors
-  let filename (word "data/parameters/myagents"  save_number ".csv")
+to save_agents [name]
+  export_data name
+  save_monitors name
+  let filename (word "data/parameters/myagents"  name ".csv")
   csv:to-file filename species_list
   ;show csv:to-row ["one" 2 true ["two" 1 false]]
   print "Saved to file"
 end
 
-to load_agents
-  load_monitors
-  let filename (word "data/parameters/myagents"  save_number ".csv")
+to load_agents [name]
+  ;load_monitors name
+  let filename (word "data/parameters/myagents"  name ".csv")
   set species_list csv:from-file filename
   print "Loaded from file: "
   print species_list
   foreach species_list [create_species ?]
 end
 
-to save_monitors
-  let filename (word "data/parameters/mymonitors" save_number ".csv")
+to save_monitors [name]
+  let filename (word "data/parameters/mymonitors" name ".csv")
   let i min-pxcor
   let j min-pycor
   carefully [file-delete filename] []
@@ -162,8 +169,8 @@ to save_monitors
   ]
 end
 
-to load_monitors
-  let filename (word "data/parameters/mymonitors" save_number ".csv")
+to load_monitors [name]
+  let filename (word "data/parameters/mymonitors" name ".csv")
   let data csv:from-file filename
   foreach (data)
   [
@@ -175,11 +182,12 @@ to load_monitors
     ]
     set monitor_number item 5 ?
   ]
+  update_monitor_area
   recolor_patches
 end
 
-to export_data
-  let filename (word "data/output/simulation"  save_number ".csv")
+to export_data [name]
+  let filename (word "data/output/simulation" name ".csv")
   csv:to-file filename monthly_data
   print "Exported simulation data to file"
 end
@@ -205,17 +213,19 @@ end
 to go
 
   calculate_time
-  if (year = 20) [stop]
-  if (count turtles = 0) [stop]
+  if (year = 20) [
+    export_data save_number
+    stop
+    ]
+  if (count turtles = 0) [
+    export_data save_number
+    stop]
 
  if (day_of_month = (item current_month num_days - 1))[ ;clears arrays a day before collection
    clear_arrays
   ]
 
   if (ticks mod (2 * periods-in-day) = 0) [
-
-    print "Species Populations"
-    show population_arr
     set global_temperature random-normal (item current_month temperatures) (1)
     calculate_temp
     update_organic_matter
@@ -286,8 +296,8 @@ GRAPHICS-WINDOW
 119
 0
 119
-0
-0
+1
+1
 1
 ticks
 1000.0
@@ -384,7 +394,7 @@ normal_reproduction_rate
 normal_reproduction_rate
 0
 1
-0.6
+0.2
 0.1
 1
 NIL
@@ -399,7 +409,7 @@ max_reproduction_rate
 max_reproduction_rate
 0
 10
-8
+7.7
 0.1
 1
 NIL
@@ -519,7 +529,7 @@ obstacle_size
 obstacle_size
 0
 max-pycor / 2
-6
+20
 1
 1
 NIL
@@ -534,7 +544,7 @@ obstacle_x
 obstacle_x
 min-pxcor
 max-pxcor
-41
+35
 1
 1
 NIL
@@ -549,7 +559,7 @@ obstacle_y
 obstacle_y
 -50
 50
-21
+20
 1
 1
 HORIZONTAL
@@ -564,7 +574,7 @@ obstacle_y
 obstacle_y
 min-pycor
 max-pycor
-21
+20
 1
 1
 NIL
@@ -590,7 +600,7 @@ speed
 speed
 0
 0.5
-0.13
+0.2
 0.01
 1
 NIL
@@ -798,8 +808,8 @@ INPUTBOX
 395
 1656
 455
-save_number
-1
+save_name
+ham1
 1
 0
 String (reporter)
@@ -951,7 +961,7 @@ species_hatch_temperature
 species_hatch_temperature
 0
 25
-12
+15
 1
 1
 NIL
@@ -1007,7 +1017,7 @@ BUTTON
 1541
 490
 Save Environment
-save_patches
+save_patches save_name
 NIL
 1
 T
@@ -1024,7 +1034,7 @@ BUTTON
 1671
 490
 Load Environment
-load_patches
+load_patches save_name
 NIL
 1
 T
@@ -1044,7 +1054,7 @@ start_x
 start_x
 0
 119
-93
+23
 1
 1
 NIL
@@ -1059,7 +1069,7 @@ start_y
 start_y
 0
 119
-42
+100
 1
 1
 NIL
@@ -1071,7 +1081,7 @@ BUTTON
 101
 544
 Save
-save_agents
+save_agents save_name
 NIL
 1
 T
@@ -1088,7 +1098,7 @@ BUTTON
 208
 544
 Load
-load_agents
+load_agents save_name
 NIL
 1
 T
@@ -1207,6 +1217,21 @@ NIL
 NIL
 NIL
 1
+
+SLIDER
+1574
+508
+1746
+541
+save_number
+save_number
+0
+100
+1
+1
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -1610,14 +1635,15 @@ NetLogo 5.3.1
 @#$#@#$#@
 @#$#@#$#@
 <experiments>
-  <experiment name="experiment" repetitions="1" runMetricsEveryStep="false">
-    <setup>setup</setup>
+  <experiment name="Hypothesis-1 Test" repetitions="1" runMetricsEveryStep="true">
+    <setup>setup
+setup_sim</setup>
     <go>go</go>
-    <metric>year</metric>
-    <enumeratedValueSet variable="starting_day">
-      <value value="190"/>
-      <value value="100"/>
-      <value value="250"/>
+    <metric>count turtles</metric>
+    <enumeratedValueSet variable="save_number">
+      <value value="1"/>
+      <value value="2"/>
+      <value value="3"/>
     </enumeratedValueSet>
   </experiment>
 </experiments>

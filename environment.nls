@@ -52,7 +52,8 @@ to setup_environment
   set speed_in_water 0.4
   set road_speed 2
 
-  set temperatures (list January February March April May June July August September October November December)
+  ;set temperatures (list January February March April May June July August September October November December)
+  set temperatures (list -5 -4 1 7 13 18 21 20 15 9 4 -2)
   set num_days (list 31 28 31 30 31 30 31 31 30 31 30 31)
   set current_month 0
   set var starting_day
@@ -113,12 +114,14 @@ to add_obstacle
   set obstacle_list lput obstacle obstacle_list
   
   if (obstacle_shape = "monitor") [set monitor_number monitor_number + 1]
-  show obstacle_list
+  ;show obstacle_list
   
   ask patches 
   [
     setup-obstacles obstacle
+    recolor-patch
   ]
+  update_monitor_area
   calculate_temp
   recolor_patches
   ;draw_obstacles
@@ -135,8 +138,10 @@ end
 to draw_obstacles
     ask patches [
       foreach obstacle_list [setup-obstacles ? ]
+      recolor-patch
     ]
-    recolor_patches
+    update_monitor_area
+    ;recolor_patches
 
 end
 
@@ -222,14 +227,16 @@ to recolor-patch
     if (Show: = "monitor") [
       if (being_monitored) [set pcolor orange]
     ]
-    if (permeability = road_speed)
-    [
-     set pcolor grey 
-    ]
+
+    
   ]
   [;if water body
     set pcolor blue
   ]
+      if (permeability = road_speed)
+    [
+     set pcolor grey 
+    ]
 end
 
 to add_patch
@@ -258,6 +265,16 @@ to add_patch
   
 end
 
+to change_speed
+  ask patches
+  [
+   if (permeability = 0.05) 
+   [
+    set permeability speed_in_water 
+   ]
+  ]
+end
+
 
 to setup-obstacles [one_obstacle]
   ;if obstacle parameters given
@@ -277,7 +294,10 @@ to setup-obstacles [one_obstacle]
     [
       if (distancexy temp_x temp_y) < temp_size 
       [
+        if (permeability != speed_in_water and permeability != road_speed)
+        [
           set permeability 1
+        ]
           set ph (ph - ((ph - min_ph) / temp_size) * (temp_size - distancexy temp_x temp_y) )
           set temperature_difference (temperature_difference + ((max_temp_difference) / temp_size) * (temp_size - distancexy temp_x temp_y))
           ;; set temperature later 
@@ -344,15 +364,22 @@ to setup-obstacles [one_obstacle]
   ]
 end
 
+to update_monitor_area
+  let monitor_list n-values monitor_number [?] 
+  foreach monitor_list [
+    set area_list lput (count patches with [monitor_index = ?]) area_list
+    ]
+end
+
 to collect_data
     if (being_monitored) [
       let patch_population 0
       
       foreach species_data [
         set patch_population (count turtles-here with [parent_breed = ((array:item (array:item ? monitor_index) 2)  - 1)])
-        
+        let area item monitor_index area_list
         array:set (array:item ? monitor_index) 3 ((array:item (array:item ? monitor_index) 3) + patch_population) ;updates (increments) species populations
-        array:set (array:item ? monitor_index) 4 ((array:item (array:item ? monitor_index) 3) / monitor_size)     ;updates density 
+        array:set (array:item ? monitor_index) 4 ((array:item (array:item ? monitor_index) 3) / area)     ;updates density 
       ]
     ]
   

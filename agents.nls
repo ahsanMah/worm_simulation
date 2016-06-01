@@ -123,8 +123,9 @@ end
 
 
 to move
-  if (food-here <= 0)
+  ifelse (food-here <= 0)
   [set stamina stamina - 0.3]
+  [set stamina 2 * periods-in-day]
   let potential-destinations (patch-set patch-here neighbors with [permeability != 0])
   ;ifelse iseating?
   ;[
