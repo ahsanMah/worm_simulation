@@ -346,7 +346,7 @@ worm_population
 worm_population
 0
 500
-200
+500
 10
 1
 NIL
@@ -1044,7 +1044,7 @@ start_x
 start_x
 0
 119
-80
+93
 1
 1
 NIL

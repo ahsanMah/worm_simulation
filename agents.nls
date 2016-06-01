@@ -92,7 +92,7 @@ to create_species [species]
   set temp_start_x item 4 species
   set temp_start_y item 5 species
   
-  array:set population_arr (temp_number - 1) temp_population
+  array:set population_arr (temp_number - 1) (array:item population_arr (temp_number - 1) + temp_population)
   
  create-adults temp_population[
     set parent_breed (temp_number - 1)
