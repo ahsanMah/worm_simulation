@@ -278,6 +278,7 @@ to check_if_hatch
       if (wait_days = wait_period) [
         set breed adults
         set size 1
+        set stamina 2 * periods-in-day
         set shape (item parent_breed shape_list)
         array:set population_arr parent_breed ((array:item population_arr parent_breed) + 1)
       ]
