@@ -2,15 +2,12 @@ extensions [array csv table]
 __includes["environment.nls" "agents.nls"]
 
 globals[
-  ;current_species
-  ;current_species_info
-  species_population
-  ;patch_population
   species_data
   monthly_data
   output_data
   has_collected
   report_month
+  area_list
 
   ;index positions of data in arrays
   ;month monitor species_number population density genetic diversity
@@ -26,15 +23,26 @@ to setup
   print "Done"
 
   set species_data [true]
-  set species_data lput (array:from-list n-values 3 [0]) species_data;hash map of species to their collected info
-
-  set monthly_data []  ;list of tables collected every month
-  ;set output_data n-values 5 [?]   ;final list that will be written to a .csv file
-  show output_data
+  set species_data lput (array:from-list n-values 3 [0]) species_data ;hash map of species to their collected info
+  set monthly_data []                                                 ;list of tables collected every month
+  set area_list []
   set report_month 0
   set-default-shape sides "line"
+  ;setup_sim
+
 
   reset-ticks
+end
+
+
+to setup_sim
+  setup
+
+  print "Loading from simulation files..."
+  load_patches "ham1"
+  load_agents "ham1"
+  load_monitors "ham1"
+  print "Done Loading"
 end
 
 to river_draw
@@ -61,23 +69,24 @@ to draw_highway
   ]
 end
 
-to save_obstacles
-  let filename1 (word "data/parameters/myobstacle"  save_number ".csv")
+to save_obstacles [name]
+  let filename1 (word "data/parameters/myobstacle"  name ".csv")
   csv:to-file filename1 obstacle_list
   print "Saved to file"
 end
 
-to load_obstacles
-  let filename (word "data/parameters/myobstacle"  save_number ".csv")
+to load_obstacles [name]
+  let filename (word "data/parameters/myobstacle"  name ".csv")
   set obstacle_list csv:from-file filename
   print "Loaded from file: "
   print obstacle_list
   ;;draw_obstacles
 end
 
-to save_patches
-  save_obstacles
-  let filename (word "data/parameters/mypatches" save_number ".csv")
+to save_patches [name]
+  save_monitors name
+  save_obstacles name
+  let filename (word "data/parameters/mypatches" name ".csv")
   let i min-pxcor
   let j min-pycor
   carefully [file-delete filename] []
@@ -101,9 +110,10 @@ to save_patches
 
 end
 
-to load_patches
-  load_obstacles
-  let filename (word "data/parameters/mypatches" save_number ".csv")
+to load_patches [name]
+
+  load_obstacles name
+  let filename (word "data/parameters/mypatches" name ".csv")
   let data csv:from-file filename
   foreach (data)
   [
@@ -117,28 +127,72 @@ to load_patches
       set being_monitored false
     ]
   ]
+  load_monitors name
   calculate_temp
   recolor_patches
 end
 
-to save_agents
-  export_data
-  let filename (word "data/parameters/myagents"  save_number ".csv")
+to save_agents [name]
+  export_data name
+
+  let filename (word "data/parameters/myagents"  name ".csv")
   csv:to-file filename species_list
   ;show csv:to-row ["one" 2 true ["two" 1 false]]
   print "Saved to file"
 end
 
-to load_agents
-  let filename (word "data/parameters/myagents"  save_number ".csv")
+to load_agents [name]
+  ;load_monitors name
+  let filename (word "data/parameters/myagents"  name ".csv")
   set species_list csv:from-file filename
   print "Loaded from file: "
   print species_list
   foreach species_list [create_species ?]
 end
 
-to export_data
-  let filename (word "data/output/simulation"  save_number ".csv")
+to save_monitors [name]
+  let filename (word "data/parameters/mymonitors" name ".csv")
+  let i min-pxcor
+  let j min-pycor
+  carefully [file-delete filename] []
+  file-open filename
+  while [(i <= max-pxcor)]
+  [
+   while [(j <= max-pycor)]
+   [
+     ask patch i j
+     [
+       let info (list i j being_monitored monitor_index monitor_size monitor_number)
+       file-open filename
+       file-print csv:to-row info
+       file-close
+       set j j + 1
+     ]
+   ]
+   set j min-pycor
+   set i i + 1
+  ]
+end
+
+to load_monitors [name]
+  let filename (word "data/parameters/mymonitors" name ".csv")
+  let data csv:from-file filename
+  foreach (data)
+  [
+    ask patch (item 0 ?) (item 1 ?)
+    [
+      set being_monitored item 2 ?
+      set monitor_index item 3 ?
+      set monitor_size item 4 ?
+    ]
+    set monitor_number item 5 ?
+  ]
+  update_monitor_area
+  recolor_patches
+end
+
+to export_data [name]
+  let filename (word "data/output/simulation" name ".csv")
   csv:to-file filename monthly_data
   print "Exported simulation data to file"
 end
@@ -164,17 +218,19 @@ end
 to go
 
   calculate_time
-  if (year = 20) [stop]
-  if (count turtles = 0) [stop]
+  if (year = 20) [
+    export_data save_number
+    stop
+    ]
+  if (count turtles = 0) [
+    export_data save_number
+    stop]
 
  if (day_of_month = (item current_month num_days - 1))[ ;clears arrays a day before collection
    clear_arrays
   ]
 
   if (ticks mod (2 * periods-in-day) = 0) [
-
-    print "Species Populations"
-    show population_arr
     set global_temperature random-normal (item current_month temperatures) (1)
     calculate_temp
     update_organic_matter
@@ -305,7 +361,7 @@ worm_population
 worm_population
 0
 500
-200
+10
 10
 1
 NIL
@@ -343,7 +399,7 @@ normal_reproduction_rate
 normal_reproduction_rate
 0
 1
-0.6
+0.2
 0.1
 1
 NIL
@@ -358,7 +414,7 @@ max_reproduction_rate
 max_reproduction_rate
 0
 10
-8
+7.7
 0.1
 1
 NIL
@@ -460,74 +516,14 @@ global_temperature
 11
 
 CHOOSER
-1420
-535
-1561
-580
+1415
+308
+1556
+353
 obstacle_shape
 obstacle_shape
 "lake" "mountain" "square" "horizontal-line" "vertical-line" "monitor" "patch"
-6
-
-SLIDER
-1418
-587
-1590
-620
-obstacle_size
-obstacle_size
-0
-max-pycor / 2
-6
-1
-1
-NIL
-HORIZONTAL
-
-SLIDER
-1418
-628
-1590
-661
-obstacle_x
-obstacle_x
-min-pxcor
-max-pxcor
-83
-1
-1
-NIL
-HORIZONTAL
-
-SLIDER
-1418
-667
-1590
-700
-obstacle_y
-obstacle_y
--50
-50
-49
-1
-1
-HORIZONTAL
-HORIZONTAL
-
-SLIDER
-1418
-667
-1590
-700
-obstacle_y
-obstacle_y
-min-pycor
-max-pycor
-49
-1
-1
-NIL
-HORIZONTAL
+5
 
 INPUTBOX
 94
@@ -554,23 +550,6 @@ speed
 1
 NIL
 HORIZONTAL
-
-BUTTON
-1608
-750
-1671
-783
-Add
-add_obstacle
-NIL
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
 
 SLIDER
 15
@@ -753,128 +732,40 @@ NIL
 VERTICAL
 
 INPUTBOX
-1573
-395
-1656
-455
-save_number
-ham1
+1568
+168
+1651
+228
+save_name
+2
 1
 0
 String (reporter)
 
 SLIDER
-1421
-56
-1600
-89
-num_patches_horizontal
-num_patches_horizontal
-4
-12
-4
-2
-1
-NIL
-HORIZONTAL
-
-SLIDER
-1420
-96
-1600
-129
-num_patches_vertical
-num_patches_vertical
-4
-12
-4
-2
-1
-NIL
-HORIZONTAL
-
-SLIDER
-1421
-165
-1593
-198
-patch_x
-patch_x
-1
-num_patches_horizontal
-4
-1
-1
-NIL
-HORIZONTAL
-
-SLIDER
-1422
-204
-1594
-237
-patch_y
-patch_y
-1
-num_patches_vertical
-1
-1
-1
-NIL
-HORIZONTAL
-
-SLIDER
-1422
-276
-1594
-309
+1417
+49
+1589
+82
 patch_pH
 patch_pH
 0
 14
-3.5
+11.9
 0.1
 1
 NIL
 HORIZONTAL
 
-BUTTON
-1421
-359
-1495
-392
-Add Patch
-add_patch
-NIL
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
-
-SWITCH
-1422
-239
-1593
-272
-change-pH?
-change-pH?
-0
-1
--1000
-
 CHOOSER
-1421
-406
-1559
-451
+1416
+179
+1554
+224
 Show:
 Show:
 "pH" "food" "temperature" "monitor"
-0
+3
 
 TEXTBOX
 10
@@ -910,7 +801,7 @@ species_hatch_temperature
 species_hatch_temperature
 0
 25
-12
+15
 1
 1
 NIL
@@ -924,7 +815,7 @@ CHOOSER
 species_number
 species_number
 1 2 3 4 5
-1
+0
 
 BUTTON
 125
@@ -944,10 +835,10 @@ NIL
 1
 
 BUTTON
-1497
-359
-1595
-392
+1429
+133
+1527
+166
 Recolor Patches
 recolor_patches
 NIL
@@ -961,12 +852,12 @@ NIL
 1
 
 BUTTON
-1419
-457
-1541
-490
+1414
+230
+1536
+263
 Save Environment
-save_patches
+save_patches save_name
 NIL
 1
 T
@@ -978,12 +869,12 @@ NIL
 1
 
 BUTTON
-1545
-457
-1671
-490
+1540
+230
+1666
+263
 Load Environment
-load_patches
+load_patches save_name
 NIL
 1
 T
@@ -1003,7 +894,7 @@ start_x
 start_x
 0
 119
-43
+102
 1
 1
 NIL
@@ -1018,7 +909,7 @@ start_y
 start_y
 0
 119
-13
+39
 1
 1
 NIL
@@ -1030,7 +921,7 @@ BUTTON
 101
 544
 Save
-save_agents
+save_agents save_name
 NIL
 1
 T
@@ -1047,7 +938,7 @@ BUTTON
 208
 544
 Load
-load_agents
+load_agents save_name
 NIL
 1
 T
@@ -1059,10 +950,10 @@ NIL
 1
 
 SLIDER
-1419
-709
-1591
-742
+1416
+366
+1588
+399
 min_ph
 min_ph
 0
@@ -1074,25 +965,25 @@ NIL
 HORIZONTAL
 
 SLIDER
-1422
-312
-1595
-345
+1417
+85
+1618
+118
 temperature_variation
 temperature_variation
 -10
 10
-4.5
+0
 0.5
 1
 NIL
 HORIZONTAL
 
 SLIDER
-1420
-747
-1591
-780
+1417
+404
+1588
+437
 max_temp_difference
 max_temp_difference
 -10
@@ -1124,20 +1015,20 @@ Environment Controls\n
 1
 
 TEXTBOX
-1422
-511
-1572
-529
+1417
+284
+1567
+302
 Obstacle Controls\n
 12
 0.0
 1
 
 BUTTON
-1168
-731
-1265
-764
+1417
+536
+1514
+569
 Draw River
 river_draw
 T
@@ -1151,10 +1042,10 @@ NIL
 1
 
 BUTTON
-1166
-769
-1284
-802
+1415
+574
+1533
+607
 Draw Highway
 draw_highway
 T
@@ -1168,10 +1059,10 @@ NIL
 1
 
 BUTTON
-1311
-795
-1451
-828
+1419
+494
+1559
+527
 NIL
 edit_environment
 T
@@ -1185,10 +1076,10 @@ NIL
 1
 
 BUTTON
-1281
-720
-1415
-753
+1421
+456
+1555
+489
 NIL
 recolor-selected
 NIL
@@ -1200,6 +1091,21 @@ NIL
 NIL
 NIL
 1
+
+SLIDER
+1416
+618
+1588
+651
+save_number
+save_number
+0
+100
+1
+1
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -1603,14 +1509,15 @@ NetLogo 5.3.1
 @#$#@#$#@
 @#$#@#$#@
 <experiments>
-  <experiment name="experiment" repetitions="1" runMetricsEveryStep="false">
-    <setup>setup</setup>
+  <experiment name="Hypothesis-1 Test" repetitions="1" runMetricsEveryStep="true">
+    <setup>setup
+setup_sim</setup>
     <go>go</go>
-    <metric>year</metric>
-    <enumeratedValueSet variable="starting_day">
-      <value value="190"/>
-      <value value="100"/>
-      <value value="250"/>
+    <metric>count turtles</metric>
+    <enumeratedValueSet variable="save_number">
+      <value value="1"/>
+      <value value="2"/>
+      <value value="3"/>
     </enumeratedValueSet>
   </experiment>
 </experiments>
