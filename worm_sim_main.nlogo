@@ -97,7 +97,7 @@ to save_patches [name]
    [
      ask patch i j
      [
-       let info (list i j ph food-here permeability local_death_threshold temperature_difference)
+       let info (list i j ph food-here permeability local_death_threshold temp_diff_here)
        file-open filename
        file-print csv:to-row info
        file-close
@@ -123,7 +123,7 @@ to load_patches [name]
       set food-here item 3 ?
       set permeability item 4 ?
       set local_death_threshold item 5 ?
-      set temperature_difference item 6 ?
+      set temp_diff_here item 6 ?
       set being_monitored false
     ]
   ]
@@ -281,9 +281,9 @@ to go
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-268
+257
 10
-1118
+1107
 881
 -1
 -1
@@ -342,10 +342,10 @@ NIL
 1
 
 MONITOR
-1148
-54
-1256
-99
+1122
+521
+1230
+566
 Day Number
 day_num
 17
@@ -368,10 +368,10 @@ NIL
 HORIZONTAL
 
 PLOT
-1147
-158
-1406
-327
+1113
+633
+1372
+802
 Worm Population for Current Year
 Day Number
 Population
@@ -436,10 +436,10 @@ NIL
 HORIZONTAL
 
 MONITOR
-1149
-103
-1256
-148
+1123
+570
+1230
+615
 Population Count
 count adults
 17
@@ -447,10 +447,10 @@ count adults
 11
 
 PLOT
-1143
-336
-1407
-509
+1386
+453
+1650
+626
 Worm Population over Years
 NIL
 NIL
@@ -465,10 +465,10 @@ PENS
 "default" 1.0 1 -11221820 true "" "plotxy year count adults"
 
 PLOT
-1142
-512
-1409
-687
+1385
+629
+1652
+804
 Organic Material Over Time
 NIL
 NIL
@@ -483,10 +483,10 @@ PENS
 "default" 1.0 0 -16777216 true "" "plotxy ticks / (periods-in-day * 2 * steps-per-ie) (sum [food-here] of patches)"
 
 MONITOR
-1264
-103
-1362
-148
+1238
+570
+1336
+615
 Cocoon Count
 count cocoons
 17
@@ -505,10 +505,10 @@ starting_day
 Number
 
 MONITOR
-1264
-53
-1359
-98
+1238
+520
+1333
+565
 Daily Temp *C
 global_temperature
 2
@@ -516,14 +516,14 @@ global_temperature
 11
 
 CHOOSER
-1415
-308
-1556
-353
+1120
+44
+1360
+89
 obstacle_shape
 obstacle_shape
 "lake" "mountain" "square" "horizontal-line" "vertical-line" "monitor" "patch"
-5
+6
 
 INPUTBOX
 94
@@ -552,10 +552,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-15
-577
-48
-727
+11
+575
+44
+725
 January
 January
 -20
@@ -563,14 +563,14 @@ January
 -5
 1
 1
-NIL
+*C
 VERTICAL
 
 SLIDER
-56
-577
-89
-727
+52
+575
+85
+725
 February
 February
 -20
@@ -578,14 +578,14 @@ February
 -4
 1
 1
-NIL
+*C
 VERTICAL
 
 SLIDER
-95
-577
-128
-727
+91
+575
+124
+725
 March
 March
 -20
@@ -593,14 +593,14 @@ March
 1
 1
 1
-NIL
+*C
 VERTICAL
 
 SLIDER
-136
-578
-169
-728
+132
+576
+165
+726
 April
 April
 -20
@@ -608,14 +608,14 @@ April
 7
 1
 1
-NIL
+*C
 VERTICAL
 
 SLIDER
-177
-578
-210
-728
+173
+576
+206
+726
 May
 May
 -20
@@ -623,14 +623,14 @@ May
 13
 1
 1
-NIL
+*C
 VERTICAL
 
 SLIDER
-217
-579
-250
-729
+213
+577
+246
+727
 June
 June
 -20
@@ -638,14 +638,14 @@ June
 18
 1
 1
-NIL
+*C
 VERTICAL
 
 SLIDER
-15
-734
-48
-884
+10
+731
+43
+881
 July
 July
 -20
@@ -653,14 +653,14 @@ July
 21
 1
 1
-NIL
+*C
 VERTICAL
 
 SLIDER
-54
-734
-87
-884
+49
+731
+82
+881
 August
 August
 -20
@@ -668,14 +668,14 @@ August
 20
 1
 1
-NIL
+*C
 VERTICAL
 
 SLIDER
-94
-735
-127
-885
+89
+732
+122
+882
 September
 September
 -20
@@ -683,14 +683,14 @@ September
 15
 1
 1
-NIL
+*C
 VERTICAL
 
 SLIDER
-135
-734
-168
-884
+130
+731
+163
+881
 October
 October
 -20
@@ -698,14 +698,14 @@ October
 9
 1
 1
-NIL
+*C
 VERTICAL
 
 SLIDER
-177
-734
-210
-884
+172
+731
+205
+881
 November
 November
 -20
@@ -713,14 +713,14 @@ November
 4
 1
 1
-NIL
+*C
 VERTICAL
 
 SLIDER
-218
-734
-251
-884
+213
+731
+246
+881
 December
 December
 -20
@@ -728,44 +728,44 @@ December
 -1
 1
 1
-NIL
+*C
 VERTICAL
 
 INPUTBOX
-1568
-168
-1651
-228
+1243
+334
+1360
+416
 save_name
-2
+ham1
 1
 0
 String (reporter)
 
 SLIDER
-1417
-49
-1589
-82
+1121
+142
+1360
+175
 patch_pH
 patch_pH
 0
 14
-11.9
+3.2
 0.1
 1
 NIL
 HORIZONTAL
 
 CHOOSER
-1416
-179
-1554
-224
+1119
+334
+1238
+379
 Show:
 Show:
 "pH" "food" "temperature" "monitor"
-3
+0
 
 TEXTBOX
 10
@@ -835,10 +835,10 @@ NIL
 1
 
 BUTTON
-1429
-133
-1527
-166
+1118
+383
+1239
+416
 Recolor Patches
 recolor_patches
 NIL
@@ -852,10 +852,10 @@ NIL
 1
 
 BUTTON
-1414
-230
-1536
-263
+1118
+419
+1240
+452
 Save Environment
 save_patches save_name
 NIL
@@ -869,10 +869,10 @@ NIL
 1
 
 BUTTON
-1540
-230
-1666
-263
+1242
+419
+1361
+452
 Load Environment
 load_patches save_name
 NIL
@@ -950,85 +950,45 @@ NIL
 1
 
 SLIDER
-1416
-366
-1588
-399
-min_ph
-min_ph
-0
-7
-1.7
-0.1
-1
-NIL
-HORIZONTAL
-
-SLIDER
-1417
-85
-1618
-118
-temperature_variation
-temperature_variation
+1121
+178
+1360
+211
+temperature_difference
+temperature_difference
 -10
 10
-0
-0.5
-1
-NIL
-HORIZONTAL
-
-SLIDER
-1417
-404
-1588
-437
-max_temp_difference
-max_temp_difference
--10
-10
--4.5
+-3.5
 0.5
 1
 NIL
 HORIZONTAL
 
 TEXTBOX
-15
-553
-208
-583
+11
+551
+204
+581
 Global Temperature Control
 12
 0.0
 1
 
 TEXTBOX
-1423
-26
-1573
-44
+1120
+20
+1270
+38
 Environment Controls\n
 12
 0.0
 1
 
-TEXTBOX
-1417
-284
-1567
-302
-Obstacle Controls\n
-12
-0.0
-1
-
 BUTTON
-1417
-536
-1514
-569
+1121
+218
+1240
+251
 Draw River
 river_draw
 T
@@ -1042,10 +1002,10 @@ NIL
 1
 
 BUTTON
-1415
-574
-1533
-607
+1244
+218
+1360
+251
 Draw Highway
 draw_highway
 T
@@ -1059,11 +1019,11 @@ NIL
 1
 
 BUTTON
-1419
-494
-1559
-527
-NIL
+1120
+258
+1360
+291
+Select Patches
 edit_environment
 T
 1
@@ -1076,11 +1036,11 @@ NIL
 1
 
 BUTTON
-1421
-456
-1555
-489
-NIL
+1120
+294
+1360
+327
+Edit Patch
 recolor-selected
 NIL
 1
@@ -1093,10 +1053,10 @@ NIL
 1
 
 SLIDER
-1416
-618
-1588
-651
+1119
+470
+1361
+503
 save_number
 save_number
 0
@@ -1106,6 +1066,16 @@ save_number
 1
 NIL
 HORIZONTAL
+
+CHOOSER
+1121
+93
+1360
+138
+change:
+change:
+"pH" "temperature difference" "both"
+0
 
 @#$#@#$#@
 ## WHAT IS IT?

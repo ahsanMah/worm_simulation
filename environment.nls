@@ -45,7 +45,7 @@ patches-own
   permeability ;; 0 - 1, 0 being completely impermeable, 1 meaning complete freedom of movement
   local_death_threshold
   food-consumed-from
-  temperature_difference
+  temp_diff_here
   temperature
   being_monitored
   monitor_size
@@ -97,7 +97,7 @@ to setup_environment
     set permeability 1
     set ph 7
     ;set local_death_threshold death_threshold
-    set temperature_variation 0
+    set temp_diff_here 0
     set being_monitored false
     set monitor_index -1
     setup-initial-food
@@ -111,7 +111,7 @@ end
 to calculate_temp
   ask patches
   [
-    set temperature global_temperature + temperature_difference
+    set temperature global_temperature + temp_diff_here
   ]
 ;    set temperature (4 * var * (180 - var)) / (40500 - var * (180 - var))
 ;    set temperature temperature * max_temperature ;scales temperature to real world values
@@ -220,17 +220,17 @@ to recolor-patch
     ]
     if (Show: = "temperature")
     [
-      if (temperature_difference = 0)
+      if (temp_diff_here = 0)
       [
         set pcolor white
       ]
-      if (temperature_difference > 0)
+      if (temp_diff_here > 0)
       [
-        set pcolor scale-color red temperature_difference 10 0 
+        set pcolor scale-color red temp_diff_here 10 0 
       ]
-      if (temperature_difference < 0)
+      if (temp_diff_here < 0)
       [
-        set pcolor scale-color violet temperature_difference -10 0
+        set pcolor scale-color violet temp_diff_here -10 0
       ]
     ]
 
@@ -263,7 +263,7 @@ end
 ;      if change-pH?
 ;      [
 ;        set pH patch_pH
-;        set temperature_difference temperature_variation
+;        set temp_diff_here temperature_variation
 ;      ]
 ;      recolor-patch
 ;    ] 
@@ -305,7 +305,7 @@ to recolor-selected
    if selected? pxcor pycor
    [
     set ph patch_ph
-    set temperature_difference temperature_variation
+    set temp_diff_here temperature_difference
     recolor-patch
    ] 
   ]
@@ -321,8 +321,8 @@ to recolor-selected
     [
       if selected? pxcor pycor and (distancexy temp_x temp_y) < mt_size
       [
-        set ph (ph - ((ph - min_ph) / mt_size) * (mt_size - distancexy temp_x temp_y) )
-        set temperature_difference (temperature_difference + ((max_temp_difference) / mt_size) * (mt_size - distancexy temp_x temp_y))
+        set ph (ph - ((ph - patch_ph) / mt_size) * (mt_size - distancexy temp_x temp_y) )
+        set temp_diff_here (temp_diff_here + ((temperature_difference) / mt_size) * (mt_size - distancexy temp_x temp_y))
         recolor-patch
       ]
     ]
@@ -424,8 +424,8 @@ to setup-obstacles [one_obstacle]
         [
           set permeability 1
         ]
-          set ph (ph - ((ph - min_ph) / temp_size) * (temp_size - distancexy temp_x temp_y) )
-          set temperature_difference (temperature_difference + ((max_temp_difference) / temp_size) * (temp_size - distancexy temp_x temp_y))
+          set ph (ph - ((ph - patch_ph) / temp_size) * (temp_size - distancexy temp_x temp_y) )
+          set temp_diff_here (temp_diff_here + ((temperature_difference) / temp_size) * (temp_size - distancexy temp_x temp_y))
           ;; set temperature later 
       ]
     ]
