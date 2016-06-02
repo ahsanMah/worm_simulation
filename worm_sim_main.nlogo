@@ -28,7 +28,7 @@ to setup
   set area_list []
   set report_month 0
   set-default-shape sides "line"
-  setup_sim
+  ;setup_sim
 
 
   reset-ticks
@@ -36,7 +36,7 @@ end
 
 
 to setup_sim
-  ;setup
+  setup
 
   print "Loading from simulation files..."
   load_patches "ham1"
@@ -352,21 +352,6 @@ day_num
 1
 11
 
-SLIDER
-9
-152
-208
-185
-worm_population
-worm_population
-0
-500
-250
-10
-1
-NIL
-HORIZONTAL
-
 PLOT
 1113
 633
@@ -391,10 +376,10 @@ PENS
 "pen-5" 1.0 0 -5825686 true "" "plotxy day_num (array:item population_arr 4)\nif (day_num = 365) [clear-plot]"
 
 SLIDER
-8
-194
-209
-227
+12
+218
+213
+251
 normal_reproduction_rate
 normal_reproduction_rate
 0
@@ -406,10 +391,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-8
-233
-208
-266
+12
+257
+212
+290
 max_reproduction_rate
 max_reproduction_rate
 0
@@ -421,10 +406,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-8
-273
-207
-306
+12
+297
+211
+330
 max_death_rate
 max_death_rate
 0
@@ -447,10 +432,10 @@ count adults
 11
 
 PLOT
-1386
-453
-1650
-626
+1113
+806
+1377
+979
 Worm Population over Years
 NIL
 NIL
@@ -463,24 +448,6 @@ false
 "" ""
 PENS
 "default" 1.0 1 -11221820 true "" "plotxy year count adults"
-
-PLOT
-1385
-629
-1652
-804
-Organic Material Over Time
-NIL
-NIL
-0.0
-10.0
-0.0
-10.0
-true
-false
-"" ""
-PENS
-"default" 1.0 0 -16777216 true "" "plotxy ticks / (periods-in-day * 2 * steps-per-ie) (sum [food-here] of patches)"
 
 MONITOR
 1238
@@ -537,10 +504,10 @@ max_temperature
 Number
 
 SLIDER
-8
-352
-207
-385
+12
+376
+211
+409
 speed
 speed
 0
@@ -552,10 +519,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-11
-575
-44
-725
+14
+568
+47
+718
 January
 January
 -20
@@ -567,10 +534,10 @@ January
 VERTICAL
 
 SLIDER
-52
-575
-85
-725
+54
+569
+87
+719
 February
 February
 -20
@@ -582,10 +549,10 @@ February
 VERTICAL
 
 SLIDER
-91
-575
-124
-725
+93
+569
+126
+719
 March
 March
 -20
@@ -597,10 +564,10 @@ March
 VERTICAL
 
 SLIDER
-132
-576
-165
-726
+134
+570
+167
+720
 April
 April
 -20
@@ -612,10 +579,10 @@ April
 VERTICAL
 
 SLIDER
-173
-576
-206
-726
+175
+570
+208
+720
 May
 May
 -20
@@ -627,10 +594,10 @@ May
 VERTICAL
 
 SLIDER
-213
-577
-246
-727
+215
+571
+248
+721
 June
 June
 -20
@@ -642,10 +609,10 @@ June
 VERTICAL
 
 SLIDER
-10
-731
-43
-881
+13
+724
+46
+874
 July
 July
 -20
@@ -657,10 +624,10 @@ July
 VERTICAL
 
 SLIDER
-49
-731
-82
-881
+51
+725
+84
+875
 August
 August
 -20
@@ -672,10 +639,10 @@ August
 VERTICAL
 
 SLIDER
-89
-732
-122
-882
+91
+726
+124
+876
 September
 September
 -20
@@ -687,10 +654,10 @@ September
 VERTICAL
 
 SLIDER
-130
-731
-163
-881
+132
+725
+165
+875
 October
 October
 -20
@@ -702,10 +669,10 @@ October
 VERTICAL
 
 SLIDER
-172
-731
-205
-881
+174
+725
+207
+875
 November
 November
 -20
@@ -717,10 +684,10 @@ November
 VERTICAL
 
 SLIDER
-213
-731
-246
-881
+215
+725
+248
+875
 December
 December
 -20
@@ -751,7 +718,7 @@ patch_pH
 patch_pH
 0
 14
-3.2
+1.6
 0.1
 1
 NIL
@@ -778,10 +745,10 @@ Species Control
 1
 
 SLIDER
-9
-311
-205
-344
+13
+335
+209
+368
 species_genetic_diversity
 species_genetic_diversity
 0
@@ -793,10 +760,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-8
-389
-207
-422
+12
+413
+211
+446
 species_hatch_temperature
 species_hatch_temperature
 0
@@ -808,23 +775,23 @@ NIL
 HORIZONTAL
 
 CHOOSER
-10
-459
-110
-504
+12
+453
+112
+498
 species_number
 species_number
 1 2 3 4 5
 0
 
 BUTTON
-125
-469
-206
-502
+127
+463
+208
+496
 Add
-add_species
-NIL
+mouse_add_species
+T
 1
 T
 OBSERVER
@@ -885,41 +852,11 @@ NIL
 NIL
 1
 
-SLIDER
-9
-423
-101
-456
-start_x
-start_x
-0
-119
-20
-1
-1
-NIL
-HORIZONTAL
-
-SLIDER
-115
-424
-207
-457
-start_y
-start_y
-0
-119
-100
-1
-1
-NIL
-HORIZONTAL
-
 BUTTON
-12
-511
-101
-544
+14
+505
+103
+538
 Save
 save_agents save_name
 NIL
@@ -933,10 +870,10 @@ NIL
 1
 
 BUTTON
-122
-511
-208
-544
+124
+505
+210
+538
 Load
 load_agents save_name
 NIL
@@ -958,17 +895,17 @@ temperature_difference
 temperature_difference
 -10
 10
--3.5
+-1
 0.5
 1
 NIL
 HORIZONTAL
 
 TEXTBOX
-11
-551
-204
-581
+13
+545
+206
+575
 Global Temperature Control
 12
 0.0
@@ -1076,6 +1013,17 @@ change:
 change:
 "pH" "temperature difference" "both"
 0
+
+INPUTBOX
+12
+150
+213
+210
+worm_population
+500
+1
+0
+Number
 
 @#$#@#$#@
 ## WHAT IS IT?
