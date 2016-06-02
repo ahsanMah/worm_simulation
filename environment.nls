@@ -48,7 +48,7 @@ to setup_environment
   
   set day_num starting_day
   set year 0
-  set periods-in-day 4;;0
+  set periods-in-day 0.5;;0
   set speed_in_water 0.4
   set road_speed 2
 
@@ -357,7 +357,6 @@ to setup-obstacles [one_obstacle]
         [
           set being_monitored true
           set monitor_index monitor_number - 1
-          set monitor_size temp_size
         ]
     ]
 

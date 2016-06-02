@@ -356,7 +356,7 @@ worm_population
 worm_population
 0
 500
-500
+250
 10
 1
 NIL
@@ -409,7 +409,7 @@ max_reproduction_rate
 max_reproduction_rate
 0
 10
-7.7
+6.5
 0.1
 1
 NIL
@@ -494,7 +494,7 @@ INPUTBOX
 87
 117
 starting_day
-120
+150
 1
 0
 Number
@@ -797,7 +797,7 @@ December
 December
 -20
 40
--2
+-1
 1
 1
 NIL

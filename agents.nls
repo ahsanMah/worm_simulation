@@ -62,7 +62,7 @@ to setup_agents
   set reprod_threshold normal_reproduction_rate ; Simulates successful births
   
   set steps-per-ie 5
-  set max_stamina (2 * steps-per-ie)
+  set max_stamina 5
   set min_stamina 1
 
   set counter 0
@@ -105,9 +105,9 @@ to create_species [species]
     set shape (item parent_breed shape_list)
 
     set maturation 70
-    set wait_period 15 + (random 50) ;simulates a wait period of 15 to 65 days 
+    set wait_period 15 + random-normal 20 3;simulates a wait period of 15 to 65 days 
     set hatch_temp temp_hatch_temperature
-    set stamina 6
+    set stamina 5
     set food-consumed-last 0
     set iseating? one-of[true false]
     set cycle-counter (random (steps-per-ie + 1))
@@ -125,7 +125,7 @@ end
 to move
   ifelse (food-here <= 0)
   [set stamina stamina - 0.3]
-  [set stamina 2 * periods-in-day]
+  [set stamina 5]
   let potential-destinations (patch-set patch-here neighbors with [permeability != 0])
   ;ifelse iseating?
   ;[
@@ -236,13 +236,11 @@ end
 ;updates probablities of dying and reproducing
 to update_thresholds
   ;cold reduces survival rate
+  set death_threshold normal_death_threshold
+  if (temperature > max_temp_resist) [ set death_threshold max_death_rate / (2 * periods-in-day)]
+  if (temperature < low_temp_resist) [ set death_threshold max_death_rate / (2 * periods-in-day)]
   
-  ifelse (temperature > max_temp_resist) [ set death_threshold max_death_rate / (2 * periods-in-day)]
-  [
-    ifelse (temperature < low_temp_resist) [ set death_threshold max_death_rate / (2 * periods-in-day)]
-    [set death_threshold normal_death_threshold]
-  ]
-    ;;pH of soil also affects survival rate
+  ;;pH of soil also affects survival rate
   if (ph < max_ph_resist) [
     set var abs (max_ph_resist - ph)
     set death_threshold (death_threshold + (random 55) / max_ph_resist * var ) ; +55% chance of them dying at pH of 0
@@ -250,7 +248,7 @@ to update_thresholds
   
   ;reproduction rate affected by temperature
   ifelse (temperature > 10) [
-    set reprod_threshold (max_reproduction_rate / 10 * temperature) ] ; probability of reproducing increases as it gets warmer (10 * 2 * periods-in-day)
+    set reprod_threshold (max_reproduction_rate * (temperature / 15)) ] ; probability of reproducing increases as it gets warmer (10 * 2 * periods-in-day)
   [set reprod_threshold normal_reproduction_rate]
   
 end
@@ -266,13 +264,16 @@ to check_if_hatch
     if (temperature > hatch_temp) [
       set wait_days wait_days + 1
       ;show wait_period
-      if (wait_days = wait_period) [
-        set breed adults
-        set size 1
-        set stamina 2 * periods-in-day
-        set shape (item parent_breed shape_list)
-        array:set population_arr parent_breed ((array:item population_arr parent_breed) + 1)
+      if (wait_days >= wait_period) [
+        ifelse (random 100 < 65)[         ;65% chance of hatching
+          set breed adults
+          set size 1
+          set stamina 5
+          set shape (item parent_breed shape_list)
+          array:set population_arr parent_breed ((array:item population_arr parent_breed) + 1)
+        ]
+        [die]
       ]
-    ] ;[if (wait_days < 3) [set wait_period wait_period - 1] ] ;to minimize affect by random fluctuations
+    ]
 end
 
