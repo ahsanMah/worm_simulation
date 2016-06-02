@@ -27,14 +27,16 @@ to setup
   set monthly_data []                                                 ;list of tables collected every month
   set area_list []
   set report_month 0
-  setup_sim
+  set-default-shape sides "line"
+  ;setup_sim
+
 
   reset-ticks
 end
 
 
 to setup_sim
-  ;setup
+  setup
 
   print "Loading from simulation files..."
   load_patches "ham1"
@@ -82,6 +84,7 @@ to load_obstacles [name]
 end
 
 to save_patches [name]
+  save_monitors name
   save_obstacles name
   let filename (word "data/parameters/mypatches" name ".csv")
   let i min-pxcor
@@ -108,6 +111,7 @@ to save_patches [name]
 end
 
 to load_patches [name]
+
   load_obstacles name
   let filename (word "data/parameters/mypatches" name ".csv")
   let data csv:from-file filename
@@ -123,13 +127,14 @@ to load_patches [name]
       set being_monitored false
     ]
   ]
+  load_monitors name
   calculate_temp
   recolor_patches
 end
 
 to save_agents [name]
   export_data name
-  save_monitors name
+
   let filename (word "data/parameters/myagents"  name ".csv")
   csv:to-file filename species_list
   ;show csv:to-row ["one" 2 true ["two" 1 false]]
@@ -296,8 +301,8 @@ GRAPHICS-WINDOW
 119
 0
 119
-1
-1
+0
+0
 1
 ticks
 1000.0
@@ -511,74 +516,14 @@ global_temperature
 11
 
 CHOOSER
-1420
-535
-1561
-580
+1415
+308
+1556
+353
 obstacle_shape
 obstacle_shape
-"lake" "mountain" "square" "horizontal-line" "vertical-line" "monitor"
+"lake" "mountain" "square" "horizontal-line" "vertical-line" "monitor" "patch"
 5
-
-SLIDER
-1418
-587
-1590
-620
-obstacle_size
-obstacle_size
-0
-max-pycor / 2
-20
-1
-1
-NIL
-HORIZONTAL
-
-SLIDER
-1418
-628
-1590
-661
-obstacle_x
-obstacle_x
-min-pxcor
-max-pxcor
-35
-1
-1
-NIL
-HORIZONTAL
-
-SLIDER
-1418
-667
-1590
-700
-obstacle_y
-obstacle_y
--50
-50
-20
-1
-1
-HORIZONTAL
-HORIZONTAL
-
-SLIDER
-1418
-667
-1590
-700
-obstacle_y
-obstacle_y
-min-pycor
-max-pycor
-20
-1
-1
-NIL
-HORIZONTAL
 
 INPUTBOX
 94
@@ -605,23 +550,6 @@ speed
 1
 NIL
 HORIZONTAL
-
-BUTTON
-1608
-750
-1671
-783
-Add
-add_obstacle
-NIL
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
 
 SLIDER
 15
@@ -804,124 +732,36 @@ NIL
 VERTICAL
 
 INPUTBOX
-1573
-395
-1656
-455
+1568
+168
+1651
+228
 save_name
-ham1
+2
 1
 0
 String (reporter)
 
 SLIDER
-1421
-56
-1600
-89
-num_patches_horizontal
-num_patches_horizontal
-4
-12
-4
-2
-1
-NIL
-HORIZONTAL
-
-SLIDER
-1420
-96
-1600
-129
-num_patches_vertical
-num_patches_vertical
-4
-12
-4
-2
-1
-NIL
-HORIZONTAL
-
-SLIDER
-1421
-165
-1593
-198
-patch_x
-patch_x
-1
-num_patches_horizontal
-4
-1
-1
-NIL
-HORIZONTAL
-
-SLIDER
-1422
-204
-1594
-237
-patch_y
-patch_y
-1
-num_patches_vertical
-1
-1
-1
-NIL
-HORIZONTAL
-
-SLIDER
-1422
-276
-1594
-309
+1417
+49
+1589
+82
 patch_pH
 patch_pH
 0
 14
-6.6
+11.9
 0.1
 1
 NIL
 HORIZONTAL
 
-BUTTON
-1421
-359
-1495
-392
-Add Patch
-add_patch
-NIL
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
-
-SWITCH
-1422
-239
-1593
-272
-change-pH?
-change-pH?
-0
-1
--1000
-
 CHOOSER
-1421
-406
-1559
-451
+1416
+179
+1554
+224
 Show:
 Show:
 "pH" "food" "temperature" "monitor"
@@ -995,10 +835,10 @@ NIL
 1
 
 BUTTON
-1497
-359
-1595
-392
+1429
+133
+1527
+166
 Recolor Patches
 recolor_patches
 NIL
@@ -1012,10 +852,10 @@ NIL
 1
 
 BUTTON
-1419
-457
-1541
-490
+1414
+230
+1536
+263
 Save Environment
 save_patches save_name
 NIL
@@ -1029,10 +869,10 @@ NIL
 1
 
 BUTTON
-1545
-457
-1671
-490
+1540
+230
+1666
+263
 Load Environment
 load_patches save_name
 NIL
@@ -1054,7 +894,7 @@ start_x
 start_x
 0
 119
-23
+102
 1
 1
 NIL
@@ -1069,7 +909,7 @@ start_y
 start_y
 0
 119
-100
+39
 1
 1
 NIL
@@ -1110,10 +950,10 @@ NIL
 1
 
 SLIDER
-1419
-709
-1591
-742
+1416
+366
+1588
+399
 min_ph
 min_ph
 0
@@ -1125,10 +965,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-1422
-312
-1595
-345
+1417
+85
+1618
+118
 temperature_variation
 temperature_variation
 -10
@@ -1140,10 +980,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-1420
-747
-1591
-780
+1417
+404
+1588
+437
 max_temp_difference
 max_temp_difference
 -10
@@ -1175,20 +1015,20 @@ Environment Controls\n
 1
 
 TEXTBOX
-1422
-511
-1572
-529
+1417
+284
+1567
+302
 Obstacle Controls\n
 12
 0.0
 1
 
 BUTTON
-1168
-731
-1265
-764
+1417
+536
+1514
+569
 Draw River
 river_draw
 T
@@ -1202,10 +1042,10 @@ NIL
 1
 
 BUTTON
-1166
-769
-1284
-802
+1415
+574
+1533
+607
 Draw Highway
 draw_highway
 T
@@ -1218,11 +1058,45 @@ NIL
 NIL
 1
 
+BUTTON
+1419
+494
+1559
+527
+NIL
+edit_environment
+T
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+1421
+456
+1555
+489
+NIL
+recolor-selected
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
 SLIDER
-1574
-508
-1746
-541
+1416
+618
+1588
+651
 save_number
 save_number
 0
