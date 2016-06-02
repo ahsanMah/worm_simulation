@@ -301,8 +301,8 @@ GRAPHICS-WINDOW
 119
 0
 119
-0
-0
+1
+1
 1
 ticks
 1000.0
@@ -395,11 +395,11 @@ SLIDER
 194
 209
 227
-normal_reproduction_rate
-normal_reproduction_rate
-0
-1
-0.2
+ph_tolerance
+ph_tolerance
+3
+5
+3
 0.1
 1
 NIL
@@ -414,7 +414,7 @@ max_reproduction_rate
 max_reproduction_rate
 0
 10
-6.5
+5
 0.1
 1
 NIL
@@ -523,7 +523,7 @@ CHOOSER
 obstacle_shape
 obstacle_shape
 "lake" "mountain" "square" "horizontal-line" "vertical-line" "monitor" "patch"
-6
+5
 
 INPUTBOX
 94
@@ -765,7 +765,7 @@ CHOOSER
 Show:
 Show:
 "pH" "food" "temperature" "monitor"
-0
+3
 
 TEXTBOX
 10
@@ -1480,14 +1480,13 @@ NetLogo 5.3.1
 @#$#@#$#@
 <experiments>
   <experiment name="Hypothesis-1 Test" repetitions="1" runMetricsEveryStep="true">
-    <setup>setup
-setup_sim</setup>
+    <setup>setup</setup>
     <go>go</go>
-    <metric>count turtles</metric>
     <enumeratedValueSet variable="save_number">
       <value value="1"/>
       <value value="2"/>
       <value value="3"/>
+      <value value="4"/>
     </enumeratedValueSet>
   </experiment>
 </experiments>

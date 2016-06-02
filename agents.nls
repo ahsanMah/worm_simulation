@@ -1,7 +1,7 @@
 globals [
   ;annual globals
-  normal_death_threshold death_threshold ;;probability of death
-  reprod_threshold ;;probablity of reproducing
+  normal_death_threshold max_death_threshold death_threshold ;;probability of death
+  normal_reproduction_rate reprod_threshold ;;probablity of reproducing
 
   ;daily globals
   amount_egested
@@ -56,7 +56,9 @@ turtles-own [
 
 to setup_agents
   
-  set normal_death_threshold 0.685 / (2 * periods-in-day) ; Simulates a 4 year life span
+  set normal_death_threshold 0.00685 / (2 * periods-in-day) ; Simulates a 4 year life span
+  set normal_reproduction_rate 0.1
+  set max_death_threshold 30
   set death_threshold normal_death_threshold
   set reprod_threshold normal_reproduction_rate ; Simulates successful births
   
@@ -76,14 +78,15 @@ to setup_agents
 end
 
 to add_species
-  let new_species (list species_number species_genetic_diversity species_hatch_temperature worm_population start_x start_y)
+  let new_species (list species_number species_genetic_diversity species_hatch_temperature (list worm_population start_x start_y))
   let updated_species []
   let exists false
   
   foreach species_list [
     if (item 0 ?) = species_number ;if species already exists
     [ 
-      set updated_species (replace-item 3 ? (item 3 ? + worm_population)) ;update the population
+      let placement_info item 3 ?
+      ;set updated_species (replace-item 3 ? (lput worm_population +placement_info)) ;update the population
       set exists true
     ]
   ]
@@ -130,7 +133,7 @@ to create_species [species]
     set genetic_diversity temp_genetic_diversity ; 0-1 measure of genetic diversity of the species
     set max_temp_resist random-normal 25 (2 * genetic_diversity)
     set low_temp_resist random-normal 5 (2 * genetic_diversity)
-    set max_ph_resist random-normal 5 (2 * genetic_diversity)
+    set max_ph_resist random-normal ph_tolerance (2 * genetic_diversity)
    ]
 end
 
@@ -250,8 +253,8 @@ end
 to update_thresholds
   ;cold reduces survival rate
   set death_threshold normal_death_threshold
-  if (temperature > max_temp_resist) [ set death_threshold max_death_rate / (2 * periods-in-day)]
-  if (temperature < low_temp_resist) [ set death_threshold max_death_rate / (2 * periods-in-day)]
+  if (temperature > max_temp_resist) [ set death_threshold max_death_threshold / (2 * periods-in-day)]
+  if (temperature < low_temp_resist) [ set death_threshold max_death_threshold / (2 * periods-in-day)]
   
   ;;pH of soil also affects survival rate
   if (ph < max_ph_resist) [
