@@ -28,7 +28,7 @@ to setup
   set area_list []
   set report_month 0
   set-default-shape sides "line"
-  ;setup_sim
+  setup_sim
 
 
   reset-ticks
@@ -36,7 +36,7 @@ end
 
 
 to setup_sim
-  setup
+  ;setup
 
   print "Loading from simulation files..."
   load_patches "ham1"
@@ -894,7 +894,7 @@ start_x
 start_x
 0
 119
-102
+20
 1
 1
 NIL
@@ -909,7 +909,7 @@ start_y
 start_y
 0
 119
-39
+100
 1
 1
 NIL

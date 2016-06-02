@@ -13,7 +13,6 @@ globals [
   max_stamina
   min_stamina
   
-  new_species
   species_list
   population_arr
 
@@ -77,9 +76,23 @@ to setup_agents
 end
 
 to add_species
-  set new_species (list species_number species_genetic_diversity species_hatch_temperature worm_population start_x start_y)
-  set species_list lput new_species species_list
+  let new_species (list species_number species_genetic_diversity species_hatch_temperature worm_population start_x start_y)
+  let updated_species []
+  let exists false
+  
+  foreach species_list [
+    if (item 0 ?) = species_number ;if species already exists
+    [ 
+      set updated_species (replace-item 3 ? (item 3 ? + worm_population)) ;update the population
+      set exists true
+    ]
+  ]
+  
+  ifelse exists [ set species_list replace-item (species_number - 1) species_list updated_species]
+    [ set species_list lput new_species species_list ]
+  
   create_species new_species
+  
 end
 
 
