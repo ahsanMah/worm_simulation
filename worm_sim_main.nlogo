@@ -28,15 +28,15 @@ to setup
   set area_list []
   set report_month 0
   set-default-shape sides "line"
-  setup_sim
+  ;setup_sim
 
-  ;show list (list 1 2)
+
   reset-ticks
 end
 
 
 to setup_sim
-  ;setup
+  setup
 
   print "Loading from simulation files..."
   load_patches "ham1"
@@ -380,11 +380,11 @@ SLIDER
 218
 213
 251
-ph_tolerance
-ph_tolerance
-3
-5
-3
+normal_reproduction_rate
+normal_reproduction_rate
+0
+1
+0.2
 0.1
 1
 NIL
@@ -399,7 +399,7 @@ max_reproduction_rate
 max_reproduction_rate
 0
 10
-5
+6.5
 0.1
 1
 NIL
@@ -410,11 +410,11 @@ SLIDER
 297
 211
 330
-temperature_tolerance
-temperature_tolerance
-5
+max_death_rate
+max_death_rate
+0
+100
 30
-18
 1
 1
 NIL
@@ -718,7 +718,7 @@ patch_pH
 patch_pH
 0
 14
-3.8
+1.6
 0.1
 1
 NIL
@@ -782,7 +782,7 @@ CHOOSER
 species_number
 species_number
 1 2 3 4 5
-1
+0
 
 BUTTON
 127
@@ -895,7 +895,7 @@ temperature_difference
 temperature_difference
 -10
 10
-4.5
+-4
 0.5
 1
 NIL
@@ -1428,13 +1428,14 @@ NetLogo 5.3.1
 @#$#@#$#@
 <experiments>
   <experiment name="Hypothesis-1 Test" repetitions="1" runMetricsEveryStep="true">
-    <setup>setup</setup>
+    <setup>setup
+setup_sim</setup>
     <go>go</go>
+    <metric>count turtles</metric>
     <enumeratedValueSet variable="save_number">
       <value value="1"/>
       <value value="2"/>
       <value value="3"/>
-      <value value="4"/>
     </enumeratedValueSet>
   </experiment>
 </experiments>
