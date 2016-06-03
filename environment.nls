@@ -57,9 +57,10 @@ to setup_environment
   
   set day_num starting_day
   set year 0
-  set periods-in-day 0.5;;0
+  set periods-in-day 1;;0
   set speed_in_water 0.4
   set road_speed 2
+  set default_food_value 5000
 
   ;set temperatures (list January February March April May June July August September October November December)
   set temperatures (list -5 -4 1 7 13 18 21 20 15 9 4 -2)
@@ -159,7 +160,7 @@ end
 to calculate_time
   ;; two ticks to simulate one gestation cycle
   ;; worm completes 10 cycles in one day
-  if (ticks mod (2 * periods-in-day) = 0) [
+  if (ticks mod (periods-in-day) = 0) [
     set day_num day_num + 1
     set day_of_month day_of_month + 1
   ]
@@ -192,7 +193,7 @@ to setup-initial-food
 ;  ]
 
 ;set food-here (random 251 + 250)
-  set food-here 5000
+  set food-here default_food_value
 end
 
 to recolor-patch

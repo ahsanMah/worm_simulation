@@ -8,13 +8,12 @@ globals[
   has_collected
   report_month
   area_list
-
+  default_food_value
   ;index positions of data in arrays
   ;month monitor species_number population density genetic diversity
 ]
 to setup
   clear-all
-
   print "Setting up environment..."
   setup_environment
   print "Done"
@@ -27,6 +26,7 @@ to setup
   set monthly_data []                                                 ;list of tables collected every month
   set area_list []
   set report_month 0
+
   set-default-shape sides "line"
   ;setup_sim
 
@@ -65,6 +65,7 @@ to draw_highway
     [
       set permeability road_speed
       set pcolor grey
+      set food-here default_food_value
     ]
   ]
 end
@@ -246,7 +247,7 @@ end
 to go
 
   calculate_time
-  if (year = 20) [
+  if (year = 30) [
     export_data save_number
     stop
     ]
@@ -258,7 +259,7 @@ to go
    clear_arrays
   ]
 
-  if (ticks mod (2 * periods-in-day) = 0) [
+  if (ticks mod (periods-in-day) = 0) [
     set global_temperature random-normal (item current_month temperatures) (1)
     calculate_temp
     ;update_organic_matter
@@ -270,7 +271,7 @@ to go
 
   ask adults [
     ;update_speed
-    if (ticks mod (2 * periods-in-day) = 0) [
+    if (ticks mod (periods-in-day) = 0) [
       update_maturity
       update_thresholds
       check_reproduction
@@ -329,8 +330,8 @@ GRAPHICS-WINDOW
 119
 0
 119
-1
-1
+0
+0
 1
 ticks
 1000.0
@@ -460,10 +461,10 @@ count adults
 11
 
 PLOT
-1113
+1380
+633
+1644
 806
-1377
-979
 Worm Population over Years
 NIL
 NIL
@@ -518,7 +519,7 @@ CHOOSER
 obstacle_shape
 obstacle_shape
 "circle" "rectangle" "mountain" "monitor"
-0
+3
 
 INPUTBOX
 94
@@ -540,7 +541,7 @@ speed
 speed
 0
 0.5
-0.2
+0.33
 0.01
 1
 NIL
@@ -760,7 +761,7 @@ CHOOSER
 Show:
 Show:
 "pH" "food" "temperature" "monitor"
-2
+1
 
 TEXTBOX
 10
@@ -781,7 +782,7 @@ species_genetic_diversity
 species_genetic_diversity
 0
 1
-0.1
+0
 0.1
 1
 NIL
@@ -810,7 +811,7 @@ CHOOSER
 species_number
 species_number
 1 2 3 4 5
-1
+0
 
 BUTTON
 127
