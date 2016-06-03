@@ -108,15 +108,24 @@ to add_species [x y population]
   let updated_species []
   let exists false
   
+<<<<<<< HEAD
   if (length species_list > 0) [
     foreach species_list [
       if (item 0 ?) = species_number ;if species already exists
       [ 
-      set updated_species (replace-item 3 ? (item 3 ? + population)) ;update the population
+        set updated_species (replace-item 3 ? (item 3 ? + worm_population)) ;update the population
         set exists true
       ]
+=======
+  foreach species_list [
+    if (item 0 ?) = species_number ;if species already exists
+    [ 
+      set updated_species (replace-item 3 ? (item 3 ? + population)) ;update the population
+      set exists true
+>>>>>>> b777c01ca889d401f8b6b597e152102e026505d2
     ]
   ]
+  
   ifelse exists [ set species_list replace-item (species_number - 1) species_list updated_species]
     [ set species_list lput new_species species_list ]
   
@@ -165,24 +174,15 @@ end
 
 
 to move
-;  ifelse (food-here <= 0)
-;  [set stamina stamina - 0.3]
-;  [set stamina 5]
-
-  ;let potential-destinations (patch-set patch-here neighbors with [permeability != 0])
+  ifelse (food-here <= 0)
+  [set stamina stamina - 0.3]
+  [set stamina 5]
+  let potential-destinations (patch-set patch-here neighbors with [permeability != 0])
   ;ifelse iseating?
   ;[
     ;; uphill [food-here]
     ;;face max-one-of potential-destinations [food-here]
     right (random 181) - 90
-    if ((count (patch-set (patch-ahead (speed * permeability))) with [permeability <= speed_in_water]) > 
-       (count (patch-set (patch-here)) with [permeability <= speed_in_water]))
-    [
-      if (random 100000 <= 99999)
-      [
-      right 180
-      ]
-    ]
     forward speed * permeability
     eat
 
