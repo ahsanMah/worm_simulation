@@ -301,8 +301,8 @@ GRAPHICS-WINDOW
 119
 0
 119
-1
-1
+0
+0
 1
 ticks
 1000.0
@@ -414,7 +414,7 @@ temperature_tolerance
 temperature_tolerance
 5
 30
-15
+18
 1
 1
 NIL
@@ -490,7 +490,7 @@ CHOOSER
 obstacle_shape
 obstacle_shape
 "lake" "mountain" "square" "horizontal-line" "vertical-line" "monitor" "patch"
-5
+6
 
 INPUTBOX
 94
@@ -718,7 +718,7 @@ patch_pH
 patch_pH
 0
 14
-1.6
+3.8
 0.1
 1
 NIL
@@ -782,7 +782,7 @@ CHOOSER
 species_number
 species_number
 1 2 3 4 5
-3
+1
 
 BUTTON
 127
@@ -895,7 +895,7 @@ temperature_difference
 temperature_difference
 -10
 10
--1
+4.5
 0.5
 1
 NIL
@@ -1012,7 +1012,7 @@ CHOOSER
 change:
 change:
 "pH" "temperature difference" "both"
-0
+1
 
 INPUTBOX
 12

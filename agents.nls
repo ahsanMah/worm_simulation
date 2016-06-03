@@ -141,7 +141,7 @@ to create_species [species]
     
     ;set population temp_population
     set genetic_diversity temp_genetic_diversity ; 0-1 measure of genetic diversity of the species
-    set max_temp_resist random-normal 25 (2 * genetic_diversity)
+    set max_temp_resist random-normal temperature_tolerance (2 * genetic_diversity)
     set low_temp_resist random-normal 5 (2 * genetic_diversity)
     set max_ph_resist random-normal ph_tolerance (2 * genetic_diversity)
    ]
