@@ -380,11 +380,11 @@ SLIDER
 218
 213
 251
-normal_reproduction_rate
-normal_reproduction_rate
-0
-1
-0.2
+ph_tolerance
+ph_tolerance
+3
+5
+3
 0.1
 1
 NIL
@@ -410,8 +410,8 @@ SLIDER
 297
 211
 330
-max_death_rate
-max_death_rate
+temperature_tolerance
+temperature_tolerance
 0
 100
 30

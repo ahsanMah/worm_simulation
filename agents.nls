@@ -165,49 +165,18 @@ end
 
 
 to move
-;  ifelse (food-here <= 0)
-;  [set stamina stamina - 0.3]
-;  [set stamina 5]
-
-  ;let potential-destinations (patch-set patch-here neighbors with [permeability != 0])
-  ;ifelse iseating?
-  ;[
-    ;; uphill [food-here]
-    ;;face max-one-of potential-destinations [food-here]
-    right (random 181) - 90
-    if ((count (patch-set (patch-ahead (speed * permeability))) with [permeability <= speed_in_water]) > 
-       (count (patch-set (patch-here)) with [permeability <= speed_in_water]))
+  right (random 181) - 90
+  if ((count (patch-set (patch-ahead (speed * permeability))) with [permeability <= speed_in_water]) > 
+     (count (patch-set (patch-here)) with [permeability <= speed_in_water]))
+  [
+    if (random 100000 <= 99999)
     [
-      if (random 100000 <= 99999)
-      [
       right 180
-      ]
     ]
-    forward speed * permeability
-    eat
-
-;    if cycle-counter >= steps-per-ie
-;    [
-;      set iseating? false
-;      set cycle-counter 0
-;    ]
-;  ]
-;  [
-;    ;; downhill [food-here]
-;    ;;face max-one-of potential-destinations [food-consumed-from]
-;    ;;face min-one-of potential-destinations [food-here]
-;    right (random 181) - 90
-;    forward speed * permeability
-;    egest
-;    if cycle-counter >= steps-per-ie
-;    [
-;      set iseating? true
-;      set cycle-counter 0
-;    ]
-;  ]
+  ]
+  forward speed * permeability
+  eat
   check_death
-  ;if not iseating? [check_reproduction]
-  ;set cycle-counter cycle-counter + 1
 end
 
 
