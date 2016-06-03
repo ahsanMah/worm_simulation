@@ -527,7 +527,7 @@ January
 January
 -20
 40
--5
+24
 1
 1
 *C
@@ -542,7 +542,7 @@ February
 February
 -20
 40
--4
+24
 1
 1
 *C
@@ -557,7 +557,7 @@ March
 March
 -20
 40
-1
+27
 1
 1
 *C
@@ -572,7 +572,7 @@ April
 April
 -20
 40
-7
+24
 1
 1
 *C
@@ -587,7 +587,7 @@ May
 May
 -20
 40
-13
+21
 1
 1
 *C
@@ -602,7 +602,7 @@ June
 June
 -20
 40
-18
+25
 1
 1
 *C
@@ -647,7 +647,7 @@ September
 September
 -20
 40
-15
+22
 1
 1
 *C
@@ -662,7 +662,7 @@ October
 October
 -20
 40
-9
+21
 1
 1
 *C
@@ -677,7 +677,7 @@ November
 November
 -20
 40
-4
+21
 1
 1
 *C
@@ -692,7 +692,7 @@ December
 December
 -20
 40
--1
+22
 1
 1
 *C
@@ -753,7 +753,7 @@ species_genetic_diversity
 species_genetic_diversity
 0
 1
-0
+0.1
 0.1
 1
 NIL
@@ -998,7 +998,7 @@ save_number
 save_number
 0
 100
-1
+0
 1
 1
 NIL

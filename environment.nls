@@ -84,7 +84,7 @@ to setup_environment
   set day_of_month (var + (item ((current_month - 1) mod 12) num_days))
   ;;set next_month current_month + 1 mod 12
   
-  set organic-regen 0.3 ;;0.004;; / 5
+  ;set organic-regen 0.3 ;;0.004;; / 5
  
  ;array used to temporarily store obstacle parameters
   set obstacle n-values 6 [0]
