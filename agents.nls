@@ -76,23 +76,40 @@ to setup_agents
 end
 
 to mouse_add_species
-  if (mouse-down?)
-  [
-    add_species mouse-xcor mouse-ycor
+  ifelse (mouse-down?)
+    
+    [
+    add_species mouse-xcor mouse-ycor worm_population
     stop
-  ]
+    ]
+    [
+    if anyselected?
+    [
+      let i 0
+      while [i < worm_population]
+      [
+       add_species (random (x-max - x-min)) + x-min (random (y-max - y-min)) + y-min 1
+       set i i + 1
+      ]
+      stop
+    ]
+    
+    ]
+
     
 end
 
-to add_species [x y]
-  let new_species (list species_number species_genetic_diversity species_hatch_temperature worm_population x y)
+
+
+to add_species [x y population]
+  let new_species (list species_number species_genetic_diversity species_hatch_temperature population x y)
   let updated_species []
   let exists false
   
   foreach species_list [
     if (item 0 ?) = species_number ;if species already exists
     [ 
-      set updated_species (replace-item 3 ? (item 3 ? + worm_population)) ;update the population
+      set updated_species (replace-item 3 ? (item 3 ? + population)) ;update the population
       set exists true
     ]
   ]
