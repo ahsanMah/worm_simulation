@@ -77,6 +77,10 @@ to setup_agents
   ;foreach species_list [create_species ?]
 end
 
+<<<<<<< HEAD
+to add_species
+  let new_species (list species_number species_genetic_diversity species_hatch_temperature (list worm_population start_x start_y))
+=======
 to mouse_add_species
   if (mouse-down?)
   [
@@ -88,16 +92,16 @@ end
 
 to add_species [x y]
   let new_species (list species_number species_genetic_diversity species_hatch_temperature worm_population x y)
+>>>>>>> a522205b567a5f813be6031ee71f4940689d5381
   let updated_species []
   let exists false
   
-  if (length species_list > 0) [
-    foreach species_list [
-      if (item 0 ?) = species_number ;if species already exists
-      [ 
-        set updated_species (replace-item 3 ? (item 3 ? + worm_population)) ;update the population
-        set exists true
-      ]
+  foreach species_list [
+    if (item 0 ?) = species_number ;if species already exists
+    [ 
+      let placement_info item 3 ?
+      ;set updated_species (replace-item 3 ? (lput worm_population +placement_info)) ;update the population
+      set exists true
     ]
   ]
   
