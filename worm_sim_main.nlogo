@@ -90,7 +90,7 @@ to save_patches [name]
   let i min-pxcor
   let j min-pycor
   carefully [file-delete filename] []
-  file-open filename
+  ;file-open filename
   while [(i <= max-pxcor)]
   [
    while [(j <= max-pycor)]
@@ -134,20 +134,48 @@ end
 
 to save_agents [name]
   export_data name
+  let filename1 (word "data/parameters/specieslist" name ".csv")
+  csv:to-file filename1 species_list
 
   let filename (word "data/parameters/myagents"  name ".csv")
-  csv:to-file filename species_list
-  ;show csv:to-row ["one" 2 true ["two" 1 false]]
+
+  carefully [file-delete filename] []
+  ask turtles
+  [
+       let info (list xcor ycor parent_breed shape wait_period hatch_temp genetic_diversity max_temp_resist low_temp_resist max_ph_resist)
+       file-open filename
+       file-print csv:to-row info
+       file-close
+  ]
   print "Saved to file"
 end
 
 to load_agents [name]
   ;load_monitors name
-  let filename (word "data/parameters/myagents"  name ".csv")
-  set species_list csv:from-file filename
+  let filename1 (word "data/parameters/specieslist"  name ".csv")
+  let filename (word "data/parameters/myagents" name ".csv")
+  set species_list csv:from-file filename1
   print "Loaded from file: "
   print species_list
-  foreach species_list [create_species ?]
+  let data csv:from-file filename
+  foreach (data)
+  [
+    create-adults 1 [
+    setxy item 0 ? item 1 ?
+    set parent_breed item 2 ?
+    set size 1
+    set shape item 3 ?
+    set maturation 70
+    set wait_period item 4 ?
+    set hatch_temp item 5 ?
+    set stamina 5
+    set genetic_diversity item 6 ?
+    set max_temp_resist item 7 ?
+    set low_temp_resist item 8 ?
+    set max_ph_resist item 9 ?
+    set color (item parent_breed color_list)
+   ]
+  ]
 end
 
 to save_monitors [name]
@@ -301,8 +329,8 @@ GRAPHICS-WINDOW
 119
 0
 119
-0
-0
+1
+1
 1
 ticks
 1000.0
@@ -718,7 +746,7 @@ patch_pH
 patch_pH
 0
 14
-1.6
+0
 0.1
 1
 NIL
@@ -782,7 +810,7 @@ CHOOSER
 species_number
 species_number
 1 2 3 4 5
-0
+1
 
 BUTTON
 127

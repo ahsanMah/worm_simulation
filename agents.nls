@@ -81,7 +81,7 @@ to mouse_add_species
   ifelse (mouse-down?)
     
     [
-    add_species mouse-xcor mouse-ycor worm_population
+    add_species mouse-xcor mouse-ycor worm_population species_number
     stop
     ]
     [
@@ -90,7 +90,7 @@ to mouse_add_species
       let i 0
       while [i < worm_population]
       [
-       add_species (random (x-max - x-min)) + x-min (random (y-max - y-min)) + y-min 1
+       add_species (random (x-max - x-min)) + x-min (random (y-max - y-min)) + y-min 1 species_number
        set i i + 1
       ]
       stop
@@ -103,8 +103,8 @@ end
 
 
 
-to add_species [x y population]
-  let new_species (list species_number species_genetic_diversity species_hatch_temperature population x y)
+to add_species [x y population species_num]
+  let new_species (list species_num species_genetic_diversity species_hatch_temperature population x y)
   let updated_species []
   let exists false
   
@@ -150,12 +150,6 @@ to create_species [species]
     set wait_period 15 + random-normal 20 3;simulates a wait period of 15 to 65 days 
     set hatch_temp temp_hatch_temperature
     set stamina 5
-    set food-consumed-last 0
-    set iseating? one-of[true false]
-    set cycle-counter (random (steps-per-ie + 1))
-    ;;set speed 0.3;; / 5
-    
-    ;set population temp_population
     set genetic_diversity temp_genetic_diversity ; 0-1 measure of genetic diversity of the species
     set max_temp_resist random-normal temperature_tolerance (2 * genetic_diversity)
     set low_temp_resist random-normal 5 (2 * genetic_diversity)
