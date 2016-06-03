@@ -249,31 +249,6 @@ to recolor-patch
     ]
 end
 
-;to add_patch
-;  let var_x ((max-pxcor + 1) / num_patches_horizontal * (patch_x - 1))
-;  let var_y ((max-pycor + 1) / num_patches_vertical * (patch_y - 1))
-;  let i var_x
-;  let j var_y
-;  while [i < var_x + max-pxcor / num_patches_horizontal]
-;  [
-;   while [j < var_y + max-pycor / num_patches_vertical]
-;   [
-;    ask (patch i j)
-;    [
-;      if change-pH?
-;      [
-;        set pH patch_pH
-;        set temp_diff_here temperature_variation
-;      ]
-;      recolor-patch
-;    ] 
-;    set j j + 1
-;   ] 
-;   set i i + 1
-;   set j var_y
-;  ]
-;  
-;end
 
 to change_speed
   ask patches
@@ -298,17 +273,35 @@ to edit_environment
 end
 
 to recolor-selected
-  ;; incorporate patch, lake, square water feature, monitor, and mountain.
-  if (obstacle_shape = "patch")[
+
+  if (obstacle_shape = "rectangle")[
   ask patches
   [
    if selected? pxcor pycor
    [
-    set ph patch_ph
-    set temp_diff_here temperature_difference
+    if (change: = "pH" or change: = "both")[set ph patch_ph]
+    if (change: = "temperature difference" or change: = "both")[set temp_diff_here temperature_difference]
     recolor-patch
    ] 
   ]
+  ]
+  
+  if (obstacle_shape = "circle")
+  [
+    adjust-sides
+    let mt_size min (list (x-max - x-min) (y-max - y-min)) / 2
+    set temp_x (x-max - x-min) / 2 + x-min
+    set temp_y (y-max - y-min) / 2 + y-min
+    ask patches
+    [
+      if selected? pxcor pycor and (distancexy temp_x temp_y) < mt_size
+      [ 
+        if (change: = "pH" or change: = "both")[set ph patch_ph]
+        if (change: = "temperature difference" or change: = "both")[set temp_diff_here temperature_difference]
+        recolor-patch
+      ]
+    ]
+      
   ]
   
   if (obstacle_shape = "mountain")
@@ -321,8 +314,8 @@ to recolor-selected
     [
       if selected? pxcor pycor and (distancexy temp_x temp_y) < mt_size
       [
-        set ph (ph - ((ph - patch_ph) / mt_size) * (mt_size - distancexy temp_x temp_y) )
-        set temp_diff_here (temp_diff_here + ((temperature_difference) / mt_size) * (mt_size - distancexy temp_x temp_y))
+        if (change: = "pH" or change: = "both")[set ph (ph - ((ph - patch_ph) / mt_size) * (mt_size - distancexy temp_x temp_y) )]
+        if (change: = "temperature difference" or change: = "both")[set temp_diff_here (temp_diff_here + ((temperature_difference) / mt_size) * (mt_size - distancexy temp_x temp_y))]
         recolor-patch
       ]
     ]
@@ -364,6 +357,18 @@ to adjust-sides
   set y-min min [ycor] of sides
   set x-max max [xcor] of sides
   set x-min min [xcor] of sides
+end
+
+to-report anyselected?
+  let bool false
+  ask patches
+  [
+    if selected? pxcor pycor
+    [
+     set bool true 
+    ]
+  ]
+  report bool
 end
 
 to-report selected? [x y]
@@ -509,9 +514,3 @@ to collect_data
   
 end
 
-
-  
-
-
-to update_organic_matter
-end

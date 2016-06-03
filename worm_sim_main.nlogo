@@ -233,7 +233,7 @@ to go
   if (ticks mod (2 * periods-in-day) = 0) [
     set global_temperature random-normal (item current_month temperatures) (1)
     calculate_temp
-    update_organic_matter
+    ;update_organic_matter
 
     ask cocoons [
       check_if_hatch
@@ -489,8 +489,8 @@ CHOOSER
 89
 obstacle_shape
 obstacle_shape
-"lake" "mountain" "square" "horizontal-line" "vertical-line" "monitor" "patch"
-6
+"circle" "rectangle" "mountain" "monitor"
+0
 
 INPUTBOX
 94
@@ -732,7 +732,7 @@ CHOOSER
 Show:
 Show:
 "pH" "food" "temperature" "monitor"
-0
+2
 
 TEXTBOX
 10
@@ -960,7 +960,7 @@ BUTTON
 258
 1360
 291
-Select Patches
+Select
 edit_environment
 T
 1
@@ -1020,7 +1020,7 @@ INPUTBOX
 213
 210
 worm_population
-500
+200
 1
 0
 Number

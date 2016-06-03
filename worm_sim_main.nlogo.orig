@@ -28,15 +28,15 @@ to setup
   set area_list []
   set report_month 0
   set-default-shape sides "line"
-  ;setup_sim
+  setup_sim
 
-
+  ;show list (list 1 2)
   reset-ticks
 end
 
 
 to setup_sim
-  setup
+  ;setup
 
   print "Loading from simulation files..."
   load_patches "ham1"
@@ -233,7 +233,7 @@ to go
   if (ticks mod (2 * periods-in-day) = 0) [
     set global_temperature random-normal (item current_month temperatures) (1)
     calculate_temp
-    update_organic_matter
+    ;update_organic_matter
 
     ask cocoons [
       check_if_hatch
@@ -301,8 +301,8 @@ GRAPHICS-WINDOW
 119
 0
 119
-1
-1
+0
+0
 1
 ticks
 1000.0
@@ -376,27 +376,15 @@ PENS
 "pen-5" 1.0 0 -5825686 true "" "plotxy day_num (array:item population_arr 4)\nif (day_num = 365) [clear-plot]"
 
 SLIDER
-<<<<<<< HEAD
-8
-194
-209
-227
+12
+218
+213
+251
 ph_tolerance
 ph_tolerance
 3
 5
 3
-=======
-12
-218
-213
-251
-normal_reproduction_rate
-normal_reproduction_rate
-0
-1
-0.2
->>>>>>> a522205b567a5f813be6031ee71f4940689d5381
 0.1
 1
 NIL
@@ -422,11 +410,11 @@ SLIDER
 297
 211
 330
-max_death_rate
-max_death_rate
-0
-100
+temperature_tolerance
+temperature_tolerance
+5
 30
+18
 1
 1
 NIL
@@ -501,8 +489,8 @@ CHOOSER
 89
 obstacle_shape
 obstacle_shape
-"lake" "mountain" "square" "horizontal-line" "vertical-line" "monitor" "patch"
-5
+"circle" "rectangle" "mountain" "monitor"
+0
 
 INPUTBOX
 94
@@ -730,7 +718,7 @@ patch_pH
 patch_pH
 0
 14
-1.6
+3.8
 0.1
 1
 NIL
@@ -744,7 +732,7 @@ CHOOSER
 Show:
 Show:
 "pH" "food" "temperature" "monitor"
-3
+2
 
 TEXTBOX
 10
@@ -794,7 +782,7 @@ CHOOSER
 species_number
 species_number
 1 2 3 4 5
-0
+1
 
 BUTTON
 127
@@ -907,7 +895,11 @@ temperature_difference
 temperature_difference
 -10
 10
--1
+<<<<<<< HEAD
+4.5
+=======
+-4
+>>>>>>> b777c01ca889d401f8b6b597e152102e026505d2
 0.5
 1
 NIL
@@ -972,7 +964,7 @@ BUTTON
 258
 1360
 291
-Select Patches
+Select
 edit_environment
 T
 1
@@ -1024,7 +1016,7 @@ CHOOSER
 change:
 change:
 "pH" "temperature difference" "both"
-0
+1
 
 INPUTBOX
 12
@@ -1032,7 +1024,7 @@ INPUTBOX
 213
 210
 worm_population
-500
+200
 1
 0
 Number
