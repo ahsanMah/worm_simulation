@@ -65,7 +65,7 @@ to draw_highway
     ask patch mouse-xcor mouse-ycor
     [
       set permeability road_speed
-      set pcolor grey
+      set pcolor black
       set food-here default_food_value
     ]
     display
@@ -325,15 +325,15 @@ GRAPHICS-WINDOW
 1
 1
 0
-0
-0
+1
+1
 1
 0
 599
 0
 399
-1
-1
+0
+0
 1
 ticks
 1000.0
@@ -543,7 +543,7 @@ speed
 speed
 0
 0.5
-0.33
+0.46
 0.01
 1
 NIL
