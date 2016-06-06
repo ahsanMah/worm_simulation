@@ -14,17 +14,17 @@ globals[
 ]
 to setup
   clear-all
-  setup_gis
+
   print "Setting up environment..."
   setup_environment
   print "Done"
+  setup_gis
   print "Setting up agents..."
   setup_agents
   print "Done"
 
-  set species_data [true]
-  set species_data lput (array:from-list n-values 3 [0]) species_data ;hash map of species to their collected info
-  set monthly_data []                                                 ;list of tables collected every month
+  set species_data [] ;list of collected info of each species for each monitor
+  set monthly_data [] ;list of data collected each month
   set area_list []
   set report_month 0
 
@@ -37,7 +37,7 @@ end
 
 
 to setup_sim
-  setup
+ ;setup
 
   print "Loading from simulation files..."
   load_patches "ham1"
@@ -234,12 +234,13 @@ to clear_arrays
    let monitor_list n-values monitor_number [?] ;(?) allows to create a list from 0 to monitor number
    foreach species_list [
      let current_species ?
-     let monitor_set array:from-list monitor_list
-     foreach monitor_list [ ;m*n matrix of species data for every monitor
+     ;n*m matrix of species data for every monitor
+     let species_matrix array:from-list monitor_list  ;n = number of species charcteristics being collected, m = number of monitors
+     foreach monitor_list [
        let current_species_info array:from-list (list report_month ? (item 0 current_species) 0 0 (item 1 current_species)) ;resets population, density and saves genetic diversity
-       array:set monitor_set ? current_species_info
+       array:set species_matrix ? current_species_info
      ]
-     set species_data lput monitor_set species_data ;list of matrices
+     set species_data lput species_matrix species_data ;list of matrices
    ]
     set has_collected false
 end
@@ -263,7 +264,7 @@ to go
 
   if (ticks mod (periods-in-day) = 0) [
     set global_temperature random-normal (item current_month temperatures) (1)
-    calculate_temp
+    ;calculate_temp
     ;update_organic_matter
 
     ask cocoons [
@@ -283,14 +284,13 @@ to go
 
     ;set food-here food-here + organic-regen
   ]
-  ask patches
+  ask patches with [being_monitored = true]
   [
     if (day_of_month = item current_month num_days)[
       if (has_collected = false)[
         collect_data
       ]
     ]
-   recolor-patch
   ]
    ;saves monthly data to accumulutor list
   if (day_of_month = item current_month num_days)[
@@ -302,8 +302,8 @@ to go
           set monthly_data lput (array:to-list ?) monthly_data
         ]
       ]
-      ;print "Monthly data: "
-      ;show monthly_data
+      print "Monthly data: "
+      show monthly_data
       set report_month report_month + 1
       set has_collected true
     ]
@@ -312,13 +312,13 @@ to go
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-257
+224
 10
-1107
-881
+1133
+640
 -1
 -1
-7.0
+1.5
 1
 10
 1
@@ -329,9 +329,9 @@ GRAPHICS-WINDOW
 0
 1
 0
-119
+599
 0
-119
+399
 1
 1
 1
@@ -373,10 +373,10 @@ NIL
 1
 
 MONITOR
-1122
-521
-1230
-566
+1155
+519
+1263
+564
 Day Number
 day_num
 17
@@ -452,10 +452,10 @@ NIL
 HORIZONTAL
 
 MONITOR
-1123
-570
-1230
-615
+1156
+568
+1263
+613
 Population Count
 count adults
 17
@@ -481,10 +481,10 @@ PENS
 "default" 1.0 1 -11221820 true "" "plotxy year count adults"
 
 MONITOR
-1238
-570
-1336
-615
+1271
+568
+1369
+613
 Cocoon Count
 count cocoons
 17
@@ -503,10 +503,10 @@ starting_day
 Number
 
 MONITOR
-1238
-520
-1333
-565
+1271
+518
+1366
+563
 Daily Temp *C
 global_temperature
 2
@@ -514,10 +514,10 @@ global_temperature
 11
 
 CHOOSER
-1120
-44
-1360
-89
+1153
+42
+1393
+87
 obstacle_shape
 obstacle_shape
 "circle" "rectangle" "mountain" "monitor"
@@ -730,10 +730,10 @@ December
 VERTICAL
 
 INPUTBOX
-1243
-334
-1360
-416
+1276
+332
+1393
+414
 save_name
 ham1
 1
@@ -741,10 +741,10 @@ ham1
 String (reporter)
 
 SLIDER
-1121
-142
-1360
-175
+1154
+140
+1393
+173
 patch_pH
 patch_pH
 0
@@ -756,14 +756,14 @@ NIL
 HORIZONTAL
 
 CHOOSER
-1119
-334
-1238
-379
+1152
+332
+1271
+377
 Show:
 Show:
 "pH" "food" "temperature" "monitor"
-3
+0
 
 TEXTBOX
 10
@@ -833,10 +833,10 @@ NIL
 1
 
 BUTTON
-1118
-383
-1239
-416
+1151
+381
+1272
+414
 Recolor Patches
 recolor_patches
 NIL
@@ -850,10 +850,10 @@ NIL
 1
 
 BUTTON
-1118
-419
-1240
-452
+1151
+417
+1273
+450
 Save Environment
 save_patches save_name
 NIL
@@ -867,10 +867,10 @@ NIL
 1
 
 BUTTON
-1242
-419
-1361
-452
+1275
+417
+1394
+450
 Load Environment
 load_patches save_name
 NIL
@@ -918,10 +918,10 @@ NIL
 1
 
 SLIDER
-1121
-178
-1360
-211
+1154
+176
+1393
+209
 temperature_difference
 temperature_difference
 -10
@@ -943,20 +943,20 @@ Global Temperature Control
 1
 
 TEXTBOX
-1120
-20
-1270
-38
+1153
+18
+1303
+36
 Environment Controls\n
 12
 0.0
 1
 
 BUTTON
-1121
-218
-1240
-251
+1154
+216
+1273
+249
 Draw River
 river_draw
 T
@@ -970,10 +970,10 @@ NIL
 1
 
 BUTTON
-1244
-218
-1360
-251
+1277
+216
+1393
+249
 Draw Highway
 draw_highway
 T
@@ -987,10 +987,10 @@ NIL
 1
 
 BUTTON
-1120
-258
-1360
-291
+1153
+256
+1393
+289
 Select
 edit_environment
 T
@@ -1004,10 +1004,10 @@ NIL
 1
 
 BUTTON
-1120
-294
-1360
-327
+1153
+292
+1393
+325
 Edit Patch
 recolor-selected
 NIL
@@ -1021,10 +1021,10 @@ NIL
 1
 
 SLIDER
-1119
-470
-1361
-503
+1152
+468
+1394
+501
 save_number
 save_number
 0
@@ -1036,10 +1036,10 @@ NIL
 HORIZONTAL
 
 CHOOSER
-1121
-93
-1360
-138
+1154
+91
+1393
+136
 change:
 change:
 "pH" "temperature difference" "both"
