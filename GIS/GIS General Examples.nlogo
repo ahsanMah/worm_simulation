@@ -2,12 +2,13 @@ extensions [ gis ]
 globals [ cities-dataset
           rivers-dataset
           countries-dataset
-          elevation-dataset ]
+          elevation-dataset
+          ]
 breed [ city-labels city-label ]
 breed [ country-labels country-label ]
 breed [ country-vertices country-vertex ]
 breed [ river-labels river-label ]
-patches-own [ population country-name elevation ]
+patches-own [ population country-name elevation characteristic  ]
 
 to setup
   clear-all
@@ -29,6 +30,8 @@ to setup
      ;                                           (gis:envelope-of elevation-dataset))
 
   ;print cities-dataset
+  gis:apply-coverage countries-dataset "MUSYM" characteristic
+
   reset-ticks
 end
 
@@ -83,31 +86,41 @@ to display-countries
   ask country-labels [ die ]
   gis:set-drawing-color red
   gis:draw countries-dataset 1
-  if label-countries
-  [ foreach gis:feature-list-of countries-dataset
 
+
+
+  ask patches[
+    if (characteristic = "W")
     [
-      if (gis:property-value ? "MUSYM" = "W")[
-      gis:fill ? 1
-      ]
+     set pcolor blue
+    ]
 
-
-       let centroid gis:location-of gis:centroid-of ?
-      ; centroid will be an empty list if it lies outside the bounds
-      ; of the current NetLogo world, as defined by our current GIS
-      ; coordinate transformation
-      if not empty? centroid
-
-      [ if (gis:property-value ? "MUSYM" = "W")[
-
-        let patch_x item 0 centroid
-        let patch_y item 1 centroid
-
-        ask patch patch_x patch_y
-          [
-           set pcolor blue
-           ask neighbors [set pcolor blue]
-            ] ] ] ] ]
+  ]
+ ; if label-countries
+;  [ foreach gis:feature-list-of countries-dataset
+;
+;    [
+;      if (gis:property-value ? "MUSYM" = "W")[
+;      gis:fill ? 1
+;      ]
+;
+;
+;       let centroid gis:location-of gis:centroid-of ?
+;      ; centroid will be an empty list if it lies outside the bounds
+;      ; of the current NetLogo world, as defined by our current GIS
+;      ; coordinate transformation
+;      if not empty? centroid
+;
+;      [ if (gis:property-value ? "MUSYM" = "W")[
+;
+;        let patch_x item 0 centroid
+;        let patch_y item 1 centroid
+;
+;        ask patch patch_x patch_y
+;          [
+;           set pcolor blue
+;           ask neighbors [set pcolor blue]
+;            ] ] ] ] ]
 end
 
 ; Loading polygon data into turtles connected by links
