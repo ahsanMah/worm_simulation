@@ -996,7 +996,7 @@ Distribution_Information:
       delimited, ASCII file format.
     Turnaround: Typically within four hours
 Metadata_Reference_Information:
-  Metadata_Date: 20160603
+  Metadata_Date: 20160606
   Metadata_Contact:
     Contact_Information:
       Contact_Organization_Primary:
