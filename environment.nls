@@ -197,7 +197,7 @@ to setup-initial-food
 end
 
 to recolor-patch
-  ifelse (permeability  > speed_in_water)
+  if (pcolor != blue and pcolor != grey and pcolor != black)
   [
 
     if (Show: = "pH")
@@ -241,13 +241,13 @@ to recolor-patch
 
     
   ]
-  [;if water body
-    set pcolor blue
-  ]
-      if (permeability = road_speed)
-    [
-     set pcolor grey 
-    ]
+;  [;if water body
+;    set pcolor blue
+;  ]
+;      if (permeability = road_speed)
+;    [
+;     set pcolor grey 
+;    ]
 end
 
 
