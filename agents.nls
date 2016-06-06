@@ -160,13 +160,17 @@ end
 
 to move
   right (random 181) - 90
-  if ((count (patch-set (patch-ahead (speed * permeability / periods-in-day))) with [permeability <= speed_in_water]) > 
-     (count (patch-set (patch-here)) with [permeability <= speed_in_water]))
+  if ((count (patch-set (patch-ahead (speed * permeability / periods-in-day))) with [pcolor = blue]) > 
+     (count (patch-set (patch-here)) with [pcolor != blue]))
   [
     if (random 100000 <= 99999)
     [
       right 180
     ]
+  ]
+  if ( count (patch-set (patch-ahead  (speed * permeability / periods-in-day))) with [pcolor = grey]) > 0
+  [
+   right 180 
   ]
   forward speed * permeability / periods-in-day
   eat
