@@ -20,7 +20,7 @@ to setup
   set cities-dataset gis:load-dataset "data/cities.shp"
   ;set rivers-dataset gis:load-dataset "soil/spatial/soilsf_p_aoi.shp"
   ;set countries-dataset gis:load-dataset "data/ne_10m_land.shp"
-  set countries-dataset gis:load-dataset "soil/spatial/Colgate_NY043_soilcip2.shp"
+  set countries-dataset gis:load-dataset "soil/spatial/soilmu_a_aoi.shp"
 
   set elevation-dataset gis:load-dataset "data/world-elevation.asc"
   ; Set the world envelope to the union of all of our dataset's envelopes
@@ -30,6 +30,8 @@ to setup
   gis:apply-coverage countries-dataset "MUSYM" characteristic
 
   load_ph
+  let new_grid gis:world-envelope
+  ;resize-world 0 0 0 0
   reset-ticks
 end
 
@@ -98,10 +100,23 @@ to display-countries
 
  foreach gis:feature-list-of countries-dataset
     [
-      if (gis:property-value ? "MUSYM" = "W")[
-      gis:fill ? 1
+      let map_symbol (gis:property-value ? "MUSYM")
+
+     if (table:has-key? ph_map map_symbol)[
+      let ph (table:get ph_map map_symbol)
+      ifelse (ph != "")[
+       gis:set-drawing-color scale-color green ph 14 0]
+      [gis:set-drawing-color grey]
+     ]
+
+    if (map_symbol = "W")[
+      gis:set-drawing-color blue
       ]
+      gis:fill ? 1
 ]
+
+
+
   ask patches[
     if (characteristic = "W")
     [
@@ -294,10 +309,10 @@ end
 GRAPHICS-WINDOW
 200
 10
-1282
-704
-65
-40
+1445
+1276
+75
+75
 8.19
 1
 8
@@ -308,10 +323,10 @@ GRAPHICS-WINDOW
 1
 1
 1
--65
-65
--40
-40
+-75
+75
+-75
+75
 0
 0
 1
