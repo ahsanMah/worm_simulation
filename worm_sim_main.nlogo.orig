@@ -314,8 +314,8 @@ end
 GRAPHICS-WINDOW
 224
 10
-1134
-641
+1133
+640
 -1
 -1
 1.5
@@ -331,9 +331,15 @@ GRAPHICS-WINDOW
 0
 599
 0
+<<<<<<< HEAD
 399
+1
+1
+=======
+119
 0
 0
+>>>>>>> 28e6f7d0acf3b971be2c01a1b7292de611420384
 1
 ticks
 1000.0
@@ -445,7 +451,7 @@ temperature_tolerance
 temperature_tolerance
 0
 100
-23
+30
 1
 1
 NIL
@@ -536,9 +542,9 @@ Number
 
 SLIDER
 12
-412
+376
 211
-445
+409
 speed
 speed
 0
@@ -792,9 +798,9 @@ HORIZONTAL
 
 SLIDER
 12
-374
+413
 211
-407
+446
 species_hatch_temperature
 species_hatch_temperature
 0
@@ -1051,7 +1057,7 @@ INPUTBOX
 213
 210
 worm_population
-50
+200
 1
 0
 Number

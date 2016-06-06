@@ -28,24 +28,25 @@ end
 
 to draw_map
   gis:set-drawing-color red
-  gis:draw soil_dataset 1
+  gis:draw soil_dataset 0.5
 
-foreach gis:feature-list-of soil_dataset [
-  let map_symbol (gis:property-value ? "MUSYM")
-  
-  if (table:has-key? ph_map map_symbol)[
-    let gis_ph (table:get ph_map map_symbol)
-    ifelse (gis_ph != "")[
-      gis:set-drawing-color scale-color green gis_ph 14 0]
-    [gis:set-drawing-color grey]
-  ]
-  
-  if (map_symbol = "W") [
-    gis:set-drawing-color blue
-  ]
-  
-  gis:fill ? 1
-]
+;foreach gis:feature-list-of soil_dataset [
+;  let map_symbol (gis:property-value ? "MUSYM")
+;  
+;  if (table:has-key? ph_map map_symbol)[
+;    let gis_ph (table:get ph_map map_symbol)
+;    ifelse (gis_ph != "")[
+;      gis:set-drawing-color scale-color green gis_ph 14 0]
+;    [gis:set-drawing-color grey]
+;  ]
+;  
+;  if (map_symbol = "W") [
+;    gis:set-drawing-color blue
+;  ]
+;  
+;  gis:fill ? 1
+;  
+;]
 end
 
 to map_patches
@@ -55,13 +56,18 @@ to map_patches
     if (table:has-key? ph_map symbol)[
       let gis_ph (table:get ph_map symbol)
       ifelse (gis_ph != "")[
-       set pcolor scale-color green gis_ph 14 0]
-       [ set pcolor grey ]
+       ;set pcolor scale-color green gis_ph 14 0
+       set ph gis_ph
+       ]
+       [ set pcolor grey
+         set permeability 0
+         ]
     ]
        
    if (symbol = "W")
     [
       set pcolor blue
+      set permeability 0
     ]
   ]
 end
