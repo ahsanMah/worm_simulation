@@ -33,16 +33,16 @@ globals [
   x-max
   y-min
   y-max
-
+  
   ]
 
 breed [sides side]
 
 patches-own
 [
-  ph        ;pH values ranging from 0-14
-  food-here ;amount of food on this patch
-  permeability ;; 0 - 1, 0 being completely impermeable, 1 meaning complete freedom of movement
+  ph                     ;pH values ranging from 0-14
+  food-here              ;amount of food on this patch
+  permeability           ;0 - 1, 0 being completely impermeable, 1 meaning complete freedom of movement
   local_death_threshold
   food-consumed-from
   temp_diff_here
@@ -50,6 +50,7 @@ patches-own
   being_monitored
   monitor_size
   monitor_index
+  symbol                 ;helps identify feature type for gis support (W = Water etc.)
   
 ]
 
@@ -107,7 +108,6 @@ to setup_environment
   ]
   
 end
-
 
 to calculate_temp
   ask patches
