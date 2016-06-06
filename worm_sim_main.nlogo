@@ -445,7 +445,7 @@ temperature_tolerance
 temperature_tolerance
 0
 100
-30
+23
 1
 1
 NIL
@@ -536,9 +536,9 @@ Number
 
 SLIDER
 12
-376
+412
 211
-409
+445
 speed
 speed
 0
@@ -763,7 +763,7 @@ CHOOSER
 Show:
 Show:
 "pH" "food" "temperature" "monitor"
-3
+0
 
 TEXTBOX
 10
@@ -792,9 +792,9 @@ HORIZONTAL
 
 SLIDER
 12
-413
+374
 211
-446
+407
 species_hatch_temperature
 species_hatch_temperature
 0
@@ -813,7 +813,7 @@ CHOOSER
 species_number
 species_number
 1 2 3 4 5
-0
+1
 
 BUTTON
 127
@@ -1051,7 +1051,7 @@ INPUTBOX
 213
 210
 worm_population
-200
+50
 1
 0
 Number
