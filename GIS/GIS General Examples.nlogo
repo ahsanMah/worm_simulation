@@ -1,8 +1,9 @@
-extensions [ gis ]
+extensions [ gis csv table]
 globals [ cities-dataset
           rivers-dataset
           countries-dataset
           elevation-dataset
+          ph_map
           ]
 breed [ city-labels city-label ]
 breed [ country-labels country-label ]
@@ -17,23 +18,31 @@ to setup
   gis:load-coordinate-system (word "data/" projection ".prj")
   ; Load all of our datasets
   set cities-dataset gis:load-dataset "data/cities.shp"
-  set rivers-dataset gis:load-dataset "soil/spatial/soilsf_p_aoi.shp"
+  ;set rivers-dataset gis:load-dataset "soil/spatial/soilsf_p_aoi.shp"
   ;set countries-dataset gis:load-dataset "data/ne_10m_land.shp"
-  set countries-dataset gis:load-dataset "soil/spatial/soilmu_a_aoi.shp"
+  set countries-dataset gis:load-dataset "soil/spatial/Colgate_NY043_soilcip2.shp"
 
   set elevation-dataset gis:load-dataset "data/world-elevation.asc"
   ; Set the world envelope to the union of all of our dataset's envelopes
   gis:set-world-envelope (gis:envelope-union-of (gis:envelope-of countries-dataset))
-  ;(gis:envelope-of cities-dataset)
-   ;                                             (gis:envelope-of rivers-dataset)
-    ;                                            (gis:envelope-of countries-dataset)
-     ;                                           (gis:envelope-of elevation-dataset))
 
-  ;print cities-dataset
+
   gis:apply-coverage countries-dataset "MUSYM" characteristic
 
+  load_ph
   reset-ticks
 end
+
+to load_ph
+  set ph_map table:make
+  let filename ("soil/pH_key.csv")
+  let ph_list csv:from-file filename
+  foreach ph_list [
+    table:put ph_map (item 0 ?) (item 2 ?)
+    ]
+  show ph_map
+end
+
 
 ; Drawing point data from a shapefile, and optionally loading the
 ; data into turtles, if label-cities is true
@@ -87,14 +96,25 @@ to display-countries
   gis:set-drawing-color red
   gis:draw countries-dataset 1
 
-
-
+ foreach gis:feature-list-of countries-dataset
+    [
+      if (gis:property-value ? "MUSYM" = "W")[
+      gis:fill ? 1
+      ]
+]
   ask patches[
     if (characteristic = "W")
     [
      set pcolor blue
     ]
 
+    if (table:has-key? ph_map characteristic)[
+      let ph (table:get ph_map characteristic)
+      ifelse (ph != "")[
+       set pcolor scale-color green ph 14 0]
+      [set pcolor grey
+        ]
+    ]
   ]
  ; if label-countries
 ;  [ foreach gis:feature-list-of countries-dataset
@@ -272,13 +292,13 @@ end
 ; copyright and related or neighboring rights to this model.
 @#$#@#$#@
 GRAPHICS-WINDOW
-212
+200
 10
-1270
-689
+1282
+704
 65
 40
-8.0
+8.19
 1
 8
 1
