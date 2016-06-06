@@ -519,7 +519,7 @@ CHOOSER
 obstacle_shape
 obstacle_shape
 "circle" "rectangle" "mountain" "monitor"
-3
+1
 
 INPUTBOX
 94
@@ -556,7 +556,7 @@ January
 January
 -20
 40
-24
+-10
 1
 1
 *C
@@ -571,7 +571,7 @@ February
 February
 -20
 40
-24
+-8
 1
 1
 *C
@@ -586,7 +586,7 @@ March
 March
 -20
 40
-27
+-2
 1
 1
 *C
@@ -601,7 +601,7 @@ April
 April
 -20
 40
-24
+4
 1
 1
 *C
@@ -616,7 +616,7 @@ May
 May
 -20
 40
-21
+11
 1
 1
 *C
@@ -631,7 +631,7 @@ June
 June
 -20
 40
-25
+15
 1
 1
 *C
@@ -646,7 +646,7 @@ July
 July
 -20
 40
-21
+18
 1
 1
 *C
@@ -661,7 +661,7 @@ August
 August
 -20
 40
-20
+17
 1
 1
 *C
@@ -676,7 +676,7 @@ September
 September
 -20
 40
-22
+17
 1
 1
 *C
@@ -691,7 +691,7 @@ October
 October
 -20
 40
-21
+7
 1
 1
 *C
@@ -706,7 +706,7 @@ November
 November
 -20
 40
-21
+1
 1
 1
 *C
@@ -721,7 +721,7 @@ December
 December
 -20
 40
-22
+-6
 1
 1
 *C
@@ -747,7 +747,7 @@ patch_pH
 patch_pH
 0
 14
-0
+3.2
 0.1
 1
 NIL
@@ -761,7 +761,7 @@ CHOOSER
 Show:
 Show:
 "pH" "food" "temperature" "monitor"
-1
+0
 
 TEXTBOX
 10
@@ -811,7 +811,7 @@ CHOOSER
 species_number
 species_number
 1 2 3 4 5
-0
+1
 
 BUTTON
 127
@@ -924,7 +924,7 @@ temperature_difference
 temperature_difference
 -10
 10
--4
+5
 0.5
 1
 NIL
