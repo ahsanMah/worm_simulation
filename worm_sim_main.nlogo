@@ -1,5 +1,5 @@
-extensions [array csv table]
-__includes["environment.nls" "agents.nls"]
+extensions [array csv table gis]
+__includes["environment.nls" "agents.nls" "gis-support.nls"]
 
 globals[
   species_data
@@ -14,6 +14,7 @@ globals[
 ]
 to setup
   clear-all
+  setup_gis
   print "Setting up environment..."
   setup_environment
   print "Done"
@@ -520,7 +521,7 @@ CHOOSER
 obstacle_shape
 obstacle_shape
 "circle" "rectangle" "mountain" "monitor"
-1
+3
 
 INPUTBOX
 94
@@ -762,7 +763,7 @@ CHOOSER
 Show:
 Show:
 "pH" "food" "temperature" "monitor"
-0
+3
 
 TEXTBOX
 10

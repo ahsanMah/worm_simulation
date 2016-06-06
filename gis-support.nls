@@ -1,0 +1,67 @@
+globals[
+   soil_dataset ;will be used for storing gis vector data
+   ph_map
+  ]
+
+to setup_gis
+  print "Loading GIS data..."
+  set soil_dataset gis:load-dataset "data/parameters/soil/spatial/soilmu_a_aoi.shp"
+  print "Setting up world..."
+  gis:set-world-envelope-ds (gis:envelope-of soil_dataset)
+  gis:apply-coverage soil_dataset "MUSYM" symbol
+  load_ph
+  draw_map
+  print "Mapping GIS features to patches..."
+  map_patches
+  print "Finished GIS setup"
+end
+
+to load_ph
+  set ph_map table:make
+  let filename ("data/parameters/soil/pH_key.csv")
+  let ph_list csv:from-file filename
+  foreach ph_list [
+    table:put ph_map (item 0 ?) (item 2 ?)
+    ]
+end
+
+
+to draw_map
+  gis:set-drawing-color red
+  gis:draw soil_dataset 1
+
+foreach gis:feature-list-of soil_dataset [
+  let map_symbol (gis:property-value ? "MUSYM")
+  
+  if (table:has-key? ph_map map_symbol)[
+    let gis_ph (table:get ph_map map_symbol)
+    ifelse (gis_ph != "")[
+      gis:set-drawing-color scale-color green gis_ph 14 0]
+    [gis:set-drawing-color grey]
+  ]
+  
+  if (map_symbol = "W") [
+    gis:set-drawing-color blue
+  ]
+  
+  gis:fill ? 1
+]
+end
+
+to map_patches
+ 
+  ask patches[
+    
+    if (table:has-key? ph_map symbol)[
+      let gis_ph (table:get ph_map symbol)
+      ifelse (gis_ph != "")[
+       set pcolor scale-color green gis_ph 14 0]
+       [ set pcolor grey ]
+    ]
+       
+   if (symbol = "W")
+    [
+      set pcolor blue
+    ]
+  ]
+end
