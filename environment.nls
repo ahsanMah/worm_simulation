@@ -496,6 +496,8 @@ to setup-obstacles [one_obstacle]
   ]
 end
 
+
+
 to update_monitor_area
   let monitor_list n-values monitor_number [?] 
   foreach monitor_list [
