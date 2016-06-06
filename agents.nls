@@ -255,8 +255,8 @@ end
 to update_thresholds
   ;cold reduces survival rate
   set death_threshold normal_death_threshold
-  if (temperature > max_temp_resist) [ set death_threshold max_death_threshold / (periods-in-day)]
-  if (temperature < low_temp_resist) [ set death_threshold max_death_threshold / (periods-in-day)]
+  if (global_temperature > max_temp_resist) [ set death_threshold max_death_threshold / (periods-in-day)]
+  if (global_temperature < low_temp_resist) [ set death_threshold max_death_threshold / (periods-in-day)]
   
   ;;pH of soil also affects survival rate
   if (ph < max_ph_resist) [
@@ -265,7 +265,7 @@ to update_thresholds
   ]
   
   ;reproduction rate affected by temperature
-  ifelse (temperature > 10) [
+  ifelse (global_temperature > 10) [
     set reprod_threshold (max_reproduction_rate * (temperature / 15)) ] ; probability of reproducing increases as it gets warmer (10 * periods-in-day)
   [set reprod_threshold normal_reproduction_rate]
   
@@ -279,7 +279,7 @@ end
 
 ;;hatches temperature is optimum for birth
 to check_if_hatch
-    if (temperature > hatch_temp) [
+    if (global_temperature > hatch_temp) [
       set wait_days wait_days + 1
       ;show wait_period
       if (wait_days >= wait_period) [

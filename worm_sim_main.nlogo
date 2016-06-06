@@ -314,8 +314,8 @@ end
 GRAPHICS-WINDOW
 224
 10
-1133
-640
+1134
+641
 -1
 -1
 1.5
@@ -813,7 +813,7 @@ CHOOSER
 species_number
 species_number
 1 2 3 4 5
-1
+0
 
 BUTTON
 127
