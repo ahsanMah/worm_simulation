@@ -1,0 +1,3 @@
+"County or Parish"|"NY041"|"Hamilton"|1157400|"12407"|"291323"
+"MLRA"|"143"|"Northeastern Mountains"|1157400|"12407"|"291324"
+"State or Territory"|"NY"|"New York"|1157400|"12407"|"291325"

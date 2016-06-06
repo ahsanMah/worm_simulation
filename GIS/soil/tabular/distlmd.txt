@@ -1,0 +1,6 @@
+"Non-MLRA Soil Survey Area"|"NY041"|"Hamilton County, New York"||02/01/1994 00:00:00|"certified, major components"|09/21/2015 17:37:28|"The ""721C 9st7-Becket-Tunbridge-Skerry complex, 3 to 15 percent slopes, very bouldery"" mapunit was combined with the ""721C 2w5hl-Becket-Tunbridge-Skerry complex, 3 to 15 percent slopes, rocky, very bouldery"" map unit as a result of the ""SDJR - MLRA 143 - ADK - Becket-Tunbridge-Skerry complex, 3 to 15 percent slopes, rocky, very bouldery (Order 3)"" project"". 
+
+The ""721F 9st9-Becket-Tunbridge complex, 35 to 60 percent slopes, very bouldery"" mapunit was combined with the ""721F 2w5hm-Becket-Tunbridge complex, 35 to 60 percent slopes, rocky, very bouldery"" map unit as a result of the ""SDJR - MLRA 143 - ADK - Becket-Tunbridge complex, 35 to 60 percent slopes, rocky, very bouldery (Order 3)"" project"". 
+
+These projects were part of the Soil Data Join Recorrelation Initiative (SDJR). The tabular database was edited and populated according to guidance in National Instruction (NI-305) exhibits A and B. 
+"|"12407"|"48281"|"48183"
