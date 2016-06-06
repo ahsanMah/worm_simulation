@@ -270,7 +270,9 @@ to edit_environment
     [
       handle-select
     ]
+    
   ]
+  display
 end
 
 to recolor-selected

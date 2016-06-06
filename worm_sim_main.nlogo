@@ -54,7 +54,7 @@ to river_draw
      set permeability speed_in_water
      set pcolor blue
     ]
-
+    display
   ]
 end
 
@@ -67,6 +67,7 @@ to draw_highway
       set pcolor grey
       set food-here default_food_value
     ]
+    display
   ]
 end
 
@@ -330,8 +331,8 @@ GRAPHICS-WINDOW
 119
 0
 119
-0
-0
+1
+1
 1
 ticks
 1000.0
@@ -811,7 +812,7 @@ CHOOSER
 species_number
 species_number
 1 2 3 4 5
-1
+0
 
 BUTTON
 127
