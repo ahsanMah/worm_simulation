@@ -104,24 +104,23 @@ end
 
 
 to add_species [x y population species_num]
-  let new_species (list species_genetic_diversity species_hatch_temperature population)
+  let new_species (list species_num species_genetic_diversity species_hatch_temperature population x y)
   
-  ifelse (table:has-key? species_list species_num) [
-    let species_info table:get species_list species_num
-    array:set species_info 2 (population + array:item species_info 2)
-    
-  ] 
-  [ table:put species_list species_num (array:from-list new_species)]
-  
-  ;update opulation array
+    ;update opulation array
+
   array:set population_arr (species_num - 1) (array:item population_arr (species_num - 1) + population)
   
-  ;restructure list to pass into create_species function
-  set new_species array:to-list table:get species_list species_num
-  set new_species fput species_num new_species
-  set new_species lput x new_species
-  set new_species lput y new_species
   
+  ifelse (table:has-key? species_list species_num) [
+    ;create new population with existing settings
+    set new_species array:to-list table:get species_list species_num
+    set new_species fput species_num new_species
+    set new_species sentence new_species (list population x y)
+    let species_info table:get species_list species_num
+    
+  ] 
+  [ table:put species_list species_num (array:from-list (list species_genetic_diversity species_hatch_temperature))]
+
   foreach table:to-list species_list [show ?]
   
   create_species new_species
@@ -156,7 +155,7 @@ to create_species [species]
     set genetic_diversity temp_genetic_diversity ; 0-1 measure of genetic diversity of the species
     set max_temp_resist random-normal temperature_tolerance (2 * genetic_diversity)
     set low_temp_resist random-normal 5 (2 * genetic_diversity)
-    set max_ph_resist random-normal ph_tolerance (2 * genetic_diversity)
+    set max_ph_resist random-normal 6.5 (2 * genetic_diversity)
    ]
 end
 
@@ -233,8 +232,8 @@ to update_thresholds
   
   ;;pH of soil also affects survival rate
   if (ph < max_ph_resist) [
-    set var abs (max_ph_resist - ph)
-    set death_threshold (death_threshold + (random 55) / max_ph_resist * var ) ; +55% chance of them dying at pH of 0
+    set var max_ph_resist - ph
+    set death_threshold (death_threshold + (random ph_tolerance) / max_ph_resist * var ) ; high tolerance increases their chance of survival
   ]
   
   ;reproduction rate affected by temperature

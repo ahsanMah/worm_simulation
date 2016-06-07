@@ -437,9 +437,9 @@ NIL
 
 MONITOR
 1155
-483
+535
 1263
-528
+580
 Day Number
 day_num
 17
@@ -447,10 +447,10 @@ day_num
 11
 
 PLOT
-1142
-621
-1401
-790
+502
+667
+761
+836
 Worm Population for Current Year
 Day Number
 Population
@@ -476,12 +476,12 @@ SLIDER
 253
 ph_tolerance
 ph_tolerance
-3
-5
-3
-0.1
+-10
+10
+0
 1
-NIL
+1
+%
 HORIZONTAL
 
 SLIDER
@@ -516,9 +516,9 @@ HORIZONTAL
 
 MONITOR
 1156
-532
+584
 1263
-577
+629
 Population Count
 count adults
 17
@@ -526,10 +526,10 @@ count adults
 11
 
 PLOT
-1409
-621
-1673
-794
+769
+667
+1033
+840
 Worm Population over Years
 NIL
 NIL
@@ -545,9 +545,9 @@ PENS
 
 MONITOR
 1271
-532
+584
 1369
-577
+629
 Cocoon Count
 count cocoons
 17
@@ -567,9 +567,9 @@ Number
 
 MONITOR
 1271
-482
+534
 1366
-527
+579
 Daily Temp *C
 global_temperature
 2
@@ -782,12 +782,12 @@ December
 VERTICAL
 
 INPUTBOX
-1276
-296
-1393
-378
+1278
+305
+1395
+387
 save_name
-99
+ph-sim
 1
 0
 String (reporter)
@@ -808,14 +808,14 @@ NIL
 HORIZONTAL
 
 CHOOSER
-1152
-296
-1271
-341
+1154
+305
+1273
+350
 Show:
 Show:
 "pH" "food" "temperature" "monitor"
-1
+0
 
 TEXTBOX
 10
@@ -865,7 +865,7 @@ CHOOSER
 species_number
 species_number
 1 2 3 4 5
-3
+0
 
 BUTTON
 127
@@ -885,10 +885,10 @@ NIL
 1
 
 BUTTON
-1151
-345
-1272
-378
+1153
+354
+1274
+387
 Recolor Patches
 recolor_patches
 NIL
@@ -902,10 +902,10 @@ NIL
 1
 
 BUTTON
-1151
-381
-1273
-414
+1153
+390
+1275
+423
 Save Environment
 save_patches save_name
 NIL
@@ -919,10 +919,10 @@ NIL
 1
 
 BUTTON
-1275
-381
-1394
-414
+1277
+390
+1396
+423
 Load Environment
 load_patches save_name
 NIL
@@ -1005,9 +1005,9 @@ Environment Controls\n
 1
 
 BUTTON
-1154
+1153
 216
-1273
+1272
 249
 Draw
 pen
@@ -1022,9 +1022,9 @@ NIL
 1
 
 BUTTON
-1277
+1276
 216
-1394
+1393
 249
 Select
 edit_environment
@@ -1056,10 +1056,10 @@ NIL
 1
 
 SLIDER
-1152
-432
-1394
-465
+1154
+441
+1396
+474
 save_number
 save_number
 0
@@ -1078,7 +1078,7 @@ CHOOSER
 change:
 change:
 "pH" "temperature difference" "pH and temperature difference" "water" "highway"
-2
+1
 
 TEXTBOX
 13
@@ -1100,79 +1100,11 @@ Environment Controls\n
 0.0
 1
 
-BUTTON
-1154
-216
-1273
-249
-Draw River
-river_draw
-T
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
-
-BUTTON
-1277
-216
-1393
-249
-Draw Highway
-draw_highway
-T
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
-
-BUTTON
-1153
-256
-1393
-289
-Select
-edit_environment
-T
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
-
-BUTTON
-1153
-292
-1393
-325
-Edit Patch
-recolor-selected
-NIL
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
-
 SLIDER
-1152
-468
-1394
-501
+1154
+477
+1396
+510
 save_number
 save_number
 0
@@ -1199,7 +1131,7 @@ INPUTBOX
 168
 212
 worm_population
-200
+50
 1
 0
 Number
