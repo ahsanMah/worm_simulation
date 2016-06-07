@@ -31,7 +31,7 @@ to setup
   set-default-shape sides "line"
   ;setup_sim
 
-
+  recolor_patches
   reset-ticks
 end
 
@@ -65,7 +65,7 @@ to draw_highway
     ask patch mouse-xcor mouse-ycor
     [
       set permeability road_speed
-      set pcolor black
+      set pcolor turquoise
       set food-here default_food_value
     ]
     display
@@ -93,7 +93,6 @@ to save_patches [name]
   let i min-pxcor
   let j min-pycor
   carefully [file-delete filename] []
-  ;file-open filename
   while [(i <= max-pxcor)]
   [
    while [(j <= max-pycor)]
@@ -114,7 +113,6 @@ to save_patches [name]
 end
 
 to load_patches [name]
-
   load_obstacles name
   let filename (word "data/parameters/mypatches" name ".csv")
   let data csv:from-file filename
@@ -179,6 +177,11 @@ to load_agents [name]
     set color (item parent_breed color_list)
    ]
   ]
+end
+
+to load_temperature [name]
+  let filename (word "data/parameters/temperaturelist" name ".csv")
+
 end
 
 to save_monitors [name]
@@ -521,18 +524,7 @@ CHOOSER
 obstacle_shape
 obstacle_shape
 "circle" "rectangle" "mountain" "monitor"
-3
-
-INPUTBOX
-94
-58
-213
-118
-max_temperature
-20
 1
-0
-Number
 
 SLIDER
 12
@@ -543,7 +535,7 @@ speed
 speed
 0
 0.5
-0.46
+0.38
 0.01
 1
 NIL
@@ -926,7 +918,7 @@ temperature_difference
 temperature_difference
 -10
 10
-5
+-1.5
 0.5
 1
 NIL
@@ -1051,7 +1043,7 @@ INPUTBOX
 213
 210
 worm_population
-50
+200
 1
 0
 Number

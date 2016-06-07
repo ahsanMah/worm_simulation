@@ -54,6 +54,9 @@ patches-own
   
 ]
 
+
+
+
 to setup_environment
   
   set day_num starting_day
@@ -63,8 +66,8 @@ to setup_environment
   set road_speed 2
   set default_food_value 5000
 
-  ;set temperatures (list January February March April May June July August September October November December)
-  set temperatures (list -5 -4 1 7 13 18 21 20 15 9 4 -2)
+  set temperatures (list January February March April May June July August September October November December)
+  ;set temperatures (list -5 -4 1 7 13 18 21 20 15 9 4 -2)
   set num_days (list 31 28 31 30 31 30 31 31 30 31 30 31)
   set current_month 0
   set var starting_day
@@ -98,13 +101,11 @@ to setup_environment
   [
     set permeability 1
     set ph 7
-    ;set local_death_threshold death_threshold
     set temp_diff_here 0
     set being_monitored false
     set monitor_index -1
     setup-initial-food
     recolor-patch
-    ;foreach obstacle_list [setup-obstacles ? ]
   ]
   
 end
@@ -118,26 +119,6 @@ to calculate_temp
 ;    set temperature temperature * max_temperature ;scales temperature to real world values
 
 end
-
-;to add_obstacle
-;  
-;  set obstacle (list obstacle_shape obstacle_size obstacle_x obstacle_y 0 false) 
-;  set obstacle_list lput obstacle obstacle_list
-;  
-;  if (obstacle_shape = "monitor") [set monitor_number monitor_number + 1]
-;  ;show obstacle_list
-;  
-;  ask patches 
-;  [
-;    setup-obstacles obstacle
-;    recolor-patch
-;  ]
-;  update_monitor_area
-;  calculate_temp
-;  recolor_patches
-;  ;draw_obstacles
-;
-;end
 
 to recolor_patches
   ask patches
@@ -156,10 +137,7 @@ to draw_obstacles
 
 end
 
-
 to calculate_time
-  ;; two ticks to simulate one gestation cycle
-  ;; worm completes 10 cycles in one day
   if (ticks mod (periods-in-day) = 0) [
     set day_num day_num + 1
     set day_of_month day_of_month + 1
@@ -197,7 +175,7 @@ to setup-initial-food
 end
 
 to recolor-patch
-  if (pcolor != blue and pcolor != grey and pcolor != black)
+  if (pcolor != blue and pcolor != grey)
   [
 
     if (Show: = "pH")
@@ -241,13 +219,6 @@ to recolor-patch
 
     
   ]
-;  [;if water body
-;    set pcolor blue
-;  ]
-;      if (permeability = road_speed)
-;    [
-;     set pcolor grey 
-;    ]
 end
 
 
@@ -377,11 +348,6 @@ end
 to-report selected? [x y]
   if not any? sides [ report false ]
   adjust-sides  
-;  let y-max max [ycor] of sides
-;  let y-min min [ycor] of sides
-;  let x-max max [xcor] of sides
-;  let x-min min [xcor] of sides
-  
   report x >= x-min and x <= x-max and y >= y-min and y <= y-max
 end
 
@@ -432,9 +398,8 @@ to setup-obstacles [one_obstacle]
         [
           set permeability 1
         ]
-          set ph (ph - ((ph - patch_ph) / temp_size) * (temp_size - distancexy temp_x temp_y) )
-          set temp_diff_here (temp_diff_here + ((temperature_difference) / temp_size) * (temp_size - distancexy temp_x temp_y))
-          ;; set temperature later 
+        set ph (ph - ((ph - patch_ph) / temp_size) * (temp_size - distancexy temp_x temp_y) )
+        set temp_diff_here (temp_diff_here + ((temperature_difference) / temp_size) * (temp_size - distancexy temp_x temp_y))
       ]
     ]
     
@@ -445,8 +410,6 @@ to setup-obstacles [one_obstacle]
         set permeability speed_in_water
         set food-here 0
         set ph 7
-        ;ask turtles-here [die]
-        
       ]
     ]
     
@@ -457,9 +420,6 @@ to setup-obstacles [one_obstacle]
       [
          set permeability speed_in_water
          set food-here 0
-
-        ;;set ph random-normal temp_pH 1
-
       ]
     ]
 
@@ -469,8 +429,6 @@ to setup-obstacles [one_obstacle]
       [
         set permeability speed_in_water
         set food-here 0
-
-        ;;set ph random-normal temp_pH 1
       ]
     ]
     
@@ -480,8 +438,6 @@ to setup-obstacles [one_obstacle]
       [
           set permeability speed_in_water
           set food-here 0
-
-        ;;set ph random-normal temp_pH 1 
       ]
     ]
     
