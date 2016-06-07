@@ -46,7 +46,7 @@ to setup_sim
   print "Done Loading"
 end
 
-to river_draw
+to draw_river
   if mouse-down?
   [
     ask patch mouse-xcor mouse-ycor
@@ -67,6 +67,57 @@ to draw_highway
       set permeability road_speed
       set pcolor turquoise
       set food-here default_food_value
+    ]
+    display
+  ]
+end
+
+to draw_other
+  if mouse-down?
+  [
+    ask patch mouse-xcor mouse-ycor
+    [
+     if (change: = "pH" or change: = "temperature difference and pH")
+     [
+      set ph patch_ph
+     ]
+     if (change: = "temperature difference" or change: = "temperature difference and pH")
+     [
+      set temp_diff_here temperature_difference
+     ]
+     recolor-patch
+    ]
+  ]
+end
+
+to pen
+  if mouse-down?
+  [
+    ask patch mouse-xcor mouse-ycor
+    [
+      if (change: = "water")
+      [
+         set food-here 0
+         set permeability speed_in_water
+         set pcolor blue
+      ]
+      if (change: = "highway")
+      [
+        set food-here default_food_value
+        set permeability road_speed
+        set pcolor turquoise
+
+      ]
+      if (change: = "pH" or change: = "temperature difference and pH")
+      [
+        set ph patch_ph
+        recolor-patch
+      ]
+      if (change: = "temperature difference" or change: = "temperature difference and pH")
+      [
+        set temp_diff_here temperature_difference
+        recolor-patch
+      ]
     ]
     display
   ]
@@ -386,9 +437,9 @@ NIL
 
 MONITOR
 1155
-519
+483
 1263
-564
+528
 Day Number
 day_num
 17
@@ -396,10 +447,10 @@ day_num
 11
 
 PLOT
-1113
-633
-1372
-802
+1142
+621
+1401
+790
 Worm Population for Current Year
 Day Number
 Population
@@ -465,9 +516,9 @@ HORIZONTAL
 
 MONITOR
 1156
-568
+532
 1263
-613
+577
 Population Count
 count adults
 17
@@ -475,10 +526,10 @@ count adults
 11
 
 PLOT
-1380
-633
-1644
-806
+1409
+621
+1673
+794
 Worm Population over Years
 NIL
 NIL
@@ -494,9 +545,9 @@ PENS
 
 MONITOR
 1271
-568
+532
 1369
-613
+577
 Cocoon Count
 count cocoons
 17
@@ -516,9 +567,9 @@ Number
 
 MONITOR
 1271
-518
+482
 1366
-563
+527
 Daily Temp *C
 global_temperature
 2
@@ -732,9 +783,9 @@ VERTICAL
 
 INPUTBOX
 1276
-332
+296
 1393
-414
+378
 save_name
 99
 1
@@ -750,7 +801,7 @@ patch_pH
 patch_pH
 0
 14
-3.2
+10.2
 0.1
 1
 NIL
@@ -758,9 +809,9 @@ HORIZONTAL
 
 CHOOSER
 1152
-332
+296
 1271
-377
+341
 Show:
 Show:
 "pH" "food" "temperature" "monitor"
@@ -835,9 +886,9 @@ NIL
 
 BUTTON
 1151
-381
+345
 1272
-414
+378
 Recolor Patches
 recolor_patches
 NIL
@@ -852,9 +903,9 @@ NIL
 
 BUTTON
 1151
-417
+381
 1273
-450
+414
 Save Environment
 save_patches save_name
 NIL
@@ -869,9 +920,9 @@ NIL
 
 BUTTON
 1275
-417
+381
 1394
-450
+414
 Load Environment
 load_patches save_name
 NIL
@@ -927,7 +978,7 @@ temperature_difference
 temperature_difference
 -10
 10
--1.5
+-6
 0.5
 1
 NIL
@@ -958,8 +1009,8 @@ BUTTON
 216
 1273
 249
-Draw River
-river_draw
+Draw
+pen
 T
 1
 T
@@ -973,10 +1024,10 @@ NIL
 BUTTON
 1277
 216
-1393
+1394
 249
-Draw Highway
-draw_highway
+Select
+edit_environment
 T
 1
 T
@@ -992,23 +1043,6 @@ BUTTON
 256
 1393
 289
-Select
-edit_environment
-T
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
-
-BUTTON
-1153
-292
-1393
-325
 Edit Patch
 recolor-selected
 NIL
@@ -1023,9 +1057,9 @@ NIL
 
 SLIDER
 1152
-468
+432
 1394
-501
+465
 save_number
 save_number
 0
@@ -1043,8 +1077,8 @@ CHOOSER
 136
 change:
 change:
-"pH" "temperature difference" "both"
-1
+"pH" "temperature difference" "pH and temperature difference" "water" "highway"
+2
 
 TEXTBOX
 13
