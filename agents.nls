@@ -12,6 +12,7 @@ globals [
   steps-per-ie
   max_stamina
   min_stamina
+  agent_size
   
   species_list
   population_arr
@@ -62,6 +63,7 @@ to setup_agents
   set death_threshold normal_death_threshold
   set reprod_threshold normal_reproduction_rate ; Simulates successful births
   
+  set agent_size 5
   set steps-per-ie 5
   set max_stamina 5
   set min_stamina 1
@@ -97,8 +99,6 @@ to mouse_add_species
     ]
     
     ]
-
-    
 end
 
 
@@ -116,26 +116,13 @@ to add_species [x y population species_num]
   ;update opulation array
   array:set population_arr (species_num - 1) (array:item population_arr (species_num - 1) + population)
   
-    ;restructure list to pass into create_species function
+  ;restructure list to pass into create_species function
   set new_species array:to-list table:get species_list species_num
   set new_species fput species_num new_species
   set new_species lput x new_species
   set new_species lput y new_species
   
-  
-;  if (length species_list > 0) [
-;    foreach species_list [
-;      if (item 0 ?) = species_number ;if species already exists
-;      [ 
-;      set updated_species (replace-item 3 ? (item 3 ? + population)) ;update the population
-;        set exists true
-;      ]
-;    ]
-;  ]
-;  ifelse exists [ set species_list replace-item (species_number - 1) species_list updated_species]
-;    [ set species_list lput new_species species_list ]
-
-  show species_list
+  foreach table:to-list species_list [show ?]
   
   create_species new_species
   
@@ -158,10 +145,8 @@ to create_species [species]
     set parent_breed (temp_number - 1)
     ;move-to one-of patches with [permeability > 0]
     setxy temp_start_x temp_start_y
-    set size 1
-;    if(temp_number = 1) [set shape "worm"]
-;    [set color blue]
-    
+    set size agent_size
+
     set shape (item parent_breed shape_list)
 
     set maturation 70
@@ -197,36 +182,6 @@ end
 
 
 to eat
-
-;;  ifelse (food-here < consumption-in-period) ;;prevents consuming more food than on patch
-;;  [
-;;    set food-consumed-last food-here
-;;    set food-here 0
-;;  ]
-;;  [
-;;    set food-consumed-last consumption-in-period
-;;    set food-here food-here - consumption-in-period
-;;    set time-since-eaten 0
-;;  ]
-;;
-;;  if (food-here > 0) [
-;;      if (stamina < max_stamina) [set stamina stamina + food-consumed-last]
-;;    ]
-;;
-;;  set food-consumed-from food-consumed-from + consumption-in-period
-  
-  
-  
-  
-  
-  
-  ;;ifelse (stamina < (max_stamina - food-consumed-last)) [ set stamina stamina + food-consumed-last ]
-  ;;[if stamina < max_stamina [set stamina max_stamina]]
-
-  ;if (stamina < max_stamina) [set stamina stamina + 1]
-
-  ;;if time-since-eaten > 40
-  ;;[die]
 
 end
 
@@ -303,7 +258,7 @@ to check_if_hatch
       if (wait_days >= wait_period) [
         ifelse (random 100 < 65)[         ;65% chance of hatching
           set breed adults
-          set size 1
+          set size agent_size
           set stamina 5
           set shape (item parent_breed shape_list)
           array:set population_arr parent_breed ((array:item population_arr parent_breed) + 1)

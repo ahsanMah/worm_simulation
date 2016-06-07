@@ -10,10 +10,11 @@ to setup_gis
   gis:set-world-envelope-ds (gis:envelope-of soil_dataset)
   gis:apply-coverage soil_dataset "MUSYM" symbol
   load_ph
+  print "Drawing map..." 
   draw_map
   print "Mapping GIS features to patches..."
   map_patches
-  print "Finished GIS setup"
+  print "Finished setting up GIS"
 end
 
 to load_ph
