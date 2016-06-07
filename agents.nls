@@ -70,7 +70,7 @@ to setup_agents
   set amount_egested 1
   set consumption-in-period 1
   
-  set species_list []
+  set species_list table:make
   set population_arr array:from-list n-values 5 [0]
   set shape_list (list "red_worm" "cyan_worm" "pink_worm" "orange_worm" "magenta_worm" "violet_worm")
   set color_list (list red cyan pink orange magenta violet)
@@ -104,23 +104,41 @@ end
 
 
 to add_species [x y population species_num]
-  let new_species (list species_num species_genetic_diversity species_hatch_temperature population x y)
-  let updated_species []
-  let exists false
+  let new_species (list species_genetic_diversity species_hatch_temperature population)
   
-  if (length species_list > 0) [
-    foreach species_list [
-      if (item 0 ?) = species_number ;if species already exists
-      [ 
-      set updated_species (replace-item 3 ? (item 3 ? + population)) ;update the population
-        set exists true
-      ]
-    ]
-  ]
-  ifelse exists [ set species_list replace-item (species_number - 1) species_list updated_species]
-    [ set species_list lput new_species species_list ]
+  ifelse (table:has-key? species_list species_num) [
+    let species_info table:get species_list species_num
+    array:set species_info 2 (population + array:item species_info 2)
+    
+  ] 
+  [ table:put species_list species_num (array:from-list new_species)]
+  
+  ;update opulation array
+  array:set population_arr (species_num - 1) (array:item population_arr (species_num - 1) + population)
+  
+    ;restructure list to pass into create_species function
+  set new_species array:to-list table:get species_list species_num
+  set new_species fput species_num new_species
+  set new_species lput x new_species
+  set new_species lput y new_species
+  
+  
+;  if (length species_list > 0) [
+;    foreach species_list [
+;      if (item 0 ?) = species_number ;if species already exists
+;      [ 
+;      set updated_species (replace-item 3 ? (item 3 ? + population)) ;update the population
+;        set exists true
+;      ]
+;    ]
+;  ]
+;  ifelse exists [ set species_list replace-item (species_number - 1) species_list updated_species]
+;    [ set species_list lput new_species species_list ]
+
+  show species_list
   
   create_species new_species
+  
   
 end
 
@@ -134,7 +152,7 @@ to create_species [species]
   set temp_start_x item 4 species
   set temp_start_y item 5 species
   
-  array:set population_arr (temp_number - 1) (array:item population_arr (temp_number - 1) + temp_population)
+  
   
  create-adults temp_population[
     set parent_breed (temp_number - 1)

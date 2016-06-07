@@ -18,7 +18,7 @@ to setup
   print "Setting up environment..."
   setup_environment
   print "Done"
-  setup_gis
+  ;setup_gis
   print "Setting up agents..."
   setup_agents
   print "Done"
@@ -763,7 +763,7 @@ CHOOSER
 Show:
 Show:
 "pH" "food" "temperature" "monitor"
-0
+1
 
 TEXTBOX
 10
@@ -1051,7 +1051,7 @@ INPUTBOX
 213
 210
 worm_population
-50
+250
 1
 0
 Number
