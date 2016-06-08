@@ -15,7 +15,6 @@ globals [
   agent_size
   
   species_list
-  population_arr
 
   temp_number
   temp_genetic_diversity 
@@ -60,8 +59,8 @@ to setup_agents
   
   set normal_death_threshold 0.00685 / (periods-in-day) ; Simulates a 4 year life span
   set normal_reproduction_rate 0.1
-  set max_death_threshold 75
-  set agent_size 1
+  set max_death_threshold 90
+  set agent_size 0.5
   set steps-per-ie 5
   set max_stamina 5
   set min_stamina 1
@@ -71,7 +70,6 @@ to setup_agents
   set consumption-in-period 1
   
   set species_list table:make
-  set population_arr array:from-list n-values 5 [0]
   set shape_list (list "red_worm" "cyan_worm" "pink_worm" "orange_worm" "magenta_worm" "violet_worm")
   set color_list (list red cyan pink orange magenta violet)
   ;foreach species_list [create_species ?]
@@ -104,11 +102,7 @@ end
 to add_species [x y population species_num]
   let new_species (list species_num species_genetic_diversity species_hatch_temperature population x y)
   
-    ;update opulation array
-
-  array:set population_arr (species_num - 1) (array:item population_arr (species_num - 1) + population)
-  
-  
+   
   ifelse (table:has-key? species_list species_num) [
     ;create new population with existing settings
     set new_species array:to-list table:get species_list species_num
@@ -214,13 +208,11 @@ to check_death
   set death_p random-float 1000
   
 ;  ifelse (stamina < min_stamina) [
-;    array:set population_arr parent_breed ((array:item population_arr parent_breed) - 1)
 ;    die
 ;    ] ;; dies if out of energy
  ; [
     if (death_p < death_threshold) [
       ;show death_threshold
-      array:set population_arr parent_breed ((array:item population_arr parent_breed) - 1)
       die
       ] ;; dies of cold/pH/natural causes
   ;  ] 
@@ -260,10 +252,10 @@ to update_thresholds
   
   ;;pH of soil also affects survival rate
   if (ph < max_ph_resist) [
-    let ph_factor (e ^ (max_ph_resist - ph) ) - 1   ; function ensures that a ph difference of 3 will have +50% death probability
+    let ph_factor (e ^ (max_ph_resist - ph) ) - 1   ; function ensures that a ph difference of 3 will have a higher death probability
     set death_threshold (death_threshold + ph_factor)  ; higher the ph lower the survival
     ;set death_threshold death_threshold + random-float death_variance
-    set reprod_threshold (reprod_threshold - ph_factor / 3)
+    set reprod_threshold (reprod_threshold - (ph_factor / 10))
   ]
   
 
@@ -286,7 +278,6 @@ to check_if_hatch
           set size agent_size
           set stamina 5
           set shape (item parent_breed shape_list)
-          array:set population_arr parent_breed ((array:item population_arr parent_breed) + 1)
         ]
         [die]
       ]

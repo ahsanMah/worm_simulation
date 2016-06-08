@@ -190,7 +190,7 @@ to recolor-patch
       ]
       if (ph < 7)
       [
-       set pcolor scale-color violet ph -2 7
+       set pcolor scale-color green ph -2 7
       ]
     ]
     if (Show: = "food")

@@ -13,10 +13,10 @@ globals[
   ;month monitor species_number population density genetic diversity
 ]
 to setup
-  clear-all
+  ;clear-all
 
   print "Setting up environment..."
-  setup_environment
+  ;setup_environment
   print "Done"
   ;setup_gis
   print "Setting up agents..."
@@ -213,7 +213,7 @@ to load_agents [name]
   let data []
   set species_list table:make
   set data csv:from-file filename1
-  foreach data [table:put species_list item 0 ? array:from-list (list item 1 ? item 2 ? item 3 ?)]
+  foreach data [table:put species_list item 0 ? array:from-list (list item 1 ? item 2 ?)]
   print "Loaded from file: "
   print species_list
   set data csv:from-file filename
@@ -465,11 +465,11 @@ false
 "" ""
 PENS
 "default" 1.0 0 -16777216 true "" "plotxy day_num count adults\nif (day_num = 365) [clear-plot]"
-"pen-1" 1.0 0 -2674135 true "" "plotxy day_num (array:item population_arr 0)\nif (day_num = 365) [clear-plot]"
-"pen-2" 1.0 0 -11221820 true "" "plotxy day_num (array:item population_arr 1)\nif (day_num = 365) [clear-plot]"
-"pen-3" 1.0 0 -2064490 true "" "plotxy day_num (array:item population_arr 2)\nif (day_num = 365) [clear-plot]"
-"pen-4" 1.0 0 -955883 true "" "plotxy day_num (array:item population_arr 3)\nif (day_num = 365) [clear-plot]"
-"pen-5" 1.0 0 -5825686 true "" "plotxy day_num (array:item population_arr 4)\nif (day_num = 365) [clear-plot]"
+"pen-1" 1.0 0 -2674135 true "" "plotxy day_num count adults with [parent_breed = 0]\nif (day_num = 365) [clear-plot]"
+"pen-2" 1.0 0 -11221820 true "" "plotxy day_num count adults with [parent_breed = 1]\nif (day_num = 365) [clear-plot]"
+"pen-3" 1.0 0 -2064490 true "" "plotxy day_num count adults with [parent_breed = 2]\nif (day_num = 365) [clear-plot]"
+"pen-4" 1.0 0 -955883 true "" "plotxy day_num count adults with [parent_breed = 3]\nif (day_num = 365) [clear-plot]"
+"pen-5" 1.0 0 -5825686 true "" "plotxy day_num count adults with [parent_breed = 4]\nif (day_num = 365) [clear-plot]"
 
 SLIDER
 13
@@ -495,7 +495,7 @@ max_reproduction_rate
 max_reproduction_rate
 0
 10
-7.5
+8.5
 0.1
 1
 NIL
@@ -597,7 +597,7 @@ speed
 speed
 0
 0.5
-0.35
+0.5
 0.01
 1
 NIL
@@ -789,7 +789,7 @@ INPUTBOX
 1324
 385
 save_name
-ph-simloc1
+abcd
 1
 0
 String (reporter)
@@ -1133,7 +1133,7 @@ INPUTBOX
 168
 212
 worm_population
-500
+1000
 1
 0
 Number
@@ -1158,10 +1158,10 @@ NIL
 BUTTON
 103
 54
-254
+309
 87
 NIL
-setup_environment
+ca\nsetup_environment\nsetup
 NIL
 1
 T
