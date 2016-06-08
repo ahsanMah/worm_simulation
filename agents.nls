@@ -1,7 +1,7 @@
 globals [
   ;annual globals
-  normal_death_threshold max_death_threshold death_threshold ;;probability of death
-  normal_reproduction_rate reprod_threshold ;;probablity of reproducing
+  normal_death_threshold max_death_threshold  ;;probability of death
+  normal_reproduction_rate  ;;probablity of reproducing
 
   ;daily globals
   amount_egested
@@ -52,18 +52,16 @@ turtles-own [
   max_ph_resist
   parent_breed
   ;population
-  
+  death_threshold
+  reprod_threshold
   ]
 
 to setup_agents
   
   set normal_death_threshold 0.00685 / (periods-in-day) ; Simulates a 4 year life span
   set normal_reproduction_rate 0.1
-  set max_death_threshold 30
-  set death_threshold normal_death_threshold
-  set reprod_threshold normal_reproduction_rate ; Simulates successful births
-  
-  set agent_size 5
+  set max_death_threshold 75
+  set agent_size 1
   set steps-per-ie 5
   set max_stamina 5
   set min_stamina 1
@@ -155,25 +153,45 @@ to create_species [species]
     set genetic_diversity temp_genetic_diversity ; 0-1 measure of genetic diversity of the species
     set max_temp_resist random-normal temperature_tolerance (2 * genetic_diversity)
     set low_temp_resist random-normal 5 (2 * genetic_diversity)
-    set max_ph_resist random-normal 6.5 (2 * genetic_diversity)
+    set max_ph_resist random-normal 6 (2 * genetic_diversity)
+    set death_threshold normal_death_threshold
+    set reprod_threshold normal_reproduction_rate 
    ]
 end
 
 
 to move
-  right (random 181) - 90
-  if ((count (patch-set (patch-ahead (speed * permeability / periods-in-day))) with [pcolor = blue]) > 
-     (count (patch-set (patch-here)) with [pcolor != blue]))
-  [
-    if (random 100000 <= 99999)
-    [
-      right 180
+  let bool false
+  if (pcolor != blue) [
+    right (random 181) - 90
+    
+    ;  if ((count (patch-set (patch-ahead (speed * permeability / periods-in-day))) with [pcolor = blue]) > 
+    ;     (count (patch-set (patch-here)) with [pcolor != blue]))
+    ;  [
+    if (patch-ahead (speed * permeability / periods-in-day) != nobody)[ 
+      ask patch-ahead (speed * permeability / periods-in-day) [
+        
+        if pcolor = blue [
+          set bool true
+        ]
+      ]
     ]
   ]
+  
+  if (bool = true)[
+          if (random 100000 <= 99999)
+        [
+          right 180
+        ]
+  ]
+  
   if ( count (patch-set (patch-ahead  (speed * permeability / periods-in-day))) with [pcolor = grey]) > 0
   [
-   right 180 
+    show "rock ahead"
+   right 180
+   
   ]
+
   forward speed * permeability / periods-in-day
   eat
   check_death
@@ -193,18 +211,19 @@ end
 
 to check_death  
   random-seed new-seed
-  set death_p random-float 100
+  set death_p random-float 1000
   
-  ifelse (stamina < min_stamina) [
-    array:set population_arr parent_breed ((array:item population_arr parent_breed) - 1)
-    die
-    ] ;; dies if out of energy
-  [
+;  ifelse (stamina < min_stamina) [
+;    array:set population_arr parent_breed ((array:item population_arr parent_breed) - 1)
+;    die
+;    ] ;; dies if out of energy
+ ; [
     if (death_p < death_threshold) [
+      ;show death_threshold
       array:set population_arr parent_breed ((array:item population_arr parent_breed) - 1)
       die
       ] ;; dies of cold/pH/natural causes
-    ] 
+  ;  ] 
   
   end
 
@@ -226,21 +245,28 @@ end
 ;updates probablities of dying and reproducing
 to update_thresholds
   ;cold reduces survival rate
-  set death_threshold normal_death_threshold
-  if (global_temperature > max_temp_resist) [ set death_threshold max_death_threshold / (periods-in-day)]
-  if (global_temperature < low_temp_resist) [ set death_threshold max_death_threshold / (periods-in-day)]
   
-  ;;pH of soil also affects survival rate
-  if (ph < max_ph_resist) [
-    set var max_ph_resist - ph
-    set death_threshold (death_threshold + (random ph_tolerance) / max_ph_resist * var ) ; high tolerance increases their chance of survival
-  ]
+  ifelse (global_temperature > max_temp_resist) [ set death_threshold max_death_threshold / (periods-in-day)]
+  [ifelse (global_temperature < low_temp_resist) [ set death_threshold max_death_threshold / (periods-in-day)]
+    [set death_threshold normal_death_threshold]
+    ]
   
-  ;reproduction rate affected by temperature
+  
+    ;reproduction rate affected by temperature
   ifelse (global_temperature > 10) [
     set reprod_threshold (max_reproduction_rate * (temperature / 15)) ] ; probability of reproducing increases as it gets warmer (10 * periods-in-day)
   [set reprod_threshold normal_reproduction_rate]
   
+  
+  ;;pH of soil also affects survival rate
+  if (ph < max_ph_resist) [
+    let ph_factor (e ^ (max_ph_resist - ph) ) - 1   ; function ensures that a ph difference of 3 will have +50% death probability
+    set death_threshold (death_threshold + ph_factor)  ; higher the ph lower the survival
+    ;set death_threshold death_threshold + random-float death_variance
+    set reprod_threshold (reprod_threshold - ph_factor / 3)
+  ]
+  
+
 end
 
 to update_maturity

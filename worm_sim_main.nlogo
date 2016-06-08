@@ -13,10 +13,10 @@ globals[
   ;month monitor species_number population density genetic diversity
 ]
 to setup
-  clear-all
+  ;clear-all
 
   print "Setting up environment..."
-  setup_environment
+  ;setup_environment
   print "Done"
   ;setup_gis
   print "Setting up agents..."
@@ -233,6 +233,8 @@ to load_agents [name]
     set low_temp_resist item 8 ?
     set max_ph_resist item 9 ?
     set color (item parent_breed color_list)
+    set death_threshold normal_death_threshold
+    set reprod_threshold normal_reproduction_rate
    ]
   ]
 end
@@ -375,28 +377,28 @@ to go
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-224
+255
 10
-1134
-641
+1067
+793
 -1
 -1
-1.5
+2.0
 1
 10
 1
 1
 1
 0
+0
+0
+1
+0
+400
+0
+375
 1
 1
-1
-0
-599
-0
-399
-0
-0
 1
 ticks
 1000.0
@@ -436,10 +438,10 @@ NIL
 1
 
 MONITOR
-1155
-535
-1263
-580
+1084
+533
+1192
+578
 Day Number
 day_num
 17
@@ -447,10 +449,10 @@ day_num
 11
 
 PLOT
-502
-667
-761
-836
+1072
+638
+1311
+802
 Worm Population for Current Year
 Day Number
 Population
@@ -493,7 +495,7 @@ max_reproduction_rate
 max_reproduction_rate
 0
 10
-6.5
+7.5
 0.1
 1
 NIL
@@ -508,17 +510,17 @@ temperature_tolerance
 temperature_tolerance
 0
 100
-23
+25
 1
 1
 NIL
 HORIZONTAL
 
 MONITOR
-1156
-584
-1263
-629
+1085
+582
+1192
+627
 Population Count
 count adults
 17
@@ -526,10 +528,10 @@ count adults
 11
 
 PLOT
-769
-667
-1033
-840
+1269
+428
+1533
+601
 Worm Population over Years
 NIL
 NIL
@@ -544,10 +546,10 @@ PENS
 "default" 1.0 1 -11221820 true "" "plotxy year count adults"
 
 MONITOR
-1271
-584
-1369
-629
+1200
+582
+1298
+627
 Cocoon Count
 count cocoons
 17
@@ -566,10 +568,10 @@ starting_day
 Number
 
 MONITOR
-1271
-534
-1366
-579
+1200
+532
+1295
+577
 Daily Temp *C
 global_temperature
 2
@@ -577,10 +579,10 @@ global_temperature
 11
 
 CHOOSER
-1153
-42
-1393
-87
+1082
+40
+1322
+85
 obstacle_shape
 obstacle_shape
 "circle" "rectangle" "mountain" "monitor"
@@ -595,7 +597,7 @@ speed
 speed
 0
 0.5
-0.38
+0.35
 0.01
 1
 NIL
@@ -782,21 +784,21 @@ December
 VERTICAL
 
 INPUTBOX
-1278
-305
-1395
-387
+1207
+303
+1324
+385
 save_name
-ph-sim
+ph-simloc1
 1
 0
 String (reporter)
 
 SLIDER
-1154
-140
-1393
-173
+1083
+138
+1322
+171
 patch_pH
 patch_pH
 0
@@ -808,10 +810,10 @@ NIL
 HORIZONTAL
 
 CHOOSER
-1154
-305
-1273
-350
+1083
+303
+1202
+348
 Show:
 Show:
 "pH" "food" "temperature" "monitor"
@@ -851,7 +853,7 @@ species_hatch_temperature
 species_hatch_temperature
 0
 25
-15
+12
 1
 1
 NIL
@@ -885,10 +887,10 @@ NIL
 1
 
 BUTTON
-1153
-354
-1274
-387
+1082
+352
+1203
+385
 Recolor Patches
 recolor_patches
 NIL
@@ -902,10 +904,10 @@ NIL
 1
 
 BUTTON
-1153
-390
-1275
-423
+1082
+388
+1204
+421
 Save Environment
 save_patches save_name
 NIL
@@ -919,10 +921,10 @@ NIL
 1
 
 BUTTON
-1277
-390
-1396
-423
+1206
+388
+1325
+421
 Load Environment
 load_patches save_name
 NIL
@@ -970,10 +972,10 @@ NIL
 1
 
 SLIDER
-1154
-176
-1393
-209
+1083
+174
+1322
+207
 temperature_difference
 temperature_difference
 -10
@@ -1005,10 +1007,10 @@ Environment Controls\n
 1
 
 BUTTON
-1153
-216
-1272
-249
+1082
+214
+1201
+247
 Draw
 pen
 T
@@ -1022,10 +1024,10 @@ NIL
 1
 
 BUTTON
-1276
-216
-1393
-249
+1205
+214
+1322
+247
 Select
 edit_environment
 T
@@ -1039,10 +1041,10 @@ NIL
 1
 
 BUTTON
-1153
-256
-1393
-289
+1082
+254
+1322
+287
 Edit Patch
 recolor-selected
 NIL
@@ -1056,10 +1058,10 @@ NIL
 1
 
 SLIDER
-1154
-441
-1396
-474
+1081
+436
+1243
+469
 save_number
 save_number
 0
@@ -1071,10 +1073,10 @@ NIL
 HORIZONTAL
 
 CHOOSER
-1154
-91
-1393
-136
+1083
+89
+1322
+134
 change:
 change:
 "pH" "temperature difference" "pH and temperature difference" "water" "highway"
@@ -1101,10 +1103,10 @@ Environment Controls\n
 1
 
 SLIDER
-1154
-477
-1396
-510
+1083
+475
+1244
+508
 save_number
 save_number
 0
@@ -1116,10 +1118,10 @@ NIL
 HORIZONTAL
 
 CHOOSER
-1154
-91
-1393
-136
+1083
+89
+1322
+134
 change:
 change:
 "pH" "temperature difference" "both"
@@ -1131,10 +1133,44 @@ INPUTBOX
 168
 212
 worm_population
-50
+500
 1
 0
 Number
+
+BUTTON
+167
+10
+256
+43
+Setup GIS
+ca\nsetup_environment\nsetup_gis\nsetup
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+103
+54
+254
+87
+NIL
+setup_environment
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
 
 @#$#@#$#@
 ## WHAT IS IT?

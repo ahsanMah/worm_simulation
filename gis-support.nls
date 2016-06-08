@@ -28,8 +28,8 @@ end
 
 
 to draw_map
-  gis:set-drawing-color red
-  gis:draw soil_dataset 0.5
+  gis:set-drawing-color black
+  gis:draw soil_dataset 0.1
 
 ;foreach gis:feature-list-of soil_dataset [
 ;  let map_symbol (gis:property-value ? "MUSYM")
@@ -68,7 +68,7 @@ to map_patches
    if (symbol = "W")
     [
       set pcolor blue
-      set permeability 0
+      set permeability speed_in_water
     ]
   ]
 end
