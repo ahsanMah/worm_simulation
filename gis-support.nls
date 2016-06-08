@@ -1,19 +1,48 @@
 globals[
    soil_dataset ;will be used for storing gis vector data
+   road_dataset
+    road_features
+    road_vertexlist
+    road_point
+    last_point
    ph_map
+ 
   ]
+
+patches-own[
+ symbol ;helps identify feature type for gis support (W = Water etc.)
+ road 
+
+]
 
 to setup_gis
   print "Loading GIS data..."
   set soil_dataset gis:load-dataset "data/parameters/soil/spatial/soilmu_a_aoi.shp"
+
   print "Setting up world..."
   gis:set-world-envelope-ds (gis:envelope-of soil_dataset)
+  set road_dataset gis:load-dataset "data/parameters/roads/roadmap.shp"
   gis:apply-coverage soil_dataset "MUSYM" symbol
+  ;gis:apply-coverage road_dataset "STATE_CODE" road
+  set road_features gis:feature-list-of road_dataset
+  set road_vertexlist []
+  foreach road_features
+  [
+    ;if i = 1
+    ;[
+   set road_vertexlist lput gis:vertex-lists-of ? road_vertexlist
+   ;show road_vertexlist
+    ;]
+    ;set i i + 1
+  ]
   load_ph
   draw_map
   print "Mapping GIS features to patches..."
   map_patches
   print "Finished GIS setup"
+  
+  ;gis:set-drawing-color turquoise
+  ;gis:draw road_dataset 5
 end
 
 to load_ph
@@ -50,7 +79,7 @@ to draw_map
 end
 
 to map_patches
- 
+ set last_point []
   ask patches[
     
     if (table:has-key? ph_map symbol)[
@@ -68,6 +97,80 @@ to map_patches
     [
       set pcolor blue
       set permeability 0
+      set food-here 0
     ]
+;   if (road = 36)
+;   [
+;      set permeability road_speed
+;      set pcolor turquoise
+;      set food-here default_food_value
+;   ]
+
+  ]
+  ;show road_vertexlist
+  foreach road_vertexlist
+    [
+      let vertex_lists ?
+      foreach vertex_lists
+      [
+        let road_point_list ?
+        foreach road_point_list [
+          set road_point gis:location-of ?;map_helper ?
+                                          ;show road_point
+                                          ;show "count"
+                                          ;show gis:type-of road_point
+          if not empty? road_point
+          [
+            ask patch item 0 road_point item 1 road_point
+            [
+              set permeability road_speed
+              set pcolor turquoise
+              set food-here default_food_value
+            ]
+            if not empty? last_point
+            [
+              let x1 item 0 road_point
+              let y1 item 1 road_point
+              let x2 item 0 last_point
+              let y2 item 1 last_point
+              let dist sqrt ((x2 - x1) ^ 2 + (y2 - y1) ^ 2)
+              let dex (x2 - x1) / dist
+              let dey (y2 - y1) / dist
+              let x-at x1
+              let y-at y1
+              ;show (not empty? last_point) and (not empty? road_point)
+              ;show x-at < x2 and y-at < y2
+              
+              while [x-at > x2]
+              [
+                ask patch x-at y-at
+                [
+                  set permeability road_speed
+                  set pcolor turquoise
+                  set food-here default_food_value
+                  ;print "coloring in between things"
+                ]
+                set x-at x-at + dex
+                set y-at y-at + dey
+              ]
+            ]
+            
+            
+          ]
+          ;show (not empty? last_point) and (not empty? road_point)
+           set last_point road_point
+        ]
+      ]
+    ]
+end
+
+to-report map_helper [thing]
+  foreach thing
+  [
+    
+    ;show gis:type-of ?
+    ;show gis:location-of ?
+    report gis:location-of ? ; item 0 thing
+
   ]
 end

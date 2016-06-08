@@ -18,7 +18,7 @@ to setup
   print "Setting up environment..."
   setup_environment
   print "Done"
-  setup_gis
+  ;setup_gis
   print "Setting up agents..."
   setup_agents
   print "Done"
@@ -30,7 +30,6 @@ to setup
 
   set-default-shape sides "line"
   ;setup_sim
-
   recolor_patches
   reset-ticks
 end
@@ -368,19 +367,19 @@ end
 GRAPHICS-WINDOW
 224
 10
-1134
-641
+1133
+640
 -1
 -1
-1.5
+1.4983333333333333
 1
 10
 1
 1
 1
 0
-1
-1
+0
+0
 1
 0
 599
@@ -559,7 +558,7 @@ Number
 MONITOR
 1271
 482
-1366
+1371
 527
 Daily Temp *C
 global_temperature
@@ -806,7 +805,7 @@ CHOOSER
 Show:
 Show:
 "pH" "food" "temperature" "monitor"
-0
+2
 
 TEXTBOX
 10
@@ -1069,7 +1068,7 @@ CHOOSER
 change:
 change:
 "pH" "temperature difference" "pH and temperature difference" "water" "highway"
-2
+3
 
 INPUTBOX
 12
@@ -1081,6 +1080,23 @@ worm_population
 1
 0
 Number
+
+BUTTON
+107
+60
+199
+93
+NIL
+setup_gis
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
 
 @#$#@#$#@
 ## WHAT IS IT?

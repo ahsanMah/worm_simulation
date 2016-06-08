@@ -50,7 +50,7 @@ patches-own
   being_monitored
   monitor_size
   monitor_index
-  symbol                 ;helps identify feature type for gis support (W = Water etc.)
+                
   
 ]
 
@@ -175,7 +175,7 @@ to setup-initial-food
 end
 
 to recolor-patch
-  if (pcolor != blue and pcolor != grey)
+  if (pcolor != blue and pcolor != grey and pcolor != turquoise)
   [
 
     if (Show: = "pH")
