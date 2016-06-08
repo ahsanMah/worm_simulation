@@ -13,10 +13,10 @@ globals[
   ;month monitor species_number population density genetic diversity
 ]
 to setup
-  ;clear-all
+  clear-all
 
   print "Setting up environment..."
-  ;setup_environment
+  setup_environment
   print "Done"
   ;setup_gis
   print "Setting up agents..."
@@ -30,7 +30,6 @@ to setup
 
   set-default-shape sides "line"
   ;setup_sim
-
   recolor_patches
   reset-ticks
 end

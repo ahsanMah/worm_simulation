@@ -13,10 +13,10 @@ globals[
   ;month monitor species_number population density genetic diversity
 ]
 to setup
-  clear-all
+  ;clear-all
 
   print "Setting up environment..."
-  setup_environment
+  ;setup_environment
   print "Done"
   ;setup_gis
   print "Setting up agents..."
@@ -30,7 +30,6 @@ to setup
 
   set-default-shape sides "line"
   ;setup_sim
-
   recolor_patches
   reset-ticks
 end
@@ -46,7 +45,7 @@ to setup_sim
   print "Done Loading"
 end
 
-to river_draw
+to draw_river
   if mouse-down?
   [
     ask patch mouse-xcor mouse-ycor
@@ -67,6 +66,57 @@ to draw_highway
       set permeability road_speed
       set pcolor turquoise
       set food-here default_food_value
+    ]
+    display
+  ]
+end
+
+to draw_other
+  if mouse-down?
+  [
+    ask patch mouse-xcor mouse-ycor
+    [
+     if (change: = "pH" or change: = "temperature difference and pH")
+     [
+      set ph patch_ph
+     ]
+     if (change: = "temperature difference" or change: = "temperature difference and pH")
+     [
+      set temp_diff_here temperature_difference
+     ]
+     recolor-patch
+    ]
+  ]
+end
+
+to pen
+  if mouse-down?
+  [
+    ask patch mouse-xcor mouse-ycor
+    [
+      if (change: = "water")
+      [
+         set food-here 0
+         set permeability speed_in_water
+         set pcolor blue
+      ]
+      if (change: = "highway")
+      [
+        set food-here default_food_value
+        set permeability road_speed
+        set pcolor turquoise
+
+      ]
+      if (change: = "pH" or change: = "temperature difference and pH")
+      [
+        set ph patch_ph
+        recolor-patch
+      ]
+      if (change: = "temperature difference" or change: = "temperature difference and pH")
+      [
+        set temp_diff_here temperature_difference
+        recolor-patch
+      ]
     ]
     display
   ]
@@ -136,7 +186,11 @@ end
 to save_agents [name]
   export_data name
   let filename1 (word "data/parameters/specieslist" name ".csv")
-  csv:to-file filename1 species_list
+  let data []
+  foreach table:to-list species_list [ ;converts table into listto store as csv
+    set data lput (sentence item 0 ? array:to-list item 1 ?) data
+    ]
+  csv:to-file filename1 data
 
   let filename (word "data/parameters/myagents"  name ".csv")
 
@@ -155,10 +209,13 @@ to load_agents [name]
   ;load_monitors name
   let filename1 (word "data/parameters/specieslist"  name ".csv")
   let filename (word "data/parameters/myagents" name ".csv")
-  set species_list csv:from-file filename1
+  let data []
+  set species_list table:make
+  set data csv:from-file filename1
+  foreach data [table:put species_list item 0 ? array:from-list (list item 1 ? item 2 ? item 3 ?)]
   print "Loaded from file: "
   print species_list
-  let data csv:from-file filename
+  set data csv:from-file filename
   foreach (data)
   [
     create-adults 1 [
@@ -175,6 +232,8 @@ to load_agents [name]
     set low_temp_resist item 8 ?
     set max_ph_resist item 9 ?
     set color (item parent_breed color_list)
+    set death_threshold normal_death_threshold
+    set reprod_threshold normal_reproduction_rate
    ]
   ]
 end
@@ -235,13 +294,15 @@ to clear_arrays
 
    set species_data []
    let monitor_list n-values monitor_number [?] ;(?) allows to create a list from 0 to monitor number
-   foreach species_list [
-     let current_species ?
+   foreach table:to-list species_list [
+     let current_species_number item 0 ?
+     ;allows for the storage of other species characteristics
+     ;let current_species_info array:to-list item 1 ?
+
      ;n*m matrix of species data for every monitor
      let species_matrix array:from-list monitor_list  ;n = number of species charcteristics being collected, m = number of monitors
      foreach monitor_list [
-       let current_species_info array:from-list (list report_month ? (item 0 current_species) 0 0 (item 1 current_species)) ;resets population, density and saves genetic diversity
-       array:set species_matrix ? current_species_info
+       array:set species_matrix ? array:from-list (list report_month ? current_species_number 0 0) ;resets population, density
      ]
      set species_data lput species_matrix species_data ;list of matrices
    ]
@@ -315,28 +376,42 @@ to go
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-224
+255
 10
-1134
-641
+<<<<<<< HEAD
+1067
+793
 -1
 -1
-1.5
+2.0
+=======
+1133
+640
+-1
+-1
+1.4983333333333333
+>>>>>>> 41cc28fe8af7260f7447e9aafeba72390d05ddab
 1
 10
 1
 1
 1
 0
+<<<<<<< HEAD
+=======
+0
+0
+1
+>>>>>>> 41cc28fe8af7260f7447e9aafeba72390d05ddab
+0
+0
+1
+0
+400
+0
+375
 1
 1
-1
-0
-599
-0
-399
-0
-0
 1
 ticks
 1000.0
@@ -376,10 +451,10 @@ NIL
 1
 
 MONITOR
-1155
-519
-1263
-564
+1084
+533
+1192
+578
 Day Number
 day_num
 17
@@ -387,9 +462,9 @@ day_num
 11
 
 PLOT
-1113
-633
-1372
+1072
+638
+1311
 802
 Worm Population for Current Year
 Day Number
@@ -410,18 +485,18 @@ PENS
 "pen-5" 1.0 0 -5825686 true "" "plotxy day_num (array:item population_arr 4)\nif (day_num = 365) [clear-plot]"
 
 SLIDER
-12
-218
-213
-251
+13
+220
+214
+253
 ph_tolerance
 ph_tolerance
-3
-5
-3
-0.1
+-10
+10
+0
 1
-NIL
+1
+%
 HORIZONTAL
 
 SLIDER
@@ -433,7 +508,7 @@ max_reproduction_rate
 max_reproduction_rate
 0
 10
-6.5
+7.5
 0.1
 1
 NIL
@@ -448,17 +523,17 @@ temperature_tolerance
 temperature_tolerance
 0
 100
-23
+25
 1
 1
 NIL
 HORIZONTAL
 
 MONITOR
-1156
-568
-1263
-613
+1085
+582
+1192
+627
 Population Count
 count adults
 17
@@ -466,10 +541,10 @@ count adults
 11
 
 PLOT
-1380
-633
-1644
-806
+1269
+428
+1533
+601
 Worm Population over Years
 NIL
 NIL
@@ -484,10 +559,10 @@ PENS
 "default" 1.0 1 -11221820 true "" "plotxy year count adults"
 
 MONITOR
-1271
-568
-1369
-613
+1200
+582
+1298
+627
 Cocoon Count
 count cocoons
 17
@@ -506,10 +581,17 @@ starting_day
 Number
 
 MONITOR
+<<<<<<< HEAD
+1200
+532
+1295
+577
+=======
 1271
-518
-1366
-563
+482
+1371
+527
+>>>>>>> 41cc28fe8af7260f7447e9aafeba72390d05ddab
 Daily Temp *C
 global_temperature
 2
@@ -517,10 +599,10 @@ global_temperature
 11
 
 CHOOSER
-1153
-42
-1393
-87
+1082
+40
+1322
+85
 obstacle_shape
 obstacle_shape
 "circle" "rectangle" "mountain" "monitor"
@@ -535,7 +617,7 @@ speed
 speed
 0
 0.5
-0.38
+0.35
 0.01
 1
 NIL
@@ -722,40 +804,40 @@ December
 VERTICAL
 
 INPUTBOX
-1276
-332
-1393
-414
+1207
+303
+1324
+385
 save_name
-ham1
+ph-simloc1
 1
 0
 String (reporter)
 
 SLIDER
-1154
-140
-1393
-173
+1083
+138
+1322
+171
 patch_pH
 patch_pH
 0
 14
-3.2
+10.2
 0.1
 1
 NIL
 HORIZONTAL
 
 CHOOSER
-1152
-332
-1271
-377
+1083
+303
+1202
+348
 Show:
 Show:
 "pH" "food" "temperature" "monitor"
-1
+2
 
 TEXTBOX
 10
@@ -791,7 +873,7 @@ species_hatch_temperature
 species_hatch_temperature
 0
 25
-15
+12
 1
 1
 NIL
@@ -825,10 +907,10 @@ NIL
 1
 
 BUTTON
-1151
-381
-1272
-414
+1082
+352
+1203
+385
 Recolor Patches
 recolor_patches
 NIL
@@ -842,10 +924,10 @@ NIL
 1
 
 BUTTON
-1151
-417
-1273
-450
+1082
+388
+1204
+421
 Save Environment
 save_patches save_name
 NIL
@@ -859,10 +941,10 @@ NIL
 1
 
 BUTTON
-1275
-417
-1394
-450
+1206
+388
+1325
+421
 Load Environment
 load_patches save_name
 NIL
@@ -910,15 +992,15 @@ NIL
 1
 
 SLIDER
-1154
-176
-1393
-209
+1083
+174
+1322
+207
 temperature_difference
 temperature_difference
 -10
 10
--1.5
+-6
 0.5
 1
 NIL
@@ -945,12 +1027,12 @@ Environment Controls\n
 1
 
 BUTTON
-1154
-216
-1273
-249
-Draw River
-river_draw
+1082
+214
+1201
+247
+Draw
+pen
 T
 1
 T
@@ -962,27 +1044,10 @@ NIL
 1
 
 BUTTON
-1277
-216
-1393
-249
-Draw Highway
-draw_highway
-T
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
-
-BUTTON
-1153
-256
-1393
-289
+1205
+214
+1322
+247
 Select
 edit_environment
 T
@@ -996,10 +1061,10 @@ NIL
 1
 
 BUTTON
-1153
-292
-1393
-325
+1082
+254
+1322
+287
 Edit Patch
 recolor-selected
 NIL
@@ -1013,10 +1078,10 @@ NIL
 1
 
 SLIDER
-1152
-468
-1394
-501
+1081
+436
+1243
+469
 save_number
 save_number
 0
@@ -1028,29 +1093,117 @@ NIL
 HORIZONTAL
 
 CHOOSER
-1154
-91
-1393
-136
+1083
+89
+1322
+134
+change:
+change:
+"pH" "temperature difference" "pH and temperature difference" "water" "highway"
+<<<<<<< HEAD
+1
+=======
+3
+>>>>>>> 41cc28fe8af7260f7447e9aafeba72390d05ddab
+
+TEXTBOX
+13
+545
+206
+575
+Global Temperature Control
+12
+0.0
+1
+
+TEXTBOX
+1153
+18
+1303
+36
+Environment Controls\n
+12
+0.0
+1
+
+SLIDER
+1083
+475
+1244
+508
+save_number
+save_number
+0
+100
+0
+1
+1
+NIL
+HORIZONTAL
+
+CHOOSER
+1083
+89
+1322
+134
 change:
 change:
 "pH" "temperature difference" "both"
 1
 
 INPUTBOX
-12
-150
-213
-210
+13
+152
+168
+212
 worm_population
-<<<<<<< HEAD
-250
-=======
-200
->>>>>>> 8d02b56c2c1d6d0b9f07a5b131efc01102ed6fcb
+500
 1
 0
 Number
+
+BUTTON
+<<<<<<< HEAD
+167
+10
+256
+43
+Setup GIS
+ca\nsetup_environment\nsetup_gis\nsetup
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+103
+54
+254
+87
+NIL
+setup_environment
+=======
+107
+60
+199
+93
+NIL
+setup_gis
+>>>>>>> 41cc28fe8af7260f7447e9aafeba72390d05ddab
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
 
 @#$#@#$#@
 ## WHAT IS IT?

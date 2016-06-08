@@ -40,10 +40,14 @@ to setup_gis
   draw_map
   print "Mapping GIS features to patches..."
   map_patches
+<<<<<<< HEAD
   print "Finished setting up GIS"
+=======
+  print "Finished GIS setup"
   
   ;gis:set-drawing-color turquoise
   ;gis:draw road_dataset 5
+>>>>>>> 41cc28fe8af7260f7447e9aafeba72390d05ddab
 end
 
 to load_ph
@@ -97,7 +101,10 @@ to map_patches
    if (symbol = "W")
     [
       set pcolor blue
+<<<<<<< HEAD
       set permeability speed_in_water
+=======
+      set permeability 0
       set food-here 0
     ]
 ;   if (road = 36)
@@ -162,6 +169,7 @@ to map_patches
            set last_point road_point
         ]
       ]
+>>>>>>> 41cc28fe8af7260f7447e9aafeba72390d05ddab
     ]
 end
 
