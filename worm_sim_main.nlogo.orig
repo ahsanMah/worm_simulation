@@ -13,10 +13,10 @@ globals[
   ;month monitor species_number population density genetic diversity
 ]
 to setup
-  ;clear-all
+  clear-all
 
   print "Setting up environment..."
-  ;setup_environment
+  setup_environment
   print "Done"
   ;setup_gis
   print "Setting up agents..."
@@ -149,7 +149,7 @@ to save_patches [name]
    [
      ask patch i j
      [
-       let info (list i j ph food-here permeability local_death_threshold temp_diff_here)
+       let info (list i j ph food-here permeability local_death_threshold temp_diff_here pcolor)
        file-open filename
        file-print csv:to-row info
        file-close
@@ -176,6 +176,7 @@ to load_patches [name]
       set local_death_threshold item 5 ?
       set temp_diff_here item 6 ?
       set being_monitored false
+      set pcolor item 7 ?
     ]
   ]
   load_monitors name
@@ -378,31 +379,17 @@ end
 GRAPHICS-WINDOW
 255
 10
-<<<<<<< HEAD
 1067
 793
 -1
 -1
 2.0
-=======
-1133
-640
--1
--1
-1.4983333333333333
->>>>>>> 41cc28fe8af7260f7447e9aafeba72390d05ddab
 1
 10
 1
 1
 1
 0
-<<<<<<< HEAD
-=======
-0
-0
-1
->>>>>>> 41cc28fe8af7260f7447e9aafeba72390d05ddab
 0
 0
 1
@@ -581,17 +568,10 @@ starting_day
 Number
 
 MONITOR
-<<<<<<< HEAD
 1200
 532
 1295
 577
-=======
-1271
-482
-1371
-527
->>>>>>> 41cc28fe8af7260f7447e9aafeba72390d05ddab
 Daily Temp *C
 global_temperature
 2
@@ -809,7 +789,11 @@ INPUTBOX
 1324
 385
 save_name
+<<<<<<< HEAD
 ph-simloc1
+=======
+abcd
+>>>>>>> a8c0cf1a14b23f4c87f8155ebebfb5135bdcdc07
 1
 0
 String (reporter)
@@ -837,7 +821,7 @@ CHOOSER
 Show:
 Show:
 "pH" "food" "temperature" "monitor"
-2
+0
 
 TEXTBOX
 10
@@ -1100,11 +1084,7 @@ CHOOSER
 change:
 change:
 "pH" "temperature difference" "pH and temperature difference" "water" "highway"
-<<<<<<< HEAD
 1
-=======
-3
->>>>>>> 41cc28fe8af7260f7447e9aafeba72390d05ddab
 
 TEXTBOX
 13
@@ -1163,7 +1143,6 @@ worm_population
 Number
 
 BUTTON
-<<<<<<< HEAD
 167
 10
 256
@@ -1187,14 +1166,6 @@ BUTTON
 87
 NIL
 setup_environment
-=======
-107
-60
-199
-93
-NIL
-setup_gis
->>>>>>> 41cc28fe8af7260f7447e9aafeba72390d05ddab
 NIL
 1
 T

@@ -149,7 +149,7 @@ to save_patches [name]
    [
      ask patch i j
      [
-       let info (list i j ph food-here permeability local_death_threshold temp_diff_here)
+       let info (list i j ph food-here permeability local_death_threshold temp_diff_here pcolor)
        file-open filename
        file-print csv:to-row info
        file-close
@@ -176,6 +176,7 @@ to load_patches [name]
       set local_death_threshold item 5 ?
       set temp_diff_here item 6 ?
       set being_monitored false
+      set pcolor item 7 ?
     ]
   ]
   load_monitors name
