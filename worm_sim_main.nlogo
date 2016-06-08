@@ -9,14 +9,15 @@ globals[
   report_month
   area_list
   default_food_value
+  temperature_table
   ;index positions of data in arrays
   ;month monitor species_number population density genetic diversity
 ]
 to setup
-  clear-all
+  ;clear-all
 
   print "Setting up environment..."
-  setup_environment
+  ;setup_environment
   print "Done"
   ;setup_gis
   print "Setting up agents..."
@@ -239,8 +240,28 @@ to load_agents [name]
   ]
 end
 
-to load_temperature [name]
-  let filename (word "data/parameters/temperaturelist" name ".csv")
+to load_temperature
+  let filename (word "data/parameters/temperaturelist.csv")
+  file-open filename
+  set temperature_table table:make
+  let i 0
+  while [i < 8]
+  [
+   let nothing csv:from-row file-read-line
+   set i i + 1
+  ]
+  let days_since_start 0
+  while [ not file-at-end? ]
+  [
+    let row (csv:from-row file-read-line)
+    let row_entry (item 1 row)
+    ;show row_entry
+    table:put temperature_table days_since_start row_entry
+    set days_since_start days_since_start + 1
+  ]
+
+
+  file-close
 
 end
 
@@ -328,7 +349,8 @@ to go
   ]
 
   if (ticks mod (periods-in-day) = 0) [
-    set global_temperature random-normal (item current_month temperatures) (1)
+    set current_day current_day + 1
+    set global_temperature table:get temperature_table current_day
     ;calculate_temp
     ;update_organic_matter
 
@@ -528,10 +550,10 @@ count adults
 11
 
 PLOT
-1269
-428
-1533
-601
+1306
+439
+1570
+612
 Worm Population over Years
 NIL
 NIL
@@ -1144,7 +1166,7 @@ BUTTON
 256
 43
 Setup GIS
-ca\nsetup_environment\nsetup_gis\nsetup
+ca\nload_temperature\nsetup_environment\nsetup_gis\nsetup\n
 NIL
 1
 T
