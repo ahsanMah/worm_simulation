@@ -48,9 +48,8 @@ to setup_sim
  ;setup
 
   print "Loading from simulation files..."
-  load_patches "ham1"
-  load_agents "ham1"
-  load_monitors "ham1"
+  load_patches "pHSim"
+  load_agents "pHSim"
   print "Done Loading"
 end
 
@@ -400,8 +399,6 @@ to go
           set monthly_data lput (array:to-list ?) monthly_data
         ]
       ]
-      print "Monthly data: "
-      show monthly_data
       set report_month report_month + 1
       set has_collected true
     ]
@@ -513,7 +510,7 @@ ph_tolerance
 ph_tolerance
 0
 7
-6
+7
 0.1
 1
 NIL
@@ -642,7 +639,7 @@ INPUTBOX
 1299
 386
 save_name
-patchSim
+pHSim
 1
 0
 String (reporter)
@@ -670,7 +667,7 @@ CHOOSER
 Show:
 Show:
 "pH" "food" "temperature" "monitor"
-3
+0
 
 TEXTBOX
 10
@@ -1380,7 +1377,16 @@ NetLogo 5.3.1
 setup_sim</setup>
     <go>go</go>
     <metric>count turtles</metric>
-    <steppedValueSet variable="ph_tolerance" first="4.5" step="0.2" last="5.5"/>
+    <steppedValueSet variable="ph_tolerance" first="4" step="0.2" last="5.5"/>
+  </experiment>
+  <experiment name="Test" repetitions="2" runMetricsEveryStep="true">
+    <setup>setup
+setup_sim</setup>
+    <go>go</go>
+    <metric>count adults</metric>
+    <enumeratedValueSet variable="ph_tolerance">
+      <value value="7"/>
+    </enumeratedValueSet>
   </experiment>
 </experiments>
 @#$#@#$#@
