@@ -9,15 +9,24 @@ globals[
   report_month
   area_list
   default_food_value
+  temperature_table
   ;index positions of data in arrays
   ;month monitor species_number population density genetic diversity
 ]
 to setup
+<<<<<<< HEAD
   clear-all
-
+=======
+  ;clear-all
+>>>>>>> cbb5f9180b4da33eb01d5ea04ae9a703b0a93c86
+  print "Loading temperature data..."
+  load_temperature
   print "Setting up environment..."
   setup_environment
+<<<<<<< HEAD
+=======
   print "Done"
+>>>>>>> cbb5f9180b4da33eb01d5ea04ae9a703b0a93c86
   ;setup_gis
   print "Setting up agents..."
   setup_agents
@@ -213,7 +222,7 @@ to load_agents [name]
   let data []
   set species_list table:make
   set data csv:from-file filename1
-  foreach data [table:put species_list item 0 ? array:from-list (list item 1 ? item 2 ? item 3 ?)]
+  foreach data [table:put species_list item 0 ? array:from-list (list item 1 ? item 2 ?)]
   print "Loaded from file: "
   print species_list
   set data csv:from-file filename
@@ -239,8 +248,28 @@ to load_agents [name]
   ]
 end
 
-to load_temperature [name]
-  let filename (word "data/parameters/temperaturelist" name ".csv")
+to load_temperature
+  let filename (word "data/parameters/temperaturelist.csv")
+  file-open filename
+  set temperature_table table:make
+  let i 0
+  while [i < 8]
+  [
+   let nothing csv:from-row file-read-line
+   set i i + 1
+  ]
+  let days_since_start 0
+  while [ not file-at-end? ]
+  [
+    let row (csv:from-row file-read-line)
+    let row_entry (item 1 row)
+    ;show row_entry
+    table:put temperature_table days_since_start row_entry
+    set days_since_start days_since_start + 1
+  ]
+
+
+  file-close
 
 end
 
@@ -328,7 +357,8 @@ to go
   ]
 
   if (ticks mod (periods-in-day) = 0) [
-    set global_temperature random-normal (item current_month temperatures) (1)
+    set current_day current_day + 1
+    set global_temperature table:get temperature_table current_day
     ;calculate_temp
     ;update_organic_matter
 
@@ -409,7 +439,7 @@ BUTTON
 78
 43
 Setup
-setup
+ca\nsetup
 NIL
 1
 T
@@ -465,11 +495,11 @@ false
 "" ""
 PENS
 "default" 1.0 0 -16777216 true "" "plotxy day_num count adults\nif (day_num = 365) [clear-plot]"
-"pen-1" 1.0 0 -2674135 true "" "plotxy day_num (array:item population_arr 0)\nif (day_num = 365) [clear-plot]"
-"pen-2" 1.0 0 -11221820 true "" "plotxy day_num (array:item population_arr 1)\nif (day_num = 365) [clear-plot]"
-"pen-3" 1.0 0 -2064490 true "" "plotxy day_num (array:item population_arr 2)\nif (day_num = 365) [clear-plot]"
-"pen-4" 1.0 0 -955883 true "" "plotxy day_num (array:item population_arr 3)\nif (day_num = 365) [clear-plot]"
-"pen-5" 1.0 0 -5825686 true "" "plotxy day_num (array:item population_arr 4)\nif (day_num = 365) [clear-plot]"
+"pen-1" 1.0 0 -2674135 true "" "plotxy day_num count adults with [parent_breed = 0]\nif (day_num = 365) [clear-plot]"
+"pen-2" 1.0 0 -11221820 true "" "plotxy day_num count adults with [parent_breed = 1]\nif (day_num = 365) [clear-plot]"
+"pen-3" 1.0 0 -2064490 true "" "plotxy day_num count adults with [parent_breed = 2]\nif (day_num = 365) [clear-plot]"
+"pen-4" 1.0 0 -955883 true "" "plotxy day_num count adults with [parent_breed = 3]\nif (day_num = 365) [clear-plot]"
+"pen-5" 1.0 0 -5825686 true "" "plotxy day_num count adults with [parent_breed = 4]\nif (day_num = 365) [clear-plot]"
 
 SLIDER
 13
@@ -495,7 +525,7 @@ max_reproduction_rate
 max_reproduction_rate
 0
 10
-7.5
+7.7
 0.1
 1
 NIL
@@ -528,10 +558,10 @@ count adults
 11
 
 PLOT
-1269
-428
-1533
-601
+1306
+439
+1570
+612
 Worm Population over Years
 NIL
 NIL
@@ -597,191 +627,11 @@ speed
 speed
 0
 0.5
-0.35
+0.3
 0.01
 1
 NIL
 HORIZONTAL
-
-SLIDER
-14
-568
-47
-718
-January
-January
--20
-40
--10
-1
-1
-*C
-VERTICAL
-
-SLIDER
-54
-569
-87
-719
-February
-February
--20
-40
--8
-1
-1
-*C
-VERTICAL
-
-SLIDER
-93
-569
-126
-719
-March
-March
--20
-40
--2
-1
-1
-*C
-VERTICAL
-
-SLIDER
-134
-570
-167
-720
-April
-April
--20
-40
-4
-1
-1
-*C
-VERTICAL
-
-SLIDER
-175
-570
-208
-720
-May
-May
--20
-40
-11
-1
-1
-*C
-VERTICAL
-
-SLIDER
-215
-571
-248
-721
-June
-June
--20
-40
-15
-1
-1
-*C
-VERTICAL
-
-SLIDER
-13
-724
-46
-874
-July
-July
--20
-40
-18
-1
-1
-*C
-VERTICAL
-
-SLIDER
-51
-725
-84
-875
-August
-August
--20
-40
-17
-1
-1
-*C
-VERTICAL
-
-SLIDER
-91
-726
-124
-876
-September
-September
--20
-40
-17
-1
-1
-*C
-VERTICAL
-
-SLIDER
-132
-725
-165
-875
-October
-October
--20
-40
-7
-1
-1
-*C
-VERTICAL
-
-SLIDER
-174
-725
-207
-875
-November
-November
--20
-40
-1
-1
-1
-*C
-VERTICAL
-
-SLIDER
-215
-725
-248
-875
-December
-December
--20
-40
--6
-1
-1
-*C
-VERTICAL
 
 INPUTBOX
 1207
@@ -789,11 +639,7 @@ INPUTBOX
 1324
 385
 save_name
-<<<<<<< HEAD
-ph-simloc1
-=======
 abcd
->>>>>>> a8c0cf1a14b23f4c87f8155ebebfb5135bdcdc07
 1
 0
 String (reporter)
@@ -991,16 +837,6 @@ NIL
 HORIZONTAL
 
 TEXTBOX
-13
-545
-206
-575
-Global Temperature Control
-12
-0.0
-1
-
-TEXTBOX
 1153
 18
 1303
@@ -1087,16 +923,6 @@ change:
 1
 
 TEXTBOX
-13
-545
-206
-575
-Global Temperature Control
-12
-0.0
-1
-
-TEXTBOX
 1153
 18
 1303
@@ -1128,7 +954,7 @@ CHOOSER
 134
 change:
 change:
-"pH" "temperature difference" "both"
+"pH" "temperature difference" "pH and temperature difference" "mountain" "monitor"
 1
 
 INPUTBOX
@@ -1137,7 +963,11 @@ INPUTBOX
 168
 212
 worm_population
+<<<<<<< HEAD
 500
+=======
+100
+>>>>>>> cbb5f9180b4da33eb01d5ea04ae9a703b0a93c86
 1
 0
 Number
@@ -1148,24 +978,7 @@ BUTTON
 256
 43
 Setup GIS
-ca\nsetup_environment\nsetup_gis\nsetup
-NIL
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
-
-BUTTON
-103
-54
-254
-87
-NIL
-setup_environment
+ca\nload_temperature\nsetup_environment\nsetup_gis\nsetup\n
 NIL
 1
 T

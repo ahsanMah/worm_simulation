@@ -307,7 +307,7 @@ to load_monitors [name]
 end
 
 to export_data [name]
-  let filename (word "data/output/simulation" name ".csv")
+  let filename (word "data/output/simulation" save_name ph_tolerance ".csv")
   csv:to-file filename monthly_data
   print "Exported simulation data to file"
 end
@@ -336,10 +336,12 @@ end
 to go
 
   calculate_time
+
   if (year = 30) [
     export_data save_number
     stop
     ]
+
   if (count turtles = 0) [
     export_data save_number
     stop]
@@ -399,13 +401,13 @@ to go
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-255
-10
-1067
-793
+269
+14
+1031
+797
 -1
 -1
-2.0
+2.5
 1
 10
 1
@@ -416,9 +418,9 @@ GRAPHICS-WINDOW
 0
 1
 0
-400
+300
 0
-375
+300
 1
 1
 1
@@ -431,7 +433,7 @@ BUTTON
 78
 43
 Setup
-setup
+ca\nsetup
 NIL
 1
 T
@@ -460,10 +462,10 @@ NIL
 1
 
 MONITOR
-1084
-533
-1192
-578
+1060
+433
+1168
+478
 Day Number
 day_num
 17
@@ -471,10 +473,10 @@ day_num
 11
 
 PLOT
-1072
-638
-1311
-802
+1049
+536
+1312
+700
 Worm Population for Current Year
 Day Number
 Population
@@ -500,12 +502,12 @@ SLIDER
 253
 ph_tolerance
 ph_tolerance
--10
-10
 0
+7
+6
+0.1
 1
-1
-%
+NIL
 HORIZONTAL
 
 SLIDER
@@ -539,10 +541,10 @@ NIL
 HORIZONTAL
 
 MONITOR
-1085
-582
-1192
-627
+1061
+482
+1168
+527
 Population Count
 count adults
 17
@@ -550,10 +552,10 @@ count adults
 11
 
 PLOT
-1306
-439
-1570
-612
+1048
+705
+1312
+878
 Worm Population over Years
 NIL
 NIL
@@ -568,10 +570,10 @@ PENS
 "default" 1.0 1 -11221820 true "" "plotxy year count adults"
 
 MONITOR
-1200
-582
-1298
-627
+1176
+482
+1274
+527
 Cocoon Count
 count cocoons
 17
@@ -590,10 +592,10 @@ starting_day
 Number
 
 MONITOR
-1200
-532
-1295
-577
+1176
+432
+1271
+477
 Daily Temp *C
 global_temperature
 2
@@ -601,14 +603,14 @@ global_temperature
 11
 
 CHOOSER
-1082
-40
-1322
-85
+1057
+41
+1297
+86
 obstacle_shape
 obstacle_shape
 "circle" "rectangle" "mountain" "monitor"
-1
+3
 
 SLIDER
 12
@@ -618,209 +620,29 @@ SLIDER
 speed
 speed
 0
-0.5
-0.5
+1
+0.8
 0.01
 1
 NIL
 HORIZONTAL
 
-SLIDER
-14
-568
-47
-718
-January
-January
--20
-40
--10
-1
-1
-*C
-VERTICAL
-
-SLIDER
-54
-569
-87
-719
-February
-February
--20
-40
--8
-1
-1
-*C
-VERTICAL
-
-SLIDER
-93
-569
-126
-719
-March
-March
--20
-40
--2
-1
-1
-*C
-VERTICAL
-
-SLIDER
-134
-570
-167
-720
-April
-April
--20
-40
-4
-1
-1
-*C
-VERTICAL
-
-SLIDER
-175
-570
-208
-720
-May
-May
--20
-40
-11
-1
-1
-*C
-VERTICAL
-
-SLIDER
-215
-571
-248
-721
-June
-June
--20
-40
-15
-1
-1
-*C
-VERTICAL
-
-SLIDER
-13
-724
-46
-874
-July
-July
--20
-40
-18
-1
-1
-*C
-VERTICAL
-
-SLIDER
-51
-725
-84
-875
-August
-August
--20
-40
-17
-1
-1
-*C
-VERTICAL
-
-SLIDER
-91
-726
-124
-876
-September
-September
--20
-40
-17
-1
-1
-*C
-VERTICAL
-
-SLIDER
-132
-725
-165
-875
-October
-October
--20
-40
-7
-1
-1
-*C
-VERTICAL
-
-SLIDER
-174
-725
-207
-875
-November
-November
--20
-40
-1
-1
-1
-*C
-VERTICAL
-
-SLIDER
-215
-725
-248
-875
-December
-December
--20
-40
--6
-1
-1
-*C
-VERTICAL
-
 INPUTBOX
-1207
-303
-1324
-385
+1182
+304
+1299
+386
 save_name
-abcd
+patchSim
 1
 0
 String (reporter)
 
 SLIDER
-1083
-138
-1322
-171
+1058
+139
+1297
+172
 patch_pH
 patch_pH
 0
@@ -832,14 +654,14 @@ NIL
 HORIZONTAL
 
 CHOOSER
-1083
-303
-1202
-348
+1058
+304
+1177
+349
 Show:
 Show:
 "pH" "food" "temperature" "monitor"
-0
+3
 
 TEXTBOX
 10
@@ -889,7 +711,7 @@ CHOOSER
 species_number
 species_number
 1 2 3 4 5
-0
+1
 
 BUTTON
 127
@@ -909,10 +731,10 @@ NIL
 1
 
 BUTTON
-1082
-352
-1203
-385
+1057
+353
+1178
+386
 Recolor Patches
 recolor_patches
 NIL
@@ -926,10 +748,10 @@ NIL
 1
 
 BUTTON
-1082
-388
-1204
-421
+1057
+389
+1179
+422
 Save Environment
 save_patches save_name
 NIL
@@ -943,10 +765,10 @@ NIL
 1
 
 BUTTON
-1206
-388
-1325
-421
+1181
+389
+1300
+422
 Load Environment
 load_patches save_name
 NIL
@@ -994,10 +816,10 @@ NIL
 1
 
 SLIDER
-1083
-174
-1322
-207
+1058
+175
+1297
+208
 temperature_difference
 temperature_difference
 -10
@@ -1009,30 +831,20 @@ NIL
 HORIZONTAL
 
 TEXTBOX
-13
-545
-206
-575
-Global Temperature Control
-12
-0.0
-1
-
-TEXTBOX
-1153
-18
-1303
-36
+1067
+16
+1217
+34
 Environment Controls\n
 12
 0.0
 1
 
 BUTTON
-1082
-214
-1201
-247
+1057
+215
+1176
+248
 Draw
 pen
 T
@@ -1046,10 +858,10 @@ NIL
 1
 
 BUTTON
-1205
-214
-1322
-247
+1180
+215
+1297
+248
 Select
 edit_environment
 T
@@ -1063,10 +875,10 @@ NIL
 1
 
 BUTTON
-1082
-254
-1322
-287
+1057
+255
+1297
+288
 Edit Patch
 recolor-selected
 NIL
@@ -1080,10 +892,10 @@ NIL
 1
 
 SLIDER
-1081
-436
-1243
-469
+1321
+43
+1483
+76
 save_number
 save_number
 0
@@ -1095,48 +907,33 @@ NIL
 HORIZONTAL
 
 CHOOSER
-1083
-89
-1322
-134
+1058
+90
+1297
+135
 change:
 change:
 "pH" "temperature difference" "pH and temperature difference" "water" "highway"
 1
 
 TEXTBOX
-1153
-18
-1303
-36
+1067
+16
+1217
+34
 Environment Controls\n
 12
 0.0
 1
 
-SLIDER
-1083
-475
-1244
-508
-save_number
-save_number
-0
-100
-0
-1
-1
-NIL
-HORIZONTAL
-
 CHOOSER
-1083
-89
-1322
-134
+1058
+90
+1297
+135
 change:
 change:
-"pH" "temperature difference" "both"
+"pH" "temperature difference" "pH and temperature difference" "mountain" "monitor"
 1
 
 INPUTBOX
@@ -1145,7 +942,7 @@ INPUTBOX
 168
 212
 worm_population
-500
+50
 1
 0
 Number
@@ -1157,23 +954,6 @@ BUTTON
 43
 Setup GIS
 ca\nload_temperature\nsetup_environment\nsetup_gis\nsetup\n
-NIL
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
-
-BUTTON
-103
-54
-309
-87
-NIL
-ca\nsetup_environment\nsetup
 NIL
 1
 T
@@ -1591,11 +1371,7 @@ NetLogo 5.3.1
 setup_sim</setup>
     <go>go</go>
     <metric>count turtles</metric>
-    <enumeratedValueSet variable="save_number">
-      <value value="1"/>
-      <value value="2"/>
-      <value value="3"/>
-    </enumeratedValueSet>
+    <steppedValueSet variable="ph_tolerance" first="4.5" step="0.2" last="5.5"/>
   </experiment>
 </experiments>
 @#$#@#$#@
