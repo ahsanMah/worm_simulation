@@ -136,7 +136,7 @@ to draw_obstacles
       foreach obstacle_list [setup-obstacles ? ]
       recolor-patch
     ]
-    update_monitor_area
+    ;update_monitor_area
     ;recolor_patches
 
 end
@@ -301,9 +301,7 @@ to recolor-selected
     
     if (obstacle_shape = "monitor")
     [
-      show monitor_number
       set monitor_number monitor_number + 1
-      show monitor_number
       ask patches
       [
         if selected? pxcor pycor
@@ -315,7 +313,7 @@ to recolor-selected
         ]
         
       ]
-      update_monitor_area
+      update_monitor_area (monitor_number - 1)
   ]
 end
 
@@ -458,12 +456,9 @@ end
 
 
 
-to update_monitor_area
-  let monitor_list n-values monitor_number [?] 
-  foreach monitor_list [
-    set area_list lput ((count patches with [monitor_index = ?]) / 900) area_list
-    show area_list
-    ]
+to update_monitor_area [index]
+  set area_list lput ((count patches with [monitor_index = index]) / 900) area_list
+  show area_list
 end
 
 to collect_data

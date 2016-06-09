@@ -302,7 +302,9 @@ to load_monitors [name]
     ]
     set monitor_number item 5 ?
   ]
-  update_monitor_area
+
+  let monitor_list n-values monitor_number [?]
+  foreach monitor_list [update_monitor_area ?]
   recolor_patches
 end
 
@@ -391,8 +393,6 @@ to go
           set monthly_data lput (array:to-list ?) monthly_data
         ]
       ]
-      print "Monthly data: "
-      show monthly_data
       set report_month report_month + 1
       set has_collected true
     ]
@@ -633,7 +633,7 @@ INPUTBOX
 1299
 386
 save_name
-patchSim
+pHSim
 1
 0
 String (reporter)

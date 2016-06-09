@@ -186,7 +186,6 @@ to move
   
   if ( count (patch-set (patch-ahead  (speed * permeability / periods-in-day))) with [pcolor = grey]) > 0
   [
-    show "rock ahead"
    right 180
    
   ]
