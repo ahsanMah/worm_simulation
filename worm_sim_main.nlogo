@@ -35,6 +35,14 @@ to setup
   reset-ticks
 end
 
+to initialize_monitors
+  draw_monitor 0 60 0 60
+  draw_monitor 0 60 240 300
+  draw_monitor 240 300 0 60
+  draw_monitor 240 300 240 300
+  draw_monitor 120 180 120 180
+end
+
 
 to setup_sim
  ;setup
@@ -633,7 +641,7 @@ INPUTBOX
 1299
 386
 save_name
-pHSim
+patchSim
 1
 0
 String (reporter)

@@ -317,6 +317,20 @@ to recolor-selected
   ]
 end
 
+to draw_monitor [xmin xmax ymin ymax]
+  set monitor_number monitor_number + 1
+  ask patches
+  [
+    if (pxcor >= xmin and pxcor <= xmax and pycor >= ymin and pycor <= ymax)
+      [
+        set being_monitored true
+        set monitor_index monitor_number - 1
+        set monitor_size temp_size
+        recolor-patch
+      ]
+  ]
+end
+
 to handle-select
   let old-x mouse-xcor
   let old-y mouse-ycor
