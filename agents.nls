@@ -88,8 +88,13 @@ to mouse_add_species
       let i 0
       while [i < worm_population]
       [
-       add_species (random-float (x-max - x-min)) + x-min (random-float (y-max - y-min)) + y-min 1 species_number
+       let rand_x (random-float (x-max - x-min)) + x-min
+       let rand_y (random-float (y-max - y-min)) + y-min
+       if ([pcolor] of patch rand_x rand_y != blue and [pcolor] of patch rand_x rand_y != grey)
+       [
+       add_species rand_x rand_y 1 species_number
        set i i + 1
+       ]
       ]
       stop
     ]
@@ -113,7 +118,7 @@ to add_species [x y population species_num]
   ] 
   [ table:put species_list species_num (array:from-list (list species_genetic_diversity species_hatch_temperature))]
 
-  foreach table:to-list species_list [show ?]
+  ;foreach table:to-list species_list [show ?]
   
   create_species new_species
   
@@ -222,7 +227,7 @@ to check_death
 to check_reproduction
   ;;random-seed new-seed
   set reprod_p random-float 100
-  if (reprod_p < reprod_threshold) [
+  if (reprod_p < reprod_threshold and pcolor != blue) [
     if (maturation = 70) [
       hatch-cocoons 1 [
         set maturation 0
