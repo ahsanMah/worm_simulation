@@ -457,7 +457,7 @@ end
 
 
 to update_monitor_area [index]
-  set area_list lput ((count patches with [monitor_index = index]) / 900) area_list
+  set area_list lput ((count patches with [monitor_index = index and pcolor != blue and pcolor != grey]) / 900) area_list
   show area_list
 end
 

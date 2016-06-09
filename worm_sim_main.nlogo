@@ -953,7 +953,7 @@ BUTTON
 256
 43
 Setup GIS
-ca\nload_temperature\nsetup_environment\nsetup_gis\nsetup\n
+setup\nsetup_gis
 NIL
 1
 T
