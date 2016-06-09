@@ -35,6 +35,14 @@ to setup
   reset-ticks
 end
 
+to initialize_monitors
+  draw_monitor 0 60 0 60
+  draw_monitor 0 60 240 300
+  draw_monitor 240 300 0 60
+  draw_monitor 240 300 240 300
+  draw_monitor 120 180 120 180
+end
+
 
 to setup_sim
  ;setup
@@ -953,7 +961,7 @@ BUTTON
 256
 43
 Setup GIS
-ca\nload_temperature\nsetup_environment\nsetup_gis\nsetup\n
+setup\nsetup_gis\n
 NIL
 1
 T
