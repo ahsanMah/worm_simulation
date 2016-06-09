@@ -76,21 +76,21 @@ to setup_environment
 
 
   
-;  while [var > 0]
-;  [
-;    if var > item current_month num_days
-;    [
-;     set current_month current_month + 1
-;
-;    ]
-;    set var var - item current_month num_days
-;  ]
+  while [var > 0]
+  [
+    if var > item current_month num_days
+    [
+     set current_month current_month + 1
+
+    ]
+    set var var - item current_month num_days
+  ]
 ;  set global_temperature random-normal (item current_month temperatures) (1)
   set global_temperature table:get temperature_table starting_day
   set current_day starting_day
   ;calculate_temp ;uncomment this if you want to have temperature vary between patches
   
-  ;set day_of_month (var + (item ((current_month - 1) mod 12) num_days))
+  set day_of_month (var + (item ((current_month - 1) mod 12) num_days))
   ;;set next_month current_month + 1 mod 12
   
   ;set organic-regen 0.3 ;;0.004;; / 5

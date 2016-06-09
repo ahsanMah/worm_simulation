@@ -252,10 +252,10 @@ to update_thresholds
   
   ;;pH of soil also affects survival rate
   if (ph < max_ph_resist) [
-    let ph_factor (e ^ (max_ph_resist - ph) ) - 1   ; function ensures that a ph difference of 3 will have a higher death probability
+    let ph_factor 1.75 * ((e ^ (max_ph_resist - ph) ) - 1)   ; function ensures that a ph difference of 3 will have a higher death probability
     set death_threshold (death_threshold + ph_factor)  ; higher the ph lower the survival
     ;set death_threshold death_threshold + random-float death_variance
-    set reprod_threshold (reprod_threshold - (ph_factor / 10))
+    set reprod_threshold (reprod_threshold - (ph_factor / 5))
   ]
   
 

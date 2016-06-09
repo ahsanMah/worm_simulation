@@ -14,11 +14,11 @@ globals[
   ;month monitor species_number population density genetic diversity
 ]
 to setup
-  ;clear-all
-
+  clear-all
+  print "Loading temperature data..."
+  load_temperature
   print "Setting up environment..."
-  ;setup_environment
-  print "Done"
+  setup_environment
   ;setup_gis
   print "Setting up agents..."
   setup_agents
@@ -517,7 +517,7 @@ max_reproduction_rate
 max_reproduction_rate
 0
 10
-8.5
+7.7
 0.1
 1
 NIL
@@ -1105,16 +1105,6 @@ change:
 1
 
 TEXTBOX
-13
-545
-206
-575
-Global Temperature Control
-12
-0.0
-1
-
-TEXTBOX
 1153
 18
 1303
@@ -1155,7 +1145,7 @@ INPUTBOX
 168
 212
 worm_population
-1000
+500
 1
 0
 Number
