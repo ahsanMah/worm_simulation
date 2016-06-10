@@ -345,7 +345,7 @@ to go
 
   calculate_time
 
-  if (year = 30) [
+  if (year = 15) [
     export_data save_number
     stop
     ]
@@ -510,7 +510,7 @@ ph_tolerance
 ph_tolerance
 0
 7
-7
+6
 0.1
 1
 NIL
@@ -540,7 +540,7 @@ temperature_tolerance
 temperature_tolerance
 0
 100
-25
+20
 1
 1
 NIL
@@ -616,7 +616,7 @@ CHOOSER
 obstacle_shape
 obstacle_shape
 "circle" "rectangle" "mountain" "monitor"
-3
+1
 
 SLIDER
 12
@@ -653,7 +653,7 @@ patch_pH
 patch_pH
 0
 14
-10.2
+3.4
 0.1
 1
 NIL
@@ -717,7 +717,7 @@ CHOOSER
 species_number
 species_number
 1 2 3 4 5
-4
+0
 
 BUTTON
 127
@@ -920,7 +920,7 @@ CHOOSER
 change:
 change:
 "pH" "temperature difference" "pH and temperature difference" "water" "highway"
-1
+0
 
 TEXTBOX
 1067
@@ -940,7 +940,7 @@ CHOOSER
 change:
 change:
 "pH" "temperature difference" "pH and temperature difference" "mountain" "monitor"
-1
+0
 
 INPUTBOX
 13
@@ -1387,6 +1387,20 @@ setup_sim</setup>
     <enumeratedValueSet variable="ph_tolerance">
       <value value="7"/>
     </enumeratedValueSet>
+  </experiment>
+  <experiment name="Hypothesis-1 Test" repetitions="10" runMetricsEveryStep="true">
+    <setup>setup
+setup_sim</setup>
+    <go>go</go>
+    <metric>count adults</metric>
+    <steppedValueSet variable="temperature_tolerance" first="0" step="1" last="10"/>
+  </experiment>
+  <experiment name="Does temperature work?" repetitions="1" runMetricsEveryStep="true">
+    <setup>setup
+setup_sim</setup>
+    <go>go</go>
+    <metric>count adults</metric>
+    <steppedValueSet variable="temperature_tolerance" first="5" step="5" last="20"/>
   </experiment>
 </experiments>
 @#$#@#$#@

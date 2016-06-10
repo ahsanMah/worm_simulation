@@ -59,7 +59,7 @@ to setup_agents
   
   set normal_death_threshold 0.00685 / (periods-in-day) ; Simulates a 4 year life span
   set normal_reproduction_rate 0.1
-  set max_death_threshold 90
+  set max_death_threshold 30
   set agent_size 0.5
   set steps-per-ie 5
   set max_stamina 5
@@ -150,8 +150,8 @@ to create_species [species]
     set hatch_temp temp_hatch_temperature
     set stamina 5
     set genetic_diversity temp_genetic_diversity ; 0-1 measure of genetic diversity of the species
-    set max_temp_resist random-normal temperature_tolerance (2 * genetic_diversity)
-    set low_temp_resist random-normal 5 (2 * genetic_diversity)
+    set max_temp_resist random-normal 25 (2 * genetic_diversity)
+    set low_temp_resist random-normal temperature_tolerance (2 * genetic_diversity)
     set max_ph_resist random-normal ph_tolerance (2 * genetic_diversity)
     set death_threshold normal_death_threshold
     set reprod_threshold normal_reproduction_rate 
@@ -209,7 +209,7 @@ end
 
 to check_death  
   random-seed new-seed
-  set death_p random-float 1000
+  set death_p random-float 100
   
 ;  ifelse (stamina < min_stamina) [
 ;    die
@@ -255,13 +255,13 @@ to update_thresholds
   
   
   ;;pH of soil also affects survival rate
-  if (ph < max_ph_resist) [
-    let ph_factor 1.5 * ((e ^ (max_ph_resist - ph) ) - 1)   ; function ensures that a ph difference of 3 will have a higher death probability
-    set death_threshold (death_threshold + ph_factor)  ; higher the ph lower the survival
-    ;set death_threshold death_threshold + random-float death_variance
-    set reprod_threshold (reprod_threshold - (ph_factor / 3))
-  ]
-  
+;  if (ph < max_ph_resist) [
+;    let ph_factor 1.5 * ((e ^ (max_ph_resist - ph) ) - 1)   ; function ensures that a ph difference of 3 will have a higher death probability
+;    set death_threshold (death_threshold + ph_factor)  ; higher the ph lower the survival
+;    ;set death_threshold death_threshold + random-float death_variance
+;    set reprod_threshold (reprod_threshold - (ph_factor / 3))
+;  ]
+;  
 
 end
 
