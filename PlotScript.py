@@ -37,4 +37,4 @@ for row in data_list:
 
 print max_pop
 avg_pop = map(calc_annual_avg, max_pop)
-print max_pop
+print avg_pop
