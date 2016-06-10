@@ -59,7 +59,7 @@ to setup_agents
   
   set normal_death_threshold 0.00685 / (periods-in-day) ; Simulates a 4 year life span
   set normal_reproduction_rate 0.1
-  set max_death_threshold 90
+  set max_death_threshold 30
   set agent_size 0.5
   set steps-per-ie 5
   set max_stamina 5
@@ -209,7 +209,7 @@ end
 
 to check_death  
   random-seed new-seed
-  set death_p random-float 1000
+  set death_p random-float 100
   
 ;  ifelse (stamina < min_stamina) [
 ;    die
@@ -256,10 +256,10 @@ to update_thresholds
   
   ;;pH of soil also affects survival rate
   if (ph < max_ph_resist) [
-    let ph_factor 1.5 * ((e ^ (max_ph_resist - ph) ) - 1)   ; function ensures that a ph difference of 3 will have a higher death probability
+    let ph_factor (3 / 42) * ((e ^ (max_ph_resist - ph) ) - 1) ; function ensures that a ph difference of 3 will have a higher death probability
     set death_threshold (death_threshold + ph_factor)  ; higher the ph lower the survival
     ;set death_threshold death_threshold + random-float death_variance
-    set reprod_threshold (reprod_threshold - (ph_factor / 3))
+    ;set reprod_threshold (reprod_threshold - (ph_factor / 2))
   ]
   
 
