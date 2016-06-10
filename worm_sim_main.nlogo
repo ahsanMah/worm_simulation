@@ -358,18 +358,18 @@ to go
 
   calculate_time
 
-    if (year = 29) [
+    if (year = 14) [
     set final_population (final_population + count adults)
 
-    if (count adults > max_pop)
-    [set max_pop (count adults)]
+;    if (count adults > max_pop)
+;    [set max_pop (count adults)]
 
   ]
-  if (year = 30) [
+  if (year = 15) [
     set final_population (final_population / 365)
     ]
 
-  if (year = 30) [
+  if (year = 15) [
     export_data save_number
     stop
     ]
@@ -388,8 +388,10 @@ to go
     ;calculate_temp
     ;update_organic_matter
 
-    ask cocoons [
-      check_if_hatch
+    if (global_temperature > 12) [
+      ask cocoons [
+        check_if_hatch
+      ]
     ]
   ]
 
@@ -549,7 +551,7 @@ max_reproduction_rate
 max_reproduction_rate
 0
 10
-7.7
+7
 0.1
 1
 NIL
@@ -712,7 +714,7 @@ species_genetic_diversity
 species_genetic_diversity
 0
 1
-0.1
+0
 0.1
 1
 NIL
@@ -1418,7 +1420,6 @@ setup_sim</setup>
 setup_sim</setup>
     <go>go</go>
     <metric>finalPop</metric>
-    <metric>maxPop</metric>
     <steppedValueSet variable="ph_tolerance" first="4" step="1" last="7"/>
   </experiment>
 </experiments>

@@ -59,7 +59,7 @@ to setup_agents
   
   set normal_death_threshold 0.00685 / (periods-in-day) ; Simulates a 4 year life span
   set normal_reproduction_rate 0.1
-  set max_death_threshold 30
+  set max_death_threshold 35
   set agent_size 0.5
   set steps-per-ie 5
   set max_stamina 5
@@ -256,10 +256,10 @@ to update_thresholds
   
   ;;pH of soil also affects survival rate
   if (ph < max_ph_resist) [
-    let ph_factor (3 / 42) * ((e ^ (max_ph_resist - ph) ) - 1) ; function ensures that a ph difference of 3 will have a higher death probability
+    let ph_factor (3.2 / 42) * ((e ^ (max_ph_resist - ph) ) - 1) ; function ensures that a ph difference of 3 will have a higher death probability
     set death_threshold (death_threshold + ph_factor)  ; higher the ph lower the survival
     ;set death_threshold death_threshold + random-float death_variance
-    ;set reprod_threshold (reprod_threshold - (ph_factor / 2))
+    set reprod_threshold (reprod_threshold - ph_factor)
   ]
   
 
@@ -273,7 +273,6 @@ end
 
 ;;hatches temperature is optimum for birth
 to check_if_hatch
-    if (global_temperature > hatch_temp) [
       set wait_days wait_days + 1
       ;show wait_period
       if (wait_days >= wait_period) [
@@ -285,6 +284,5 @@ to check_if_hatch
         ]
         [die]
       ]
-    ]
 end
 
