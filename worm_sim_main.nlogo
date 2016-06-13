@@ -12,6 +12,7 @@ globals[
   temperature_table
   final_population
   max_pop
+  pop_data
   ;index positions of data in arrays
   ;month monitor species_number population density genetic diversity
 ]
@@ -29,6 +30,7 @@ to setup
   set species_data [] ;list of collected info of each species for each monitor
   set monthly_data [] ;list of data collected each month
   set area_list []
+  set pop_data []
   set report_month 0
   set final_population 0
   set max_pop 0
@@ -49,11 +51,11 @@ end
 
 
 to setup_sim
- ;setup
+  ;setup
 
   print "Loading from simulation files..."
-  load_patches "pHSim"
-  load_agents "pHSim"
+  load_patches save_name
+  load_agents save_name
   print "Done Loading"
 end
 
@@ -62,9 +64,9 @@ to draw_river
   [
     ask patch mouse-xcor mouse-ycor
     [
-     set food-here 0
-     set permeability speed_in_water
-     set pcolor blue
+      set food-here 0
+      set permeability speed_in_water
+      set pcolor blue
     ]
     display
   ]
@@ -88,15 +90,15 @@ to draw_other
   [
     ask patch mouse-xcor mouse-ycor
     [
-     if (change: = "pH" or change: = "temperature difference and pH")
-     [
-      set ph patch_ph
-     ]
-     if (change: = "temperature difference" or change: = "temperature difference and pH")
-     [
-      set temp_diff_here temperature_difference
-     ]
-     recolor-patch
+      if (change: = "pH" or change: = "temperature difference and pH")
+      [
+        set ph patch_ph
+      ]
+      if (change: = "temperature difference" or change: = "temperature difference and pH")
+      [
+        set temp_diff_here temperature_difference
+      ]
+      recolor-patch
     ]
   ]
 end
@@ -108,9 +110,9 @@ to pen
     [
       if (change: = "water")
       [
-         set food-here 0
-         set permeability speed_in_water
-         set pcolor blue
+        set food-here 0
+        set permeability speed_in_water
+        set pcolor blue
       ]
       if (change: = "highway")
       [
@@ -157,19 +159,19 @@ to save_patches [name]
   carefully [file-delete filename] []
   while [(i <= max-pxcor)]
   [
-   while [(j <= max-pycor)]
-   [
-     ask patch i j
-     [
-       let info (list i j ph food-here permeability local_death_threshold temp_diff_here pcolor)
-       file-open filename
-       file-print csv:to-row info
-       file-close
-       set j j + 1
-     ]
-   ]
-   set j min-pycor
-   set i i + 1
+    while [(j <= max-pycor)]
+    [
+      ask patch i j
+      [
+        let info (list i j ph food-here permeability local_death_threshold temp_diff_here pcolor)
+        file-open filename
+        file-print csv:to-row info
+        file-close
+        set j j + 1
+      ]
+    ]
+    set j min-pycor
+    set i i + 1
   ]
 
 end
@@ -202,7 +204,7 @@ to save_agents [name]
   let data []
   foreach table:to-list species_list [ ;converts table into listto store as csv
     set data lput (sentence item 0 ? array:to-list item 1 ?) data
-    ]
+  ]
   csv:to-file filename1 data
 
   let filename (word "data/parameters/myagents"  name ".csv")
@@ -210,10 +212,10 @@ to save_agents [name]
   carefully [file-delete filename] []
   ask turtles
   [
-       let info (list xcor ycor parent_breed shape wait_period hatch_temp genetic_diversity max_temp_resist low_temp_resist max_ph_resist)
-       file-open filename
-       file-print csv:to-row info
-       file-close
+    let info (list xcor ycor parent_breed shape wait_period hatch_temp genetic_diversity max_temp_resist low_temp_resist max_ph_resist)
+    file-open filename
+    file-print csv:to-row info
+    file-close
   ]
   print "Saved to file"
 end
@@ -232,22 +234,22 @@ to load_agents [name]
   foreach (data)
   [
     create-adults 1 [
-    setxy item 0 ? item 1 ?
-    set parent_breed item 2 ?
-    set size 1
-    set shape item 3 ?
-    set maturation 70
-    set wait_period item 4 ?
-    set hatch_temp item 5 ?
-    set stamina 5
-    set genetic_diversity item 6 ?
-    set max_temp_resist item 7 ?
-    set low_temp_resist temperature_tolerance
-    set max_ph_resist ph_tolerance
-    set color (item parent_breed color_list)
-    set death_threshold normal_death_threshold
-    set reprod_threshold normal_reproduction_rate
-   ]
+      setxy item 0 ? item 1 ?
+      set parent_breed item 2 ?
+      set size 1
+      set shape item 3 ?
+      set maturation 70
+      set wait_period item 4 ?
+      set hatch_temp item 5 ?
+      set stamina 5
+      set genetic_diversity item 6 ?
+      set max_temp_resist item 7 ?
+      set low_temp_resist temperature_tolerance
+      set max_ph_resist ph_tolerance
+      set color (item parent_breed color_list)
+      set death_threshold normal_death_threshold
+      set reprod_threshold normal_reproduction_rate
+    ]
   ]
 end
 
@@ -258,8 +260,8 @@ to load_temperature
   let i 0
   while [i < 8]
   [
-   let nothing csv:from-row file-read-line
-   set i i + 1
+    let nothing csv:from-row file-read-line
+    set i i + 1
   ]
   let days_since_start 0
   while [ not file-at-end? ]
@@ -284,19 +286,19 @@ to save_monitors [name]
   file-open filename
   while [(i <= max-pxcor)]
   [
-   while [(j <= max-pycor)]
-   [
-     ask patch i j
-     [
-       let info (list i j being_monitored monitor_index monitor_size monitor_number)
-       file-open filename
-       file-print csv:to-row info
-       file-close
-       set j j + 1
-     ]
-   ]
-   set j min-pycor
-   set i i + 1
+    while [(j <= max-pycor)]
+    [
+      ask patch i j
+      [
+        let info (list i j being_monitored monitor_index monitor_size monitor_number)
+        file-open filename
+        file-print csv:to-row info
+        file-close
+        set j j + 1
+      ]
+    ]
+    set j min-pycor
+    set i i + 1
   ]
 end
 
@@ -320,29 +322,29 @@ end
 
 to export_data [name]
   let filename (word "data/output/simulation" save_name ph_tolerance ".csv")
-  ;let filename2 (word "data/output/finalPop" save_name ph_tolerance ".csv")
+  let filename2 (word "data/output/finalPop" save_name ph_tolerance ".csv")
   csv:to-file filename monthly_data
- ; csv:to-file filename2 final_population
+  csv:to-file filename2 pop_data
   print "Exported simulation data to file"
 end
 
 to clear_arrays
 
-   set species_data []
-   let monitor_list n-values monitor_number [?] ;(?) allows to create a list from 0 to monitor number
-   foreach table:to-list species_list [
-     let current_species_number item 0 ?
-     ;allows for the storage of other species characteristics
-     ;let current_species_info array:to-list item 1 ?
+  set species_data []
+  let monitor_list n-values monitor_number [?] ;(?) allows to create a list from 0 to monitor number
+  foreach table:to-list species_list [
+    let current_species_number item 0 ?
+    ;allows for the storage of other species characteristics
+    ;let current_species_info array:to-list item 1 ?
 
-     ;n*m matrix of species data for every monitor
-     let species_matrix array:from-list monitor_list  ;n = number of species charcteristics being collected, m = number of monitors
-     foreach monitor_list [
-       array:set species_matrix ? array:from-list (list report_month ? current_species_number 0 0) ;resets population, density
-     ]
-     set species_data lput species_matrix species_data ;list of matrices
-   ]
-    set has_collected false
+    ;n*m matrix of species data for every monitor
+    let species_matrix array:from-list monitor_list  ;n = number of species charcteristics being collected, m = number of monitors
+    foreach monitor_list [
+      array:set species_matrix ? array:from-list (list report_month ? current_species_number 0 0) ;resets population, density
+    ]
+    set species_data lput species_matrix species_data ;list of matrices
+  ]
+  set has_collected false
 end
 
 
@@ -351,32 +353,55 @@ to-report maxPop
 end
 
 to-report finalPop
-  report final_population
+  report final_population / 365
 end
 
 to go
 
+  if (count turtles = 0) [
+    export_data save_number
+    stop
+  ]
+
   calculate_time
 
-    if (year = 29) [
+  if (year = 9) [
+    set final_population (final_population + count adults)
+  ]
+
+  if (year = 10) [
+    set pop_data lput (list year (final_population / 365)) pop_data
+    export_data save_number
+    set final_population 0
+
+  ]
+
+  if (year = 19) [
+    set final_population (final_population + count adults)
+  ]
+
+  if (year = 20) [
+    set pop_data lput (list year (final_population / 365)) pop_data
+    export_data save_number
+    set final_population 0
+  ]
+
+  if (year = 29) [
     set final_population (final_population + count adults)
 
-;    if (count adults > max_pop)
-;    [set max_pop (count adults)]
+    ;    if (count adults > max_pop)
+    ;    [set max_pop (count adults)]
 
   ]
 
   if (year = 30) [
+    set pop_data lput (list year (final_population / 365)) pop_data
     export_data save_number
     stop
-    ]
+  ]
 
-  if (count turtles = 0) [
-    export_data save_number
-    stop]
-
- if (day_of_month = (item current_month num_days - 1))[ ;clears arrays a day before collection
-   clear_arrays
+  if (day_of_month = (item current_month num_days - 1))[ ;clears arrays a day before collection
+    clear_arrays
   ]
 
   if (ticks mod (periods-in-day) = 0) [
@@ -398,7 +423,7 @@ to go
       update_maturity
       update_thresholds
       check_reproduction
-      ]
+    ]
 
     move
 
@@ -412,7 +437,7 @@ to go
       ]
     ]
   ]
-   ;saves monthly data to accumulutor list
+  ;saves monthly data to accumulutor list
   if (day_of_month = item current_month num_days)[
     if (has_collected = false) [
       ;show species_data
@@ -502,10 +527,10 @@ day_num
 11
 
 PLOT
-1049
-536
-1312
-700
+0
+602
+263
+766
 Worm Population for Current Year
 Day Number
 Population
@@ -533,7 +558,7 @@ ph_tolerance
 ph_tolerance
 0
 7
-6
+4
 0.1
 1
 NIL
@@ -548,7 +573,7 @@ max_reproduction_rate
 max_reproduction_rate
 0
 10
-7.7
+6.7
 0.1
 1
 NIL
@@ -581,10 +606,10 @@ count adults
 11
 
 PLOT
-1048
-705
-1312
-878
+1046
+591
+1310
+764
 Worm Population over Years
 NIL
 NIL
@@ -662,7 +687,7 @@ INPUTBOX
 1299
 386
 save_name
-pHSim
+phTest
 1
 0
 String (reporter)
@@ -676,7 +701,7 @@ patch_pH
 patch_pH
 0
 14
-3.4
+4
 0.1
 1
 NIL
@@ -971,7 +996,7 @@ INPUTBOX
 168
 212
 worm_population
-100
+50
 1
 0
 Number
@@ -1422,6 +1447,14 @@ setup_sim</setup>
     <go>go</go>
     <metric>count adults</metric>
     <steppedValueSet variable="temperature_tolerance" first="5" step="2.5" last="20"/>
+  </experiment>
+  <experiment name="Does pH work?" repetitions="4" runMetricsEveryStep="true">
+    <setup>setup
+setup_sim</setup>
+    <go>go</go>
+    <metric>count adults</metric>
+    <metric>finalPop</metric>
+    <steppedValueSet variable="pH_tolerance" first="4" step="0.5" last="7"/>
   </experiment>
 </experiments>
 @#$#@#$#@
