@@ -242,8 +242,8 @@ to load_agents [name]
     set stamina 5
     set genetic_diversity item 6 ?
     set max_temp_resist item 7 ?
-    set low_temp_resist item 8 ?
-    set max_ph_resist item 9 ?
+    set low_temp_resist temperature_tolerance
+    set max_ph_resist ph_tolerance
     set color (item parent_breed color_list)
     set death_threshold normal_death_threshold
     set reprod_threshold normal_reproduction_rate
@@ -358,18 +358,15 @@ to go
 
   calculate_time
 
-  if (year = 15) [
+    if (year = 29) [
     set final_population (final_population + count adults)
 
 ;    if (count adults > max_pop)
 ;    [set max_pop (count adults)]
 
   ]
-  if (year = 15) [
-    set final_population (final_population / 365)
-    ]
 
-  if (year = 15) [
+  if (year = 30) [
     export_data save_number
     stop
     ]
@@ -388,7 +385,7 @@ to go
     ;calculate_temp
     ;update_organic_matter
 
-    if (global_temperature > 12) [
+    if (global_temperature > species_hatch_temperature) [
       ask cocoons [
         check_if_hatch
       ]
@@ -551,7 +548,7 @@ max_reproduction_rate
 max_reproduction_rate
 0
 10
-7
+7.7
 0.1
 1
 NIL
@@ -566,7 +563,7 @@ temperature_tolerance
 temperature_tolerance
 0
 100
-20
+5
 1
 1
 NIL
@@ -974,7 +971,7 @@ INPUTBOX
 168
 212
 worm_population
-5000
+100
 1
 0
 Number
@@ -1405,22 +1402,19 @@ setup_sim</setup>
     <metric>count adults</metric>
     <steppedValueSet variable="ph_tolerance" first="4" step="0.1" last="6"/>
   </experiment>
-  <experiment name="Test" repetitions="2" runMetricsEveryStep="true">
+  <experiment name="FIXED-temp-Hypothesis" repetitions="8" runMetricsEveryStep="true">
     <setup>setup
 setup_sim</setup>
     <go>go</go>
-    <metric>count adults</metric>
-    <enumeratedValueSet variable="ph_tolerance">
-      <value value="6.5"/>
-      <value value="7"/>
-    </enumeratedValueSet>
+    <metric>finalPop</metric>
+    <steppedValueSet variable="temperature_tolerance" first="0" step="2" last="10"/>
   </experiment>
-  <experiment name="Hypothesis-1 Test" repetitions="10" runMetricsEveryStep="true">
+  <experiment name="FIXED-pH-Hypothesis" repetitions="8" runMetricsEveryStep="false">
     <setup>setup
 setup_sim</setup>
     <go>go</go>
     <metric>count adults</metric>
-    <steppedValueSet variable="temperature_tolerance" first="0" step="1" last="10"/>
+    <steppedValueSet variable="ph_tolerance" first="4" step="0.5" last="6"/>
   </experiment>
   <experiment name="Does temperature work?" repetitions="10" runMetricsEveryStep="true">
     <setup>setup
