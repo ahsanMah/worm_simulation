@@ -10,6 +10,8 @@ globals[
   area_list
   default_food_value
   temperature_table
+  final_population
+  max_pop
   ;index positions of data in arrays
   ;month monitor species_number population density genetic diversity
 ]
@@ -28,6 +30,8 @@ to setup
   set monthly_data [] ;list of data collected each month
   set area_list []
   set report_month 0
+  set final_population 0
+  set max_pop 0
 
   set-default-shape sides "line"
   ;setup_sim
@@ -316,7 +320,9 @@ end
 
 to export_data [name]
   let filename (word "data/output/simulation" save_name ph_tolerance ".csv")
+  ;let filename2 (word "data/output/finalPop" save_name ph_tolerance ".csv")
   csv:to-file filename monthly_data
+ ; csv:to-file filename2 final_population
   print "Exported simulation data to file"
 end
 
@@ -340,10 +346,28 @@ to clear_arrays
 end
 
 
+to-report maxPop
+  report max_pop
+end
+
+to-report finalPop
+  report final_population
+end
 
 to go
 
   calculate_time
+
+  if (year = 15) [
+    set final_population (final_population + count adults)
+
+;    if (count adults > max_pop)
+;    [set max_pop (count adults)]
+
+  ]
+  if (year = 15) [
+    set final_population (final_population / 365)
+    ]
 
   if (year = 15) [
     export_data save_number
@@ -364,8 +388,10 @@ to go
     ;calculate_temp
     ;update_organic_matter
 
-    ask cocoons [
-      check_if_hatch
+    if (global_temperature > 12) [
+      ask cocoons [
+        check_if_hatch
+      ]
     ]
   ]
 
@@ -525,7 +551,7 @@ max_reproduction_rate
 max_reproduction_rate
 0
 10
-7.7
+7
 0.1
 1
 NIL
@@ -627,7 +653,7 @@ speed
 speed
 0
 1
-0.8
+0.7
 0.01
 1
 NIL
@@ -948,7 +974,7 @@ INPUTBOX
 168
 212
 worm_population
-50
+5000
 1
 0
 Number
@@ -1372,12 +1398,12 @@ NetLogo 5.3.1
 @#$#@#$#@
 @#$#@#$#@
 <experiments>
-  <experiment name="Hypothesis-1 Test" repetitions="1" runMetricsEveryStep="true">
+  <experiment name="pH-Hypothesis" repetitions="8" runMetricsEveryStep="true">
     <setup>setup
 setup_sim</setup>
     <go>go</go>
-    <metric>count turtles</metric>
-    <steppedValueSet variable="ph_tolerance" first="4" step="0.2" last="5.5"/>
+    <metric>count adults</metric>
+    <steppedValueSet variable="ph_tolerance" first="4" step="0.1" last="6"/>
   </experiment>
   <experiment name="Test" repetitions="2" runMetricsEveryStep="true">
     <setup>setup
@@ -1385,6 +1411,7 @@ setup_sim</setup>
     <go>go</go>
     <metric>count adults</metric>
     <enumeratedValueSet variable="ph_tolerance">
+      <value value="6.5"/>
       <value value="7"/>
     </enumeratedValueSet>
   </experiment>
@@ -1395,12 +1422,12 @@ setup_sim</setup>
     <metric>count adults</metric>
     <steppedValueSet variable="temperature_tolerance" first="0" step="1" last="10"/>
   </experiment>
-  <experiment name="Does temperature work?" repetitions="1" runMetricsEveryStep="true">
+  <experiment name="Does temperature work?" repetitions="10" runMetricsEveryStep="true">
     <setup>setup
 setup_sim</setup>
     <go>go</go>
     <metric>count adults</metric>
-    <steppedValueSet variable="temperature_tolerance" first="5" step="5" last="20"/>
+    <steppedValueSet variable="temperature_tolerance" first="5" step="2.5" last="20"/>
   </experiment>
 </experiments>
 @#$#@#$#@
