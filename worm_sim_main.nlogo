@@ -358,7 +358,7 @@ to go
 
   calculate_time
 
-    if (year = 29) [
+    if (year = 14) [
     set final_population (final_population + count adults)
 
 ;    if (count adults > max_pop)
@@ -366,7 +366,7 @@ to go
 
   ]
 
-  if (year = 30) [
+  if (year = 14) [
     export_data save_number
     stop
     ]
@@ -563,7 +563,7 @@ temperature_tolerance
 temperature_tolerance
 0
 100
-5
+8
 1
 1
 NIL
@@ -1416,12 +1416,12 @@ setup_sim</setup>
     <metric>count adults</metric>
     <steppedValueSet variable="ph_tolerance" first="4" step="0.5" last="6"/>
   </experiment>
-  <experiment name="Does temperature work?" repetitions="10" runMetricsEveryStep="true">
+  <experiment name="Does temperature work?" repetitions="1" runMetricsEveryStep="true">
     <setup>setup
 setup_sim</setup>
     <go>go</go>
     <metric>count adults</metric>
-    <steppedValueSet variable="temperature_tolerance" first="5" step="2.5" last="20"/>
+    <steppedValueSet variable="temperature_tolerance" first="0" step="1" last="10"/>
   </experiment>
 </experiments>
 @#$#@#$#@
