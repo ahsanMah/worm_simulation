@@ -238,7 +238,7 @@ to load_agents [name]
       set parent_breed item 2 ?
       set size 1
       set shape item 3 ?
-      set maturation 70
+      set maturation_wait 70
       set wait_period item 4 ?
       set hatch_temp item 5 ?
       set stamina 5
@@ -558,7 +558,7 @@ ph_tolerance
 ph_tolerance
 0
 7
-4
+4.5
 0.1
 1
 NIL
@@ -1448,13 +1448,13 @@ setup_sim</setup>
     <metric>count adults</metric>
     <steppedValueSet variable="temperature_tolerance" first="5" step="2.5" last="20"/>
   </experiment>
-  <experiment name="Does pH work?" repetitions="4" runMetricsEveryStep="true">
+  <experiment name="Does pH work?" repetitions="1" runMetricsEveryStep="true">
     <setup>setup
 setup_sim</setup>
     <go>go</go>
     <metric>count adults</metric>
     <metric>finalPop</metric>
-    <steppedValueSet variable="pH_tolerance" first="4" step="0.5" last="7"/>
+    <steppedValueSet variable="pH_tolerance" first="4.5" step="0.5" last="7"/>
   </experiment>
 </experiments>
 @#$#@#$#@

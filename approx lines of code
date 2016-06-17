@@ -1,0 +1,1376 @@
+extensions [array csv table gis]
+__includes["environment.nls" "agents.nls" "gis-support.nls"]
+
+globals[
+  species_data
+  monthly_data
+  output_data
+  has_collected
+  report_month
+  area_list
+  default_food_value
+  temperature_table
+  final_population
+  max_pop
+  pop_data
+  ;index positions of data in arrays
+  ;month monitor species_number population density genetic diversity
+]
+to setup
+  clear-all
+  print "Loading temperature data..."
+  load_temperature
+  print "Setting up environment..."
+  setup_environment
+  ;setup_gis
+  print "Setting up agents..."
+  setup_agents
+  print "Done"
+
+  set species_data [] ;list of collected info of each species for each monitor
+  set monthly_data [] ;list of data collected each month
+  set area_list []
+  set pop_data []
+  set report_month 0
+  set final_population 0
+  set max_pop 0
+
+  set-default-shape sides "line"
+  ;setup_sim
+  recolor_patches
+  reset-ticks
+end
+
+to initialize_monitors
+  draw_monitor 0 60 0 60
+  draw_monitor 0 60 240 300
+  draw_monitor 240 300 0 60
+  draw_monitor 240 300 240 300
+  draw_monitor 120 180 120 180
+end
+
+
+to setup_sim
+  ;setup
+
+  print "Loading from simulation files..."
+  load_patches save_name
+  load_agents save_name
+  print "Done Loading"
+end
+
+to draw_river
+  if mouse-down?
+  [
+    ask patch mouse-xcor mouse-ycor
+    [
+      set food-here 0
+      set permeability speed_in_water
+      set pcolor blue
+    ]
+    display
+  ]
+end
+
+to draw_highway
+  if mouse-down?
+  [
+    ask patch mouse-xcor mouse-ycor
+    [
+      set permeability road_speed
+      set pcolor turquoise
+      set food-here default_food_value
+    ]
+    display
+  ]
+end
+
+to draw_other
+  if mouse-down?
+  [
+    ask patch mouse-xcor mouse-ycor
+    [
+      if (change: = "pH" or change: = "temperature difference and pH")
+      [
+        set ph patch_ph
+      ]
+      if (change: = "temperature difference" or change: = "temperature difference and pH")
+      [
+        set temp_diff_here temperature_difference
+      ]
+      recolor-patch
+    ]
+  ]
+end
+
+to pen
+  if mouse-down?
+  [
+    ask patch mouse-xcor mouse-ycor
+    [
+      if (change: = "water")
+      [
+        set food-here 0
+        set permeability speed_in_water
+        set pcolor blue
+      ]
+      if (change: = "highway")
+      [
+        set food-here default_food_value
+        set permeability road_speed
+        set pcolor turquoise
+
+      ]
+      if (change: = "pH" or change: = "temperature difference and pH")
+      [
+        set ph patch_ph
+        recolor-patch
+      ]
+      if (change: = "temperature difference" or change: = "temperature difference and pH")
+      [
+        set temp_diff_here temperature_difference
+        recolor-patch
+      ]
+    ]
+    display
+  ]
+end
+
+to save_obstacles [name]
+  let filename1 (word "data/parameters/myobstacle"  name ".csv")
+  csv:to-file filename1 obstacle_list
+  print "Saved to file"
+end
+
+to load_obstacles [name]
+  let filename (word "data/parameters/myobstacle"  name ".csv")
+  set obstacle_list csv:from-file filename
+  print "Loaded from file: "
+  print obstacle_list
+  ;;draw_obstacles
+end
+
+to save_patches [name]
+  save_monitors name
+  save_obstacles name
+  let filename (word "data/parameters/mypatches" name ".csv")
+  let i min-pxcor
+  let j min-pycor
+  carefully [file-delete filename] []
+  while [(i <= max-pxcor)]
+  [
+    while [(j <= max-pycor)]
+    [
+      ask patch i j
+      [
+        let info (list i j ph food-here permeability local_death_threshold temp_diff_here pcolor)
+        file-open filename
+        file-print csv:to-row info
+        file-close
+        set j j + 1
+      ]
+    ]
+    set j min-pycor
+    set i i + 1
+  ]
+
+end
+
+to load_patches [name]
+  load_obstacles name
+  let filename (word "data/parameters/mypatches" name ".csv")
+  let data csv:from-file filename
+  foreach (data)
+  [
+    ask patch (item 0 ?) (item 1 ?)
+    [
+      set ph item 2 ?
+      set food-here item 3 ?
+      set permeability item 4 ?
+      set local_death_threshold item 5 ?
+      set temp_diff_here item 6 ?
+      set being_monitored false
+      set pcolor item 7 ?
+    ]
+  ]
+  load_monitors name
+  calculate_temp
+  recolor_patches
+end
+
+to save_agents [name]
+  export_data name
+  let filename1 (word "data/parameters/specieslist" name ".csv")
+  let data []
+  foreach table:to-list species_list [ ;converts table into listto store as csv
+    set data lput (sentence item 0 ? array:to-list item 1 ?) data
+  ]
+  csv:to-file filename1 data
+
+  let filename (word "data/parameters/myagents"  name ".csv")
+
+  carefully [file-delete filename] []
+  ask turtles
+  [
+    let info (list xcor ycor parent_breed shape wait_period hatch_temp genetic_diversity max_temp_resist low_temp_resist max_ph_resist)
+    file-open filename
+    file-print csv:to-row info
+    file-close
+  ]
+  print "Saved to file"
+end
+
+to load_agents [name]
+  ;load_monitors name
+  let filename1 (word "data/parameters/specieslist"  name ".csv")
+  let filename (word "data/parameters/myagents" name ".csv")
+  let data []
+  set species_list table:make
+  set data csv:from-file filename1
+  foreach data [table:put species_list item 0 ? array:from-list (list item 1 ? item 2 ?)]
+  print "Loaded from file: "
+  print species_list
+  set data csv:from-file filename
+  foreach (data)
+  [
+    create-adults 1 [
+      setxy item 0 ? item 1 ?
+      set parent_breed item 2 ?
+      set size 1
+      set shape item 3 ?
+      set maturation 70
+      set wait_period item 4 ?
+      set hatch_temp item 5 ?
+      set stamina 5
+      set genetic_diversity item 6 ?
+      set max_temp_resist item 7 ?
+      set low_temp_resist temperature_tolerance
+      set max_ph_resist ph_tolerance
+      set color (item parent_breed color_list)
+      set death_threshold normal_death_threshold
+      set reprod_threshold normal_reproduction_rate
+    ]
+  ]
+end
+
+to load_temperature
+  let filename (word "data/parameters/temperaturelist.csv")
+  file-open filename
+  set temperature_table table:make
+  let i 0
+  while [i < 8]
+  [
+    let nothing csv:from-row file-read-line
+    set i i + 1
+  ]
+  let days_since_start 0
+  while [ not file-at-end? ]
+  [
+    let row (csv:from-row file-read-line)
+    let row_entry (item 1 row)
+    ;show row_entry
+    table:put temperature_table days_since_start row_entry
+    set days_since_start days_since_start + 1
+  ]
+
+
+  file-close
+
+end
+
+to save_monitors [name]
+  let filename (word "data/parameters/mymonitors" name ".csv")
+  let i min-pxcor
+  let j min-pycor
+  carefully [file-delete filename] []
+  file-open filename
+  while [(i <= max-pxcor)]
+  [
+    while [(j <= max-pycor)]
+    [
+      ask patch i j
+      [
+        let info (list i j being_monitored monitor_index monitor_size monitor_number)
+        file-open filename
+        file-print csv:to-row info
+        file-close
+        set j j + 1
+      ]
+    ]
+    set j min-pycor
+    set i i + 1
+  ]
+end
+
+to load_monitors [name]
+  let filename (word "data/parameters/mymonitors" name ".csv")
+  let data csv:from-file filename
+  foreach (data)
+  [
+    ask patch (item 0 ?) (item 1 ?)
+    [
+      set being_monitored item 2 ?
+      set monitor_index item 3 ?
+      set monitor_size item 4 ?
+    ]
+    set monitor_number item 5 ?
+  ]
+  let monitor_list n-values monitor_number [?]
+  foreach monitor_list [update_monitor_area ?]
+  recolor_patches
+end
+
+to export_data [name]
+  let filename (word "data/output/simulation" save_name ph_tolerance ".csv")
+  let filename2 (word "data/output/finalPop" save_name ph_tolerance ".csv")
+  csv:to-file filename monthly_data
+  csv:to-file filename2 pop_data
+  print "Exported simulation data to file"
+end
+
+to clear_arrays
+
+  set species_data []
+  let monitor_list n-values monitor_number [?] ;(?) allows to create a list from 0 to monitor number
+  foreach table:to-list species_list [
+    let current_species_number item 0 ?
+    ;allows for the storage of other species characteristics
+    ;let current_species_info array:to-list item 1 ?
+
+    ;n*m matrix of species data for every monitor
+    let species_matrix array:from-list monitor_list  ;n = number of species charcteristics being collected, m = number of monitors
+    foreach monitor_list [
+      array:set species_matrix ? array:from-list (list report_month ? current_species_number 0 0) ;resets population, density
+    ]
+    set species_data lput species_matrix species_data ;list of matrices
+  ]
+  set has_collected false
+end
+
+
+to-report maxPop
+  report max_pop
+end
+
+to-report finalPop
+  report final_population / 365
+end
+
+to go
+
+  if (count turtles = 0) [
+    export_data save_number
+    stop
+  ]
+
+  calculate_time
+
+  if (year = 9) [
+    set final_population (final_population + count adults)
+  ]
+
+  if (year = 10) [
+    set pop_data lput (list year (final_population / 365)) pop_data
+    export_data save_number
+    set final_population 0
+
+  ]
+
+  if (year = 19) [
+    set final_population (final_population + count adults)
+  ]
+
+  if (year = 20) [
+    set pop_data lput (list year (final_population / 365)) pop_data
+    export_data save_number
+    set final_population 0
+  ]
+
+  if (year = 29) [
+    set final_population (final_population + count adults)
+
+    ;    if (count adults > max_pop)
+    ;    [set max_pop (count adults)]
+
+  ]
+
+  if (year = 30) [
+    set pop_data lput (list year (final_population / 365)) pop_data
+    export_data save_number
+    stop
+  ]
+
+  if (day_of_month = (item current_month num_days - 1))[ ;clears arrays a day before collection
+    clear_arrays
+  ]
+
+  if (ticks mod (periods-in-day) = 0) [
+    set current_day current_day + 1
+    set global_temperature table:get temperature_table current_day
+    ;calculate_temp
+    ;update_organic_matter
+
+    if (global_temperature > species_hatch_temperature) [
+      ask cocoons [
+        check_if_hatch
+      ]
+    ]
+  ]
+
+  ask adults [
+    ;update_speed
+    if (ticks mod (periods-in-day) = 0) [
+      update_maturity
+      update_thresholds
+      check_reproduction
+    ]
+
+    move
+
+    ;set food-here food-here + organic-regen
+  ]
+  ask patches with [being_monitored = true]
+  [
+    if (day_of_month = item current_month num_days)[
+      if (has_collected = false)[
+        collect_data
+      ]
+    ]
+  ]
+  ;saves monthly data to accumulutor list
+  if (day_of_month = item current_month num_days)[
+    if (has_collected = false) [
+      ;show species_data
+      foreach species_data [
+        let monitor_list (array:to-list ?)
+        foreach monitor_list [
+          set monthly_data lput (array:to-list ?) monthly_data
+        ]
+      ]
+      set report_month report_month + 1
+      set has_collected true
+    ]
+  ]
+  tick
+end
+
+globals [
+  ;annual globals
+  normal_death_threshold max_death_threshold  ;;probability of death
+  normal_reproduction_rate  ;;probablity of reproducing
+
+  ;daily globals
+  amount_egested
+  consumption-in-period
+  periods-in-day
+  counter
+  organic-regen
+  steps-per-ie
+  max_stamina
+  min_stamina
+  agent_size
+  
+  species_list
+
+  temp_number
+  temp_genetic_diversity 
+  temp_hatch_temperature
+  temp_population
+  temp_start_x
+  temp_start_y
+  
+  shape_list
+  color_list
+  
+  ]
+
+breed [cocoons]
+breed [adults]
+
+turtles-own [
+  death_p     ;probability of death
+  reprod_p    ;probability of reproduction
+  
+  maturation
+  wait_period ;days taken by cocoon to hatch given optimal temperature considitions
+  wait_days
+  hatch_temp  ;minimum temperature required for cocoons to hatch
+
+  stamina     ;helps simulate starvation
+  time-since-eaten
+  food-consumed-last
+  iseating?
+  cycle-counter
+  genetic_diversity
+  max_temp_resist
+  low_temp_resist
+  max_ph_resist
+  parent_breed
+  ;population
+  death_threshold
+  reprod_threshold
+  ]
+
+to setup_agents
+  
+  set normal_death_threshold 0.00685 / (periods-in-day) ; Simulates a 4 year life span
+  set normal_reproduction_rate 0.1
+  set max_death_threshold 40
+  set agent_size 0.5
+  set steps-per-ie 5
+  set max_stamina 5
+  set min_stamina 1
+
+  set counter 0
+  set amount_egested 1
+  set consumption-in-period 1
+  
+  set species_list table:make
+  set shape_list (list "red_worm" "cyan_worm" "pink_worm" "orange_worm" "magenta_worm" "violet_worm")
+  set color_list (list red cyan pink orange magenta violet)
+  ;foreach species_list [create_species ?]
+end
+
+to mouse_add_species
+  ifelse (mouse-down?)
+    
+    [
+    add_species mouse-xcor mouse-ycor worm_population species_number
+    stop
+    ]
+    [
+    if anyselected?
+    [
+      let i 0
+      while [i < worm_population]
+      [
+       let rand_x (random-float (x-max - x-min)) + x-min
+       let rand_y (random-float (y-max - y-min)) + y-min
+       if ([pcolor] of patch rand_x rand_y != blue and [pcolor] of patch rand_x rand_y != grey)
+       [
+       add_species rand_x rand_y 1 species_number
+       set i i + 1
+       ]
+      ]
+      stop
+    ]
+    
+    ]
+end
+
+
+
+to add_species [x y population species_num]
+  let new_species (list species_num species_genetic_diversity species_hatch_temperature population x y)
+  
+   
+  ifelse (table:has-key? species_list species_num) [
+    ;create new population with existing settings
+    set new_species array:to-list table:get species_list species_num
+    set new_species fput species_num new_species
+    set new_species sentence new_species (list population x y)
+    let species_info table:get species_list species_num
+    
+  ] 
+  [ table:put species_list species_num (array:from-list (list species_genetic_diversity species_hatch_temperature))]
+
+  ;foreach table:to-list species_list [show ?]
+  
+  create_species new_species
+  
+  
+end
+
+
+to create_species [species]
+  
+  set temp_number item 0 species
+  set temp_genetic_diversity item 1 species
+  set temp_hatch_temperature item 2 species
+  set temp_population item 3 species
+  set temp_start_x item 4 species
+  set temp_start_y item 5 species
+  
+  
+  
+ create-adults temp_population[
+    set parent_breed (temp_number - 1)
+    ;move-to one-of patches with [permeability > 0]
+    setxy temp_start_x temp_start_y
+    set size agent_size
+
+    set shape (item parent_breed shape_list)
+
+    set maturation 70
+    set wait_period 15 + random-normal 20 3;simulates a wait period of 15 to 65 days 
+    set hatch_temp temp_hatch_temperature
+    set stamina 5
+    set genetic_diversity temp_genetic_diversity ; 0-1 measure of genetic diversity of the species
+    set max_temp_resist random-normal 25 (2 * genetic_diversity)
+    set low_temp_resist random-normal temperature_tolerance (2 * genetic_diversity)
+    set max_ph_resist random-normal ph_tolerance (2 * genetic_diversity)
+    set death_threshold normal_death_threshold
+    set reprod_threshold normal_reproduction_rate 
+   ]
+end
+
+
+to move
+  let bool false
+  if (pcolor != blue) [
+    right (random 181) - 90
+    
+    ;  if ((count (patch-set (patch-ahead (speed * permeability / periods-in-day))) with [pcolor = blue]) > 
+    ;     (count (patch-set (patch-here)) with [pcolor != blue]))
+    ;  [
+    if (patch-ahead (speed * permeability / periods-in-day) != nobody)[ 
+      ask patch-ahead (speed * permeability / periods-in-day) [
+        
+        if pcolor = blue [
+          set bool true
+        ]
+      ]
+    ]
+  ]
+  
+  if (bool = true)[
+          if (random 100000 <= 99999)
+        [
+          right 180
+        ]
+  ]
+  
+  if ( count (patch-set (patch-ahead  (speed * permeability / periods-in-day))) with [pcolor = grey]) > 0
+  [
+   right 180
+   
+  ]
+
+  forward speed * permeability / periods-in-day
+  eat
+  check_death
+end
+
+
+to eat
+
+end
+
+
+to egest
+  set food-consumed-from food-consumed-from - ((1 - amount_egested) * food-consumed-last / steps-per-ie)
+  ;;set food-here food-here + ((1 - amount_egested) * food-consumed-last)
+  set food-consumed-last food-consumed-last / steps-per-ie
+end
+
+to check_death  
+  random-seed new-seed
+  set death_p random-float 100
+  
+;  ifelse (stamina < min_stamina) [
+;    die
+;    ] ;; dies if out of energy
+ ; [
+    if (death_p < death_threshold) [
+      ;show death_threshold
+      die
+      ] ;; dies of cold/pH/natural causes
+  ;  ] 
+  
+  end
+
+to check_reproduction
+  ;;random-seed new-seed
+  set reprod_p random-float 100
+  if (reprod_p < reprod_threshold and pcolor != blue) [
+    if (maturation = 70) [
+      hatch-cocoons 1 [
+        set maturation 0
+        set wait_days 0
+        set color (item parent_breed color_list)
+        set shape "dot"
+        ]
+      ]
+  ]
+end
+
+;updates probablities of dying and reproducing
+to update_thresholds
+  ;cold reduces survival rate
+  
+  ifelse (global_temperature > max_temp_resist) [ set death_threshold max_death_threshold / (periods-in-day)]
+  [ifelse (global_temperature < low_temp_resist) [ set death_threshold max_death_threshold / (periods-in-day)]
+    [set death_threshold normal_death_threshold]
+    ]
+  
+  
+    ;reproduction rate affected by temperature
+  ifelse (global_temperature > 10) [
+    set reprod_threshold (max_reproduction_rate * (temperature / 15)) ] ; probability of reproducing increases as it gets warmer (10 * periods-in-day)
+  [set reprod_threshold normal_reproduction_rate]
+
+  
+  ;;pH of soil also affects survival rate
+  if (ph < max_ph_resist) [
+    let ph_factor (3 / 42) * ((e ^ (max_ph_resist - ph) ) - 1) ; function ensures that a ph difference of 3 will have a higher death probability
+    set death_threshold (death_threshold + ph_factor)  ; higher the ph lower the survival
+    ;set death_threshold death_threshold + random-float death_variance
+    ;set reprod_threshold (reprod_threshold - (ph_factor))
+  ]
+;  
+
+end
+
+to update_maturity
+    if (maturation < 70) [
+      set maturation maturation + 1
+    ]
+end
+
+;;hatches temperature is optimum for birth
+to check_if_hatch
+      set wait_days wait_days + 1
+      ;show wait_period
+      if (wait_days >= wait_period) [
+        ifelse (random 100 < 65)[         ;65% chance of hatching
+          set breed adults
+          set size agent_size
+          set stamina 5
+          set shape (item parent_breed shape_list)
+        ]
+        [die]
+      ]
+end
+
+
+globals [
+  ;;annual globals
+  day_num ;;day number
+  year
+  global_temperature
+  ;temperature ;temperature in a given day
+  var ;multi-use temporary variable
+
+  current_month
+  current_day
+  next_month
+  num_days
+  temperatures
+  day_of_month
+  
+  monitor_number
+  obstacle
+  obstacle_list
+  temp_arr
+  speed_in_water
+  road_speed
+
+  temp_shape
+  temp_size
+  temp_x
+  temp_y
+  temp_pH
+  temp_movable
+  
+  selected
+  
+  x-min
+  x-max
+  y-min
+  y-max
+  
+  ]
+
+breed [sides side]
+
+patches-own
+[
+  ph                     ;pH values ranging from 0-14
+  food-here              ;amount of food on this patch
+  permeability           ;0 - 1, 0 being completely impermeable, 1 meaning complete freedom of movement
+  local_death_threshold
+  food-consumed-from
+  temp_diff_here
+  temperature
+  being_monitored
+  monitor_size
+  monitor_index 
+]
+
+to setup_environment
+  
+  set day_num starting_day
+  set year 0
+  set periods-in-day 1;;0
+  set speed_in_water 0.4
+  set road_speed 2
+  set default_food_value 5000
+
+  ;set temperatures (list January February March April May June July August September October November December)
+;  ;set temperatures (list -5 -4 1 7 13 18 21 20 15 9 4 -2)
+  set num_days (list 31 28 31 30 31 30 31 31 30 31 30 31)
+  set current_month 0
+  set var starting_day
+  set monitor_number 0
+
+  while [var > 0]
+  [
+    if var > item current_month num_days
+    [
+     set current_month current_month + 1
+
+    ]
+    set var var - item current_month num_days
+  ]
+;  set global_temperature random-normal (item current_month temperatures) (1)
+  set global_temperature table:get temperature_table starting_day
+  set current_day starting_day
+  ;calculate_temp ;uncomment this if you want to have temperature vary between patches
+  
+  set day_of_month (var + (item ((current_month - 1) mod 12) num_days))
+  ;;set next_month current_month + 1 mod 12
+  
+  ;set organic-regen 0.3 ;;0.004;; / 5
+ 
+ ;array used to temporarily store obstacle parameters
+  set obstacle n-values 6 [0]
+
+  ;print obstacle
+  set obstacle_list []
+  
+  ask patches
+  [
+    set permeability 1
+    set ph 7
+    set temp_diff_here 0
+    set being_monitored false
+    set monitor_index -1
+    setup-initial-food
+    recolor-patch
+  ]
+  
+end
+
+to calculate_temp
+  ask patches
+  [
+    set temperature global_temperature + temp_diff_here
+  ]
+;    set temperature (4 * var * (180 - var)) / (40500 - var * (180 - var))
+;    set temperature temperature * max_temperature ;scales temperature to real world values
+
+end
+
+to recolor_patches
+  ask patches
+  [
+   recolor-patch 
+  ]
+end
+
+to draw_obstacles
+    ask patches [
+      foreach obstacle_list [setup-obstacles ? ]
+      recolor-patch
+    ]
+    ;update_monitor_area
+    ;recolor_patches
+
+end
+
+to calculate_time
+  if (ticks mod (periods-in-day) = 0) [
+    set day_num day_num + 1
+    set day_of_month day_of_month + 1
+  ]
+    if day_of_month > item current_month num_days
+    [
+      set current_month (current_month + 1) mod 12
+      set day_of_month 1
+      ;show current_month
+  ]
+  
+  if (day_num = 366) [
+    set year year + 1
+    set day_num 1 ;;reset for every year
+  ]
+  
+
+  end
+
+to setup-initial-food
+;  let setup-patch one-of patches
+;  if (distancexy 0 60) < 30
+;  [
+;    set food-here 400
+;  ]
+;
+;  let setup-patch2 one-of patches
+;  if (distancexy 0 -60) < 30
+;  [
+;    set food-here 400
+;  ]
+
+;set food-here (random 251 + 250)
+  set food-here default_food_value
+end
+
+to recolor-patch
+  if (pcolor != blue and pcolor != grey and pcolor != turquoise)
+  [
+
+    if (Show: = "pH")
+    [
+      if (ph = 7)
+      [
+       set pcolor white 
+      ]
+      if (ph > 7)
+      [
+       set pcolor scale-color yellow ph 16 7 
+      ]
+      if (ph < 7)
+      [
+       set pcolor scale-color green ph -2 7
+      ]
+    ]
+    if (Show: = "food")
+    [
+      set pcolor scale-color green food-here 6000 0
+    ]
+    if (Show: = "temperature")
+    [
+      if (temp_diff_here = 0)
+      [
+        set pcolor white
+      ]
+      if (temp_diff_here > 0)
+      [
+        set pcolor scale-color red temp_diff_here 10 0 
+      ]
+      if (temp_diff_here < 0)
+      [
+        set pcolor scale-color violet temp_diff_here -10 0
+      ]
+    ]
+
+    if (Show: = "monitor") [
+      if (being_monitored) [set pcolor orange]
+    ]
+
+    
+  ]
+end
+
+
+to change_speed
+  ask patches
+  [
+   if (permeability = 0.05) 
+   [
+    set permeability speed_in_water 
+   ]
+  ]
+end
+
+to edit_environment
+  if mouse-down? [
+    ifelse selected? mouse-xcor mouse-ycor
+    [
+      deselect
+    ]
+    [
+      handle-select
+    ]
+    
+  ]
+  display
+end
+
+to recolor-selected
+
+  if (obstacle_shape = "rectangle")[
+  ask patches
+  [
+   if selected? pxcor pycor
+   [
+    if (change: = "pH" or change: = "pH and temperature difference")[set ph patch_ph]
+    if (change: = "temperature difference" or change: = "pH and temperature difference")[set temp_diff_here temperature_difference]
+    recolor-patch
+   ] 
+  ]
+  ]
+  
+  if (obstacle_shape = "circle")
+  [
+    adjust-sides
+    let mt_size min (list (x-max - x-min) (y-max - y-min)) / 2
+    set temp_x (x-max - x-min) / 2 + x-min
+    set temp_y (y-max - y-min) / 2 + y-min
+    ask patches
+    [
+      if selected? pxcor pycor and (distancexy temp_x temp_y) < mt_size
+      [ 
+        if (change: = "pH" or change: = "pH and temperature difference")[set ph patch_ph]
+        if (change: = "temperature difference" or change: = "pH and temperature difference")[set temp_diff_here temperature_difference]
+        recolor-patch
+      ]
+    ]
+      
+  ]
+  
+  if (obstacle_shape = "mountain")
+  [
+    adjust-sides
+    let mt_size min (list (x-max - x-min) (y-max - y-min)) / 2
+    set temp_x (x-max - x-min) / 2 + x-min
+    set temp_y (y-max - y-min) / 2 + y-min
+    ask patches
+    [
+      if selected? pxcor pycor and (distancexy temp_x temp_y) < mt_size
+      [
+        if (change: = "pH" or change: = "pH and temperature difference")[set ph (ph - ((ph - patch_ph) / mt_size) * (mt_size - distancexy temp_x temp_y) )]
+        if (change: = "temperature difference" or change: = "pH and temperature difference")[set temp_diff_here (temp_diff_here + ((temperature_difference) / mt_size) * (mt_size - distancexy temp_x temp_y))]
+        recolor-patch
+      ]
+    ]
+  ]
+    
+    if (obstacle_shape = "monitor")
+    [
+      set monitor_number monitor_number + 1
+      ask patches
+      [
+        if selected? pxcor pycor
+        [
+          set being_monitored true
+          set monitor_index monitor_number - 1
+          set monitor_size temp_size
+          recolor-patch
+        ]
+        
+      ]
+      update_monitor_area (monitor_number - 1)
+  ]
+end
+
+to draw_monitor [xmin xmax ymin ymax]
+  set monitor_number monitor_number + 1
+  ask patches
+  [
+    if (pxcor >= xmin and pxcor <= xmax and pycor >= ymin and pycor <= ymax)
+      [
+        set being_monitored true
+        set monitor_index monitor_number - 1
+        set monitor_size temp_size
+        recolor-patch
+      ]
+  ]
+end
+
+to handle-select
+  let old-x mouse-xcor
+  let old-y mouse-ycor
+  while [mouse-down?]
+  [
+    select old-x old-y mouse-xcor mouse-ycor
+    display
+  ]
+  if not any? selected [ deselect ]
+end
+
+to adjust-sides 
+  set y-max max [ycor] of sides
+  set y-min min [ycor] of sides
+  set x-max max [xcor] of sides
+  set x-min min [xcor] of sides
+end
+
+to-report anyselected?
+  let bool false
+  ask patches
+  [
+    if selected? pxcor pycor
+    [
+     set bool true 
+    ]
+  ]
+  report bool
+end
+
+to-report selected? [x y]
+  if not any? sides [ report false ]
+  adjust-sides  
+  report x >= x-min and x <= x-max and y >= y-min and y <= y-max
+end
+
+to select [x1 y1 x2 y2]
+  deselect
+  make-side x1 y1 x2 y1
+  make-side x1 y1 x1 y2
+  make-side x1 y2 x2 y2
+  make-side x2 y1 x2 y2
+  set selected patches with [selected? pxcor pycor]
+  
+end
+
+to deselect
+  ask sides [die]
+  set selected no-patches
+end
+
+to make-side [x1 y1 x2 y2]
+  create-sides 1 [
+    set color gray
+    setxy (x1 + x2) / 2
+          (y1 + y2) / 2
+    facexy x1 y1
+    set size 2 * distancexy x1 y1
+  ]
+end
+
+to setup-obstacles [one_obstacle]
+  ;if obstacle parameters given
+
+  if (item 0 one_obstacle != 0) [
+    ;looks at items in the array to setup the obstacle
+
+    set temp_shape item 0 one_obstacle
+    set temp_size item 1 one_obstacle
+    set temp_x item 2 one_obstacle
+    set temp_y item 3 one_obstacle
+    set temp_pH item 4 one_obstacle
+    set temp_movable item 5 one_obstacle
+
+
+    if temp_shape = "mountain"
+    [
+      if (distancexy temp_x temp_y) < temp_size 
+      [
+        if (permeability != speed_in_water and permeability != road_speed)
+        [
+          set permeability 1
+        ]
+        set ph (ph - ((ph - patch_ph) / temp_size) * (temp_size - distancexy temp_x temp_y) )
+        set temp_diff_here (temp_diff_here + ((temperature_difference) / temp_size) * (temp_size - distancexy temp_x temp_y))
+      ]
+    ]
+    
+    if temp_shape = "lake"
+    [
+      if (distancexy temp_x temp_y) < temp_size 
+      [
+        set permeability speed_in_water
+        set food-here 0
+        set ph 7
+      ]
+    ]
+    
+    
+    if temp_shape = "square"
+    [
+      if pxcor >= temp_x - temp_size and pxcor <= temp_x + temp_size and pycor >= temp_y - temp_size and pycor <= temp_y + temp_size
+      [
+         set permeability speed_in_water
+         set food-here 0
+      ]
+    ]
+
+    if temp_shape = "horizontal-line"
+    [
+      if distancexy temp_x temp_y <= temp_size and temp_y = pycor
+      [
+        set permeability speed_in_water
+        set food-here 0
+      ]
+    ]
+    
+    if temp_shape = "vertical-line"
+    [
+      if distancexy temp_x temp_y <= temp_size and temp_x = pxcor
+      [
+          set permeability speed_in_water
+          set food-here 0
+      ]
+    ]
+    
+    if temp_shape = "monitor"
+    [
+      if (distancexy temp_x temp_y) < temp_size 
+        [
+
+        ]
+    ]
+
+  ]
+end
+
+to update_monitor_area [index]
+  set area_list lput ((count patches with [monitor_index = index and pcolor != blue and pcolor != grey]) / 900) area_list
+  show area_list
+end
+
+to collect_data
+    if (being_monitored) [
+      let patch_population 0
+      
+      foreach species_data [
+        set patch_population (count turtles-here with [parent_breed = ((array:item (array:item ? monitor_index) 2)  - 1)])
+        let area item monitor_index area_list
+        array:set (array:item ? monitor_index) 3 ((array:item (array:item ? monitor_index) 3) + patch_population) ;updates (increments) species populations
+        array:set (array:item ? monitor_index) 4 ((array:item (array:item ? monitor_index) 3) / area)     ;updates density 
+      ]
+    ]
+  
+end
+
+globals[
+   soil_dataset ;will be used for storing gis vector data
+   road_dataset
+    road_features
+    road_vertexlist
+    road_point
+    last_point
+   ph_map
+ 
+  ]
+
+patches-own[
+ symbol ;helps identify feature type for gis support (W = Water etc.)
+ road 
+
+]
+
+to setup_gis
+  print "Loading GIS data..."
+  set soil_dataset gis:load-dataset "data/parameters/soil/spatial/soilmu_a_aoi.shp"
+
+  print "Setting up world..."
+  gis:set-world-envelope-ds (gis:envelope-of soil_dataset)
+  set road_dataset gis:load-dataset "data/parameters/roads/roadmap.shp"
+  gis:apply-coverage soil_dataset "MUSYM" symbol
+  ;gis:apply-coverage road_dataset "STATE_CODE" road
+  set road_features gis:feature-list-of road_dataset
+  set road_vertexlist []
+  foreach road_features
+  [
+    ;if i = 1
+    ;[
+   set road_vertexlist lput gis:vertex-lists-of ? road_vertexlist
+   ;show road_vertexlist
+    ;]
+    ;set i i + 1
+  ]
+  load_ph
+  print "Drawing map..." 
+  draw_map
+  print "Mapping GIS features to patches..."
+  map_patches
+  print "Finished setting up GIS"
+  
+  ;gis:set-drawing-color turquoise
+  ;gis:draw road_dataset 5
+end
+
+to load_ph
+  set ph_map table:make
+  let filename ("data/parameters/soil/pH_key.csv")
+  let ph_list csv:from-file filename
+  foreach ph_list [
+    table:put ph_map (item 0 ?) (item 2 ?)
+    ]
+end
+
+
+to draw_map
+  gis:set-drawing-color black
+  gis:draw soil_dataset 0.1
+end
+
+to map_patches
+ set last_point []
+  ask patches[
+    
+    if (table:has-key? ph_map symbol)[
+      let gis_ph (table:get ph_map symbol)
+      ifelse (gis_ph != "")[
+       ;set pcolor scale-color green gis_ph 14 0
+       set ph gis_ph
+       ]
+       [ set pcolor grey
+         set permeability 0
+         ]
+    ]
+       
+   if (symbol = "W")
+    [
+      set pcolor blue
+      set permeability speed_in_water
+      set food-here 0
+    ]
+  ]
+  ;show road_vertexlist
+  foreach road_vertexlist
+    [
+      let vertex_lists ?
+      foreach vertex_lists
+      [
+        let road_point_list ?
+        foreach road_point_list [
+          set road_point gis:location-of ?;map_helper ?
+                                          ;show road_point
+                                          ;show "count"
+                                          ;show gis:type-of road_point
+          if not empty? road_point
+          [
+            ask patch item 0 road_point item 1 road_point
+            [
+              set permeability road_speed
+              set pcolor turquoise
+              set food-here default_food_value
+            ]
+            if not empty? last_point
+            [
+              let x1 item 0 road_point
+              let y1 item 1 road_point
+              let x2 item 0 last_point
+              let y2 item 1 last_point
+              let dist sqrt ((x2 - x1) ^ 2 + (y2 - y1) ^ 2)
+              let dex (x2 - x1) / dist
+              let dey (y2 - y1) / dist
+              let x-at x1
+              let y-at y1
+              ;show (not empty? last_point) and (not empty? road_point)
+              ;show x-at < x2 and y-at < y2
+              
+              while [x-at > x2]
+              [
+                ask patch x-at y-at
+                [
+                  set permeability road_speed
+                  set pcolor turquoise
+                  set food-here default_food_value
+                  ;print "coloring in between things"
+                ]
+                set x-at x-at + dex
+                set y-at y-at + dey
+              ]
+            ]
+          ]
+          ;show (not empty? last_point) and (not empty? road_point)
+           set last_point road_point
+        ]
+      ]
+    ]
+end
+
+to-report map_helper [thing]
+  foreach thing
+  [
+    
+    ;show gis:type-of ?
+    ;show gis:location-of ?
+    report gis:location-of ? ; item 0 thing
+
+  ]
+end
