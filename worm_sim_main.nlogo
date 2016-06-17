@@ -248,7 +248,6 @@ to load_agents [name]
       set max_ph_resist ph_tolerance
       set color (item parent_breed color_list)
       set death_threshold normal_death_threshold
-      set reprod_threshold normal_reproduction_rate
     ]
   ]
 end
@@ -394,7 +393,7 @@ to go
 
   ]
 
-  if (year = 14) [
+  if (year = 30) [
     set pop_data lput (list year (final_population / 365)) pop_data
     export_data save_number
     stop
@@ -487,7 +486,7 @@ BUTTON
 78
 43
 Setup
-ca\nsetup
+ca\nsetup\nload_patches save_name
 NIL
 1
 T
@@ -558,7 +557,7 @@ ph_tolerance
 ph_tolerance
 0
 7
-4.5
+3.8
 0.1
 1
 NIL
@@ -588,7 +587,7 @@ temperature_tolerance
 temperature_tolerance
 0
 100
-8
+0
 1
 1
 NIL
@@ -751,7 +750,7 @@ species_hatch_temperature
 species_hatch_temperature
 0
 25
-12
+15
 1
 1
 NIL
@@ -996,7 +995,7 @@ INPUTBOX
 168
 212
 worm_population
-50
+1
 1
 0
 Number
@@ -1441,12 +1440,12 @@ setup_sim</setup>
     <metric>count adults</metric>
     <steppedValueSet variable="ph_tolerance" first="4" step="0.5" last="6"/>
   </experiment>
-  <experiment name="Does temperature work?" repetitions="1" runMetricsEveryStep="true">
+  <experiment name="Does temperature work?" repetitions="10" runMetricsEveryStep="true">
     <setup>setup
 setup_sim</setup>
     <go>go</go>
     <metric>count adults</metric>
-    <steppedValueSet variable="temperature_tolerance" first="0" step="1" last="10"/>
+    <steppedValueSet variable="temperature_tolerance" first="5" step="2.5" last="20"/>
   </experiment>
   <experiment name="Does pH work?" repetitions="1" runMetricsEveryStep="true">
     <setup>setup
@@ -1455,6 +1454,16 @@ setup_sim</setup>
     <metric>count adults</metric>
     <metric>finalPop</metric>
     <steppedValueSet variable="pH_tolerance" first="4.5" step="0.5" last="7"/>
+  </experiment>
+  <experiment name="experiment" repetitions="1" runMetricsEveryStep="true">
+    <setup>setup</setup>
+    <go>go</go>
+    <metric>count turtles</metric>
+    <enumeratedValueSet variable="amount_egested">
+      <value value="2"/>
+      <value value="3"/>
+      <value value="4"/>
+    </enumeratedValueSet>
   </experiment>
 </experiments>
 @#$#@#$#@
