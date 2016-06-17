@@ -394,7 +394,7 @@ to go
 
   ]
 
-  if (year = 30) [
+  if (year = 14) [
     set pop_data lput (list year (final_population / 365)) pop_data
     export_data save_number
     stop
@@ -588,7 +588,7 @@ temperature_tolerance
 temperature_tolerance
 0
 100
-5
+8
 1
 1
 NIL
@@ -1441,12 +1441,12 @@ setup_sim</setup>
     <metric>count adults</metric>
     <steppedValueSet variable="ph_tolerance" first="4" step="0.5" last="6"/>
   </experiment>
-  <experiment name="Does temperature work?" repetitions="10" runMetricsEveryStep="true">
+  <experiment name="Does temperature work?" repetitions="1" runMetricsEveryStep="true">
     <setup>setup
 setup_sim</setup>
     <go>go</go>
     <metric>count adults</metric>
-    <steppedValueSet variable="temperature_tolerance" first="5" step="2.5" last="20"/>
+    <steppedValueSet variable="temperature_tolerance" first="0" step="1" last="10"/>
   </experiment>
   <experiment name="Does pH work?" repetitions="1" runMetricsEveryStep="true">
     <setup>setup
