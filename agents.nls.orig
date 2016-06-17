@@ -57,9 +57,9 @@ turtles-own [
 
 to setup_agents
   
-  set normal_death_threshold 0.00685 / (periods-in-day) ; Simulates a 4 year life span
+  set normal_death_threshold 0;0.00685 / (periods-in-day) ; Simulates a 4 year life span
   set normal_reproduction_rate 0.1
-  set max_death_threshold 33
+  set max_death_threshold 40
   set agent_size 0.5
   set steps-per-ie 5
   set max_stamina 5
@@ -252,26 +252,22 @@ to update_thresholds
   ifelse (global_temperature > 10) [
     set reprod_threshold (max_reproduction_rate * (temperature / 15)) ] ; probability of reproducing increases as it gets warmer (10 * periods-in-day)
   [set reprod_threshold normal_reproduction_rate]
-  
+
   
   ;;pH of soil also affects survival rate
 <<<<<<< HEAD
 ;  if (ph < max_ph_resist) [
-    let ph_factor (3.2 / 42) * ((e ^ (max_ph_resist - ph) ) - 1) ; function ensures that a ph difference of 3 will have a higher death probability
-;    set death_threshold (death_threshold + ph_factor)  ; higher the ph lower the survival
-;    ;set death_threshold death_threshold + random-float death_variance
-    set reprod_threshold (reprod_threshold - ph_factor)
-;  ]
-;  
-=======
-  if (ph < max_ph_resist) [
     let ph_factor (3 / 42) * ((e ^ (max_ph_resist - ph) ) - 1) ; function ensures that a ph difference of 3 will have a higher death probability
     set death_threshold (death_threshold + ph_factor)  ; higher the ph lower the survival
-    ;set death_threshold death_threshold + random-float death_variance
-    set reprod_threshold (reprod_threshold - (ph_factor / 7))
+=======
+  if (ph < max_ph_resist) [
+    let ph_factor (3.5 / 42) * ((e ^ (max_ph_resist - ph) ) - 1) ; function ensures that a ph difference of 3 will have a higher death probability
+;    set death_threshold (death_threshold + ph_factor)  ; higher the ph lower the survival
+>>>>>>> a733ad56c60e0d718ed1de0a9b7b7b7a901f7fa0
+;    ;set death_threshold death_threshold + random-float death_variance
+    set reprod_threshold (reprod_threshold - (ph_factor))
   ]
-  
->>>>>>> 14a917957887348880a6127df965e15031e0a686
+;  
 
 end
 

@@ -26,6 +26,7 @@ globals [
   shape_list
   color_list
   
+  degree_accumulation_needed
   ]
 
 breed [cocoons]
@@ -53,7 +54,13 @@ turtles-own [
   ;population
   death_threshold
   reprod_threshold
+  
   ]
+
+cocoons-own[
+ degree_days 
+  
+]
 
 to setup_agents
   
@@ -273,16 +280,44 @@ end
 
 ;;hatches temperature is optimum for birth
 to check_if_hatch
-      set wait_days wait_days + 1
-      ;show wait_period
-      if (wait_days >= wait_period) [
-        ifelse (random 100 < 65)[         ;65% chance of hatching
-          set breed adults
-          set size agent_size
-          set stamina 5
-          set shape (item parent_breed shape_list)
-        ]
-        [die]
-      ]
+  if (global_temperature > 0)[
+    set degree_days degree_days + global_temperature
+  ]
+  ifelse (degree_days >= degree_accumulation_needed) [
+    set breed adults
+    set size agent_size
+    set stamina 5
+    set shape (item parent_breed shape_list)
+  ]
+  [check_cocoon_death]
 end
+
+to check_cocoon_death
+  let randNum random 1000
+  if global_temperature <= 5
+  [
+    if randNum >= 998 [die]
+  ]
+  if global_temperature > 5 and global_temperature <= 10
+  [
+    if randNum >= 998 [die]
+  ]
+  if global_temperature > 10 and global_temperature <= 15
+  [
+    if randNum >= 998 - (998 - 996) / 5 * (global_temperature - 10) [die]
+  ]
+  if global_temperature > 15 and global_temperature <= 20
+  [
+    if randNum >= 996 - (996 - 995) / 5 * (global_temperature - 15) [die]
+  ]
+  if global_temperature >= 20 and global_temperature <= 25
+  [
+    if randNum >= 995 - (995 - 989) / 5 * (global_temperature - 20) [die]
+  ]
+  if global_temperature > 25
+  [
+    if randNum >= 989 - 5 * (global_temperature - 25) [die]
+  ]
+end
+
 

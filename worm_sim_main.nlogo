@@ -34,6 +34,7 @@ to setup
   set report_month 0
   set final_population 0
   set max_pop 0
+  set degree_accumulation_needed 1400
 
   set-default-shape sides "line"
   ;setup_sim
@@ -410,11 +411,11 @@ to go
     ;calculate_temp
     ;update_organic_matter
 
-    if (global_temperature > species_hatch_temperature) [
+    ;if (global_temperature > species_hatch_temperature) [
       ask cocoons [
         check_if_hatch
       ]
-    ]
+    ;]
   ]
 
   ask adults [
@@ -996,7 +997,7 @@ INPUTBOX
 168
 212
 worm_population
-50
+500
 1
 0
 Number
