@@ -36,7 +36,7 @@ turtles-own [
   death_p     ;probability of death
   reprod_p    ;probability of reproduction
   
-  maturation
+  maturation_wait
   wait_period ;days taken by cocoon to hatch given optimal temperature considitions
   wait_days
   hatch_temp  ;minimum temperature required for cocoons to hatch
@@ -51,12 +51,12 @@ turtles-own [
   low_temp_resist
   max_ph_resist
   parent_breed
-  ;population
   death_threshold
-  reprod_threshold
-  
+  reprod_min_temp
+  reprod_max_temp
+  cocoon_rate ;cocoon per day
+  cocoon
   ]
-
 cocoons-own[
  degree_days 
   
@@ -64,10 +64,10 @@ cocoons-own[
 
 to setup_agents
   
-  set normal_death_threshold 0;0.00685 / (periods-in-day) ; Simulates a 4 year life span
+  set normal_death_threshold 0.00685 / (periods-in-day) ; Simulates a 4 year life span
   set normal_reproduction_rate 0.1
   set max_death_threshold 40
-  set agent_size 0.5
+  set agent_size 5
   set steps-per-ie 5
   set max_stamina 5
   set min_stamina 1
@@ -152,7 +152,7 @@ to create_species [species]
 
     set shape (item parent_breed shape_list)
 
-    set maturation 70
+    set maturation_wait 0;random-normal 91 22
     set wait_period 15 + random-normal 20 3;simulates a wait period of 15 to 65 days 
     set hatch_temp temp_hatch_temperature
     set stamina 5
@@ -161,7 +161,9 @@ to create_species [species]
     set low_temp_resist random-normal temperature_tolerance (2 * genetic_diversity)
     set max_ph_resist random-normal ph_tolerance (2 * genetic_diversity)
     set death_threshold normal_death_threshold
-    set reprod_threshold normal_reproduction_rate 
+    set reprod_min_temp one-of [13 14 15 16]
+    set reprod_max_temp reprod_min_temp + 10
+    set cocoon_rate 0.077
    ]
 end
 
@@ -218,31 +220,38 @@ to check_death
   random-seed new-seed
   set death_p random-float 100
   
-;  ifelse (stamina < min_stamina) [
-;    die
-;    ] ;; dies if out of energy
- ; [
-    if (death_p < death_threshold) [
-      ;show death_threshold
-      die
-      ] ;; dies of cold/pH/natural causes
-  ;  ] 
+  ;  ifelse (stamina < min_stamina) [
+  ;    die
+  ;    ] ;; dies if out of energy
+  ; [
+  if (death_p < death_threshold) [
+    ;show death_threshold
+    die
+  ] ;; dies of cold/pH/natural causes
+    ;  ] 
   
-  end
+end
 
 to check_reproduction
-  ;;random-seed new-seed
-  set reprod_p random-float 100
-  if (reprod_p < reprod_threshold and pcolor != blue) [
-    if (maturation = 70) [
-      hatch-cocoons 1 [
-        set maturation 0
-        set wait_days 0
-        set color (item parent_breed color_list)
-        set shape "dot"
-        ]
+  if (global_temperature > reprod_min_temp and pcolor != blue) [
+    if (global_temperature < reprod_max_temp)[
+      
+      if (maturation_wait < 1) [
+        set cocoon cocoon + cocoon_rate
       ]
+      
+      if (cocoon >= 1)[
+        hatch-cocoons 1 [
+          set maturation_wait random-normal 91 22
+          set wait_days 0
+          set color (item parent_breed color_list)
+          set shape "dot"
+        ]
+        set cocoon 0
+      ]
+    ]
   ]
+
 end
 
 ;updates probablities of dying and reproducing
@@ -255,26 +264,26 @@ to update_thresholds
     ]
   
   
-    ;reproduction rate affected by temperature
-  ifelse (global_temperature > 10) [
-    set reprod_threshold (max_reproduction_rate * (temperature / 15)) ] ; probability of reproducing increases as it gets warmer (10 * periods-in-day)
-  [set reprod_threshold normal_reproduction_rate]
+;    ;reproduction rate affected by temperature
+;  ifelse (global_temperature > 10) [
+;    set reprod_threshold (max_reproduction_rate * (temperature / 15)) ] ; probability of reproducing increases as it gets warmer (10 * periods-in-day)
+;  [set reprod_threshold normal_reproduction_rate]
 
   
   ;;pH of soil also affects survival rate
   if (ph < max_ph_resist) [
-    let ph_factor (3.5 / 42) * ((e ^ (max_ph_resist - ph) ) - 1) ; function ensures that a ph difference of 3 will have a higher death probability
+    let ph_factor (3 / 42) * ((e ^ (max_ph_resist - ph) ) - 1) ; function ensures that a ph difference of 3 will have a higher death probability
     set death_threshold (death_threshold + ph_factor)  ; higher the ph lower the survival
-;    ;set death_threshold death_threshold + random-float death_variance
-    set reprod_threshold (reprod_threshold - (ph_factor))
+    ;set death_threshold death_threshold + random-float death_variance
+    ;set reprod_threshold (reprod_threshold - (ph_factor))
   ]
 ;  
 
 end
 
 to update_maturity
-    if (maturation < 70) [
-      set maturation maturation + 1
+    if (maturation_wait > 0) [
+      set maturation_wait maturation_wait - 1
     ]
 end
 
