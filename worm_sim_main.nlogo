@@ -13,20 +13,14 @@ globals[
   final_population
   max_pop
   pop_data
+  ph_table
   ;index positions of data in arrays
   ;month monitor species_number population density genetic diversity
 ]
 to setup
   clear-all
-  print "Loading temperature data..."
-  load_temperature
-  print "Setting up environment..."
-  setup_environment
-  ;setup_gis
-  print "Setting up agents..."
-  setup_agents
-  print "Done"
 
+  set ph_table table:make
   set species_data [] ;list of collected info of each species for each monitor
   set monthly_data [] ;list of data collected each month
   set area_list []
@@ -35,6 +29,16 @@ to setup
   set final_population 0
   set max_pop 0
   set degree_accumulation_needed 1400
+
+  print "Loading temperature data..."
+  load_temperature
+  print "Setting up environment..."
+  setup_environment
+  print "Loading parameters..."
+  load_param
+  print "Setting up agents..."
+  setup_agents
+  print "Done"
 
   set-default-shape sides "line"
   ;setup_sim
@@ -320,6 +324,18 @@ to load_monitors [name]
   recolor_patches
 end
 
+to load_param
+  let filename "interpolated.csv"
+  let data csv:from-file filename
+
+  foreach data[
+    let param precision (7 - item 0 ?) 1
+    let values (but-first ?)
+    table:put ph_table param values
+    ]
+  print ph_table
+end
+
 to export_data [name]
   let filename (word "data/output/simulation" save_name ph_tolerance ".csv")
   let filename2 (word "data/output/finalPop" save_name ph_tolerance ".csv")
@@ -558,7 +574,7 @@ ph_tolerance
 ph_tolerance
 0
 7
-2.2
+6.4
 0.1
 1
 NIL
@@ -687,7 +703,7 @@ INPUTBOX
 1299
 386
 save_name
-evilface
+phTest
 1
 0
 String (reporter)
@@ -996,7 +1012,7 @@ INPUTBOX
 168
 212
 worm_population
-50
+10
 1
 0
 Number

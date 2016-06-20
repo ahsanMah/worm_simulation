@@ -263,18 +263,20 @@ to update_thresholds
     [set death_threshold normal_death_threshold]
     ]
   
-  
-;    ;reproduction rate affected by temperature
-;  ifelse (global_temperature > 10) [
-;    set reprod_threshold (max_reproduction_rate * (temperature / 15)) ] ; probability of reproducing increases as it gets warmer (10 * periods-in-day)
-;  [set reprod_threshold normal_reproduction_rate]
+  ;reproduction rate affected by temperature + pH
+  let temp_cocoon_rate 0.54 / 7
+  let phDiff precision (max_ph_resist - ph) 1
+  let ph_cocoon_rate (item 1 table:get ph_table phDiff) / 7
+  set cocoon_rate min (list temp_cocoon_rate ph_cocoon_rate)
+  show cocoon_rate
 
   
   ;;pH of soil also affects survival rate
-  if (ph < max_ph_resist) [
-    let ph_factor (3 / 42) * ((e ^ (max_ph_resist - ph) ) - 1) ; function ensures that a ph difference of 3 will have a higher death probability
-    set death_threshold (death_threshold + ph_factor)  ; higher the ph lower the survival
-    ;set death_threshold death_threshold + random-float death_variance
+  if (phDiff > 0) [
+    ;let ph_factor (3 / 42) * ((e ^ (max_ph_resist - ph) ) - 1) ; function ensures that a ph difference of 3 will have a higher death probability
+    let ph_factor item 0 (table:get ph_table phDiff) ;gets survival chance from pH table
+    set ph_factor 100 - ph_factor                 ;convert to death probablity
+    set death_threshold (death_threshold + ph_factor)  
     ;set reprod_threshold (reprod_threshold - (ph_factor))
   ]
 ;  

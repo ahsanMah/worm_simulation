@@ -12,8 +12,11 @@ def getNext (row_index, col_index, table):
 			return (row_index,table[row_index][col_index])
 		row_index += 1
 
-data = open("data/input_files/pH-Table.csv", "rb")
-data_reader = csv.reader(data)
+
+
+
+data = open("data/input_files/pH-Table.csv", "rU")
+data_reader = csv.reader(data, dialect = "excel")
 data_table = []
 index = 0
 
@@ -23,24 +26,22 @@ for row in data_reader:
 
 data.close()
 
+#searches the table row by row and fills in any missing values
 while index < len(data_table):
 	row = data_table[index]
-	if row[1] == None:
-		prev_val = data_table[index - 1][1]
-		next_index,next_val = getNext(index,1,data_table)
-		inc = (next_val - prev_val)/(next_index - (index - 1))
-		data_table[index][1] = prev_val + inc
-
-	# if row[2] == None:
-	# 	prev_val = data_table[index - 1][2]
-	# 	next_index,next_val = getNext(index,2,data_table)
-	# 	inc = (next_val - prev_val)/(next_index - (index - 1))
-	# 	data_table[index][2] = prev_val + inc
+	for col_index,val in enumerate(row): #gets the index position and value respectively for each entry in the array
+		if val == None:
+			prev_val = data_table[index - 1][col_index]
+			next_index,next_val = getNext(index,col_index,data_table) #gets next available data point
+			print next_index,next_val
+			inc = (next_val - prev_val)/(next_index - (index - 1))
+			data_table[index][col_index] = prev_val + inc
 	index += 1
 			
 output = open("interpolated.csv", "wb")
 data_writer = csv.writer(output)
 
 for row in data_table:
-	data_writer.writerow(row)			
+	data_writer.writerow(row)
+
 print data_table
