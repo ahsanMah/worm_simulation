@@ -56,6 +56,10 @@ turtles-own [
   reprod_max_temp
   cocoon_rate ;cocoon per day
   cocoon
+  prev_patch
+  patch_days
+  temp_factor
+  ph_factor
   ]
 cocoons-own[
  degree_days 
@@ -67,7 +71,7 @@ to setup_agents
   set normal_death_threshold 0.00685 / (periods-in-day) ; Simulates a 4 year life span
   set normal_reproduction_rate 0.1
   set max_death_threshold 40
-  set agent_size 5
+  set agent_size 3
   set steps-per-ie 5
   set max_stamina 5
   set min_stamina 1
@@ -164,6 +168,8 @@ to create_species [species]
     set reprod_min_temp one-of [13 14 15 16]
     set reprod_max_temp reprod_min_temp + 10
     set cocoon_rate 0.093
+    set prev_patch ph
+    set patch_days 0
    ]
 end
 
@@ -200,6 +206,11 @@ to move
   ]
 
   forward speed * permeability / periods-in-day
+  
+  ifelse (ph = prev_patch) 
+  [set patch_days patch_days + 1
+  ][set patch_days 1]
+  
   eat
   check_death
 end
@@ -258,29 +269,35 @@ end
 to update_thresholds
   ;cold reduces survival rate
   
-  ifelse (global_temperature > max_temp_resist) [ set death_threshold max_death_threshold / (periods-in-day)]
-  [ifelse (global_temperature < low_temp_resist) [ set death_threshold max_death_threshold / (periods-in-day)]
-    [set death_threshold normal_death_threshold]
+  ifelse (global_temperature > max_temp_resist) [ set temp_factor max_death_threshold / (periods-in-day)]
+  [ifelse (global_temperature < low_temp_resist) [ set temp_factor max_death_threshold / (periods-in-day)]
+    [set temp_factor normal_death_threshold]
     ]
   
+  ;set temp_factor 0.1
   ;reproduction rate affected by temperature + pH
   let temp_cocoon_rate 0.54 / 7
-  let phDiff precision (max_ph_resist - ph) 1
-  let ph_cocoon_rate (item 1 table:get ph_table phDiff) / 7
-  set cocoon_rate min (list temp_cocoon_rate ph_cocoon_rate)
-  show cocoon_rate
-
   
-  ;;pH of soil also affects survival rate
-  if (phDiff > 0) [
-    ;let ph_factor (3 / 42) * ((e ^ (max_ph_resist - ph) ) - 1) ; function ensures that a ph difference of 3 will have a higher death probability
-    let ph_factor item 0 (table:get ph_table phDiff) ;gets survival chance from pH table
-    set ph_factor 100 - ph_factor                 ;convert to death probablity
-    set death_threshold (death_threshold + ph_factor)  
-    ;set reprod_threshold (reprod_threshold - (ph_factor))
-  ]
-;  
+  ;;pH of soil also affects survival + reproduction rate
+  if (ph < max_ph_resist) [ 
+    let phDiff precision (max_ph_resist - ph) 1
+    let ph_cocoon_rate (item 1 table:get ph_table phDiff) / 7
+    set cocoon_rate min (list temp_cocoon_rate ph_cocoon_rate)
 
+    ;let ph_factor (3 / 42) * ((e ^ (max_ph_resist - ph) ) - 1) ; function ensures that a ph difference of 3 will have a higher death probability
+    let survival item 0 (table:get ph_table phDiff) ;gets survival chance from pH table
+    ;set ph_factor 100 - ph_factor                    ;convert to death probablity
+    ;set death_threshold (death_threshold + ph_factor) 
+    
+    ;set reprod_threshold (reprod_threshold - (ph_factor))
+    
+    let hazard_rate (ln (survival / 100)) / 3
+    let mortality_rate 1 - (e ^ (hazard_rate * patch_days))
+    set ph_factor mortality_rate * 100
+  ]
+  
+  set death_threshold temp_factor + ph_factor
+  ;show death
 end
 
 to update_maturity

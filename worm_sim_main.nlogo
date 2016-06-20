@@ -14,6 +14,7 @@ globals[
   max_pop
   pop_data
   ph_table
+  day_count
   ;index positions of data in arrays
   ;month monitor species_number population density genetic diversity
 ]
@@ -28,7 +29,8 @@ to setup
   set report_month 0
   set final_population 0
   set max_pop 0
-  set degree_accumulation_needed 1400
+  set degree_accumulation_needed 1300
+  set day_count 0
 
   print "Loading temperature data..."
   load_temperature
@@ -374,6 +376,11 @@ end
 
 to go
 
+;  let filename (word "movie/" ticks ".png")
+;  export-view filename
+;
+;  if (ticks = 480) [stop]
+
   if (count turtles = 0) [
     export_data save_number
     stop
@@ -491,8 +498,8 @@ GRAPHICS-WINDOW
 300
 0
 300
-1
-1
+0
+0
 1
 ticks
 1000.0
@@ -572,9 +579,9 @@ SLIDER
 253
 ph_tolerance
 ph_tolerance
-0
+6.5
+7.5
 7
-6.4
 0.1
 1
 NIL
@@ -604,7 +611,7 @@ temperature_tolerance
 temperature_tolerance
 0
 100
-5
+0
 1
 1
 NIL
@@ -703,7 +710,7 @@ INPUTBOX
 1299
 386
 save_name
-phTest
+phSim
 1
 0
 String (reporter)
@@ -1012,7 +1019,7 @@ INPUTBOX
 168
 212
 worm_population
-10
+500
 1
 0
 Number

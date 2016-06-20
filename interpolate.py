@@ -12,7 +12,7 @@ def getNext (row_index, col_index, table):
 			return (row_index,table[row_index][col_index])
 		row_index += 1
 
-data = open("data/input/pH-Table.csv", "rU")
+data = open("data/input/pH-Table copy.csv", "rU")
 data_reader = csv.reader(data, dialect = "excel")
 data_table = []
 index = 0
