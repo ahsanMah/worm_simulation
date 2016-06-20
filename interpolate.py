@@ -12,10 +12,7 @@ def getNext (row_index, col_index, table):
 			return (row_index,table[row_index][col_index])
 		row_index += 1
 
-
-
-
-data = open("data/input_files/pH-Table.csv", "rU")
+data = open("data/input/pH-Table.csv", "rU")
 data_reader = csv.reader(data, dialect = "excel")
 data_table = []
 index = 0
@@ -38,7 +35,7 @@ while index < len(data_table):
 			data_table[index][col_index] = prev_val + inc
 	index += 1
 			
-output = open("interpolated.csv", "wb")
+output = open("data/input/pH-Table.csv", "wb")
 data_writer = csv.writer(output)
 
 for row in data_table:

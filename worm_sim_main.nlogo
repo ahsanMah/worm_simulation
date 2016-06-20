@@ -325,7 +325,7 @@ to load_monitors [name]
 end
 
 to load_param
-  let filename "interpolated.csv"
+  let filename "data/input/pH-Table.csv"
   let data csv:from-file filename
 
   foreach data[
