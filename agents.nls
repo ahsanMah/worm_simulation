@@ -163,7 +163,7 @@ to create_species [species]
     set death_threshold normal_death_threshold
     set reprod_min_temp one-of [13 14 15 16]
     set reprod_max_temp reprod_min_temp + 10
-    set cocoon_rate 0.077
+    set cocoon_rate 0.093
    ]
 end
 

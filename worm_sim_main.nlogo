@@ -145,7 +145,7 @@ end
 
 to load_obstacles [name]
   let filename (word "data/parameters/myobstacle"  name ".csv")
-  set obstacle_list csv:from-file filename
+  ;set obstacle_list csv:from-file filename
   print "Loaded from file: "
   print obstacle_list
   ;;draw_obstacles
@@ -558,7 +558,7 @@ ph_tolerance
 ph_tolerance
 0
 7
-3.8
+2.2
 0.1
 1
 NIL
@@ -588,7 +588,7 @@ temperature_tolerance
 temperature_tolerance
 0
 100
-0
+5
 1
 1
 NIL
@@ -687,7 +687,7 @@ INPUTBOX
 1299
 386
 save_name
-phTest
+evilface
 1
 0
 String (reporter)
@@ -765,7 +765,7 @@ CHOOSER
 species_number
 species_number
 1 2 3 4 5
-0
+1
 
 BUTTON
 127
@@ -996,7 +996,7 @@ INPUTBOX
 168
 212
 worm_population
-500
+50
 1
 0
 Number
