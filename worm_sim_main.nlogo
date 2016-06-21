@@ -602,7 +602,7 @@ ph_tolerance
 ph_tolerance
 6.5
 7.5
-6.9
+7
 0.1
 1
 NIL
@@ -1010,7 +1010,7 @@ INPUTBOX
 168
 212
 worm_population
-500
+5000
 1
 0
 Number

@@ -61,11 +61,12 @@ turtles-own [
   prev_patch
   patch_days
   ph_shift  ;shift in optimum ph due to tolerance
+  temp_shift
 
   ]
 cocoons-own[
  degree_days 
-  
+ degree_accumulation
 ]
 
 to setup_agents
@@ -166,6 +167,7 @@ to create_species [species]
     set low_temp_resist random-normal temperature_tolerance (2 * genetic_diversity)
     set max_ph_resist random-normal ph_tolerance (2 * genetic_diversity)
     set ph_shift 7 - max_ph_resist
+    set temp_shift 5 - low_temp_resist
     set death_threshold normal_death_threshold
     set reprod_min_temp one-of [13 14 15 16]
     set reprod_max_temp reprod_min_temp + 10
@@ -233,7 +235,7 @@ to check_death
   random-seed new-seed
   set death_p random-float 1
 
-  if (death_p < death_threshold) [
+  if (death_p > death_threshold) [
     ;show death_threshold
     die
   ]
@@ -249,6 +251,7 @@ to check_reproduction
       
       if (cocoon >= 1)[
         hatch-cocoons 1 [
+          set degree_accumulation item (16 - reprod_min_temp) [1300 1200 1100 1000]
           set maturation_wait random-normal 91 22
           set wait_days 0
           set color (item parent_breed color_list)
@@ -277,16 +280,27 @@ to update_thresholds
 ;    [set temp_factor normal_death_threshold]
 ;  ]
   
-  set temp_factor 1 - (item 0 table:get temp_table global_temperature)
+  
  ; show death_threshold
   
   ;set temp_factor 0.1
   ;let ph_factor (3 / 42) * ((e ^ (max_ph_resist - ph) ) - 1) ; function ensures that a ph difference of 3 will have a higher death probability
   ;reproduction rate affected by temperature + pH
-  set temp_cocoon_rate 0.54 / 7
+  set temp_cocoon_rate 0.65 / 7
   
   ;;pH of soil also affects survival + reproduction rate
   let mapped_ph precision (ph + ph_shift) 1
+  let mapped_temp precision (global_temperature + temp_shift) 1
+  
+  
+  ifelse table:has-key? ph_table mapped_temp [
+    set temp_factor (item 0 table:get temp_table mapped_temp)
+  ]
+  [
+    set temp_factor (item 0 table:get temp_table global_temperature)
+    ]
+  
+  
   
   ifelse table:has-key? ph_table mapped_ph [
     set ph_cocoon_rate (item 1 table:get ph_table mapped_ph) / 7
@@ -299,9 +313,9 @@ to update_thresholds
  
   set hazard_rate (ln (survival / 100)) / 3
   set mortality_rate 1 - (e ^ (hazard_rate * patch_days))
-  set ph_factor mortality_rate ;* 100
+  set ph_factor mortality_rate
   
-  set cocoon_rate min (list temp_cocoon_rate ph_cocoon_rate)
+  set cocoon_rate temp_cocoon_rate ;min (list temp_cocoon_rate ph_cocoon_rate)
   set death_threshold temp_factor ;+ ph_factor
   ;print word temp_factor ph_factor
   ;show death_threshold
@@ -318,7 +332,8 @@ to check_if_hatch
   if (global_temperature > 0)[
     set degree_days degree_days + global_temperature
   ]
-  ifelse (degree_days >= degree_accumulation_needed) [
+  
+  ifelse (degree_days >= degree_accumulation) [
     set breed adults
     set size agent_size
     set stamina 5
@@ -332,8 +347,7 @@ to check_cocoon_death
   let cocoon_death_thresh item 1 table:get temp_table global_temperature
   
   if (randNum > cocoon_death_thresh) [
-    show cocoon_death_thresh
-    die
+
     ]
 
 ;  if global_temperature <= 5
