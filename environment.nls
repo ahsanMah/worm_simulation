@@ -220,7 +220,25 @@ to recolor-patch
     if (Show: = "monitor") [
       if (being_monitored) [set pcolor orange]
     ]
-
+    
+    ifelse (Show: = "turtle density")
+    [
+      if (pcolor != blue and pcolor != grey and pcolor != turquoise )
+        [
+          set pcolor scale-color orange (count turtles-here) 25 0
+        ]
+      ask turtles-here
+        [
+          hide-turtle
+        ]
+    ]
+    [
+      ask turtles-here
+      [
+        show-turtle
+      ]
+    ]
+    
     
   ]
 end

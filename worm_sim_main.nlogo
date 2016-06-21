@@ -737,8 +737,8 @@ CHOOSER
 349
 Show:
 Show:
-"pH" "food" "temperature" "monitor"
-0
+"pH" "food" "temperature" "monitor" "turtle density"
+4
 
 TEXTBOX
 10
