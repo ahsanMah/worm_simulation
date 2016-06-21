@@ -14,7 +14,7 @@ globals[
   max_pop
   pop_data
   ph_table
-  day_count
+  temp_table
   ;index positions of data in arrays
   ;month monitor species_number population density genetic diversity
 ]
@@ -22,6 +22,7 @@ to setup
   clear-all
 
   set ph_table table:make
+  set temp_table table:make
   set species_data [] ;list of collected info of each species for each monitor
   set monthly_data [] ;list of data collected each month
   set area_list []
@@ -30,20 +31,17 @@ to setup
   set final_population 0
   set max_pop 0
   set degree_accumulation_needed 1300
-  set day_count 0
 
   print "Loading temperature data..."
   load_temperature
   print "Setting up environment..."
   setup_environment
-  print "Loading parameters..."
-  load_param
   print "Setting up agents..."
   setup_agents
   print "Done"
 
   set-default-shape sides "line"
-  ;setup_sim
+  setup_sim
   recolor_patches
   reset-ticks
 end
@@ -59,10 +57,13 @@ end
 
 to setup_sim
   ;setup
-
   print "Loading from simulation files..."
   load_patches save_name
-  load_agents save_name
+  ;load_agents save_name
+  print "Loading parameters..."
+  let filename "data/input/pH-Table.csv"
+  load_param "data/input/pH-Table.csv" ph_table
+  load_param "data/input/temp-Table.csv" temp_table
   print "Done Loading"
 end
 
@@ -210,7 +211,7 @@ to save_agents [name]
   let filename1 (word "data/parameters/specieslist" name ".csv")
   let data []
   foreach table:to-list species_list [ ;converts table into listto store as csv
-    set data lput (sentence item 0 ? array:to-list item 1 ?) data
+    set data lput (sentence item 0 ? item 1 ?) data
   ]
   csv:to-file filename1 data
 
@@ -234,7 +235,7 @@ to load_agents [name]
   let data []
   set species_list table:make
   set data csv:from-file filename1
-  foreach data [table:put species_list item 0 ? array:from-list (list item 1 ? item 2 ?)]
+  foreach data [table:put species_list item 0 ? (list item 1 ? item 2 ? item 3 ?)]
   print "Loaded from file: "
   print species_list
   set data csv:from-file filename
@@ -326,16 +327,17 @@ to load_monitors [name]
   recolor_patches
 end
 
-to load_param
-  let filename "data/input/pH-Table.csv"
+to load_param [filename table]
+
   let data csv:from-file filename
 
   foreach data[
-    let param precision (7 - item 0 ?) 1
+    let param item 0 ?
     let values (but-first ?)
-    table:put ph_table param values
+    table:put table param values
     ]
-  print ph_table
+  print filename
+  print table
 end
 
 to export_data [name]
@@ -346,25 +348,44 @@ to export_data [name]
   print "Exported simulation data to file"
 end
 
+;clears the arrays that are used to store matrix data
 to clear_arrays
 
   set species_data []
   let monitor_list n-values monitor_number [?] ;(?) allows to create a list from 0 to monitor number
-  foreach table:to-list species_list [
+  foreach table:to-list species_list [  ; --> [species_num, [species info] ]
     let current_species_number item 0 ?
-    ;allows for the storage of other species characteristics
-    ;let current_species_info array:to-list item 1 ?
+    let species_info item 1 ?           ;data to be exported from species_list can be changed in add_species function
 
     ;n*m matrix of species data for every monitor
     let species_matrix array:from-list monitor_list  ;n = number of species charcteristics being collected, m = number of monitors
     foreach monitor_list [
-      array:set species_matrix ? array:from-list (list report_month ? current_species_number 0 0) ;resets population, density
+      let matrix_row sentence (list report_month ? current_species_number 0 0) species_info
+      array:set species_matrix ? array:from-list matrix_row ;resets population, density
     ]
     set species_data lput species_matrix species_data ;list of matrices
   ]
   set has_collected false
 end
 
+to collect_monthly_data
+
+  ;saves monthly data to accumulutor list
+  if (day_of_month = item current_month num_days)[
+    if (has_collected = false) [
+      ;show species_data
+      foreach species_data [
+        let monitor_list (array:to-list ?)
+        foreach monitor_list [
+          set monthly_data lput (array:to-list ?) monthly_data
+        ]
+      ]
+      set report_month report_month + 1
+      set has_collected true
+    ]
+  ]
+
+end
 
 to-report maxPop
   report max_pop
@@ -388,15 +409,16 @@ to go
 
   calculate_time
 
-  if (year = 9) [
+  if (year = 1) [
     set final_population (final_population + count adults)
   ]
 
-  if (year = 10) [
-    set pop_data lput (list year (final_population / 365)) pop_data
-    export_data save_number
-    set final_population 0
-
+  if (year = 2) [
+    if (ticks mod 365 = 1)[ ;coolects data
+      set pop_data lput (list year finalPop) pop_data
+      export_data save_number
+      set final_population 0
+    ]
   ]
 
   if (year = 19) [
@@ -411,10 +433,6 @@ to go
 
   if (year = 29) [
     set final_population (final_population + count adults)
-
-    ;    if (count adults > max_pop)
-    ;    [set max_pop (count adults)]
-
   ]
 
   if (year = 30) [
@@ -446,6 +464,7 @@ to go
       update_maturity
       update_thresholds
       check_reproduction
+      ;check_death
     ]
 
     move
@@ -460,6 +479,8 @@ to go
       ]
     ]
   ]
+
+  ;collect_monthly_data
   ;saves monthly data to accumulutor list
   if (day_of_month = item current_month num_days)[
     if (has_collected = false) [
@@ -480,11 +501,11 @@ end
 GRAPHICS-WINDOW
 269
 14
-1031
-797
+1001
+767
 -1
 -1
-2.5
+2.4
 1
 10
 1
@@ -498,8 +519,8 @@ GRAPHICS-WINDOW
 300
 0
 300
-0
-0
+1
+1
 1
 ticks
 1000.0
@@ -510,7 +531,7 @@ BUTTON
 78
 43
 Setup
-ca\nsetup\nload_patches save_name
+setup
 NIL
 1
 T
@@ -539,10 +560,10 @@ NIL
 1
 
 MONITOR
-1060
-433
-1168
-478
+1057
+486
+1165
+531
 Day Number
 day_num
 17
@@ -581,7 +602,7 @@ ph_tolerance
 ph_tolerance
 6.5
 7.5
-7
+6.9
 0.1
 1
 NIL
@@ -589,39 +610,24 @@ HORIZONTAL
 
 SLIDER
 12
-257
-212
-290
-max_reproduction_rate
-max_reproduction_rate
-0
-10
-6.7
-0.1
-1
-NIL
-HORIZONTAL
-
-SLIDER
-12
-297
+262
 211
-330
+295
 temperature_tolerance
 temperature_tolerance
 0
 100
-0
+5
 1
 1
 NIL
 HORIZONTAL
 
 MONITOR
-1061
-482
-1168
-527
+1058
+535
+1165
+580
 Population Count
 count adults
 17
@@ -647,10 +653,10 @@ PENS
 "default" 1.0 1 -11221820 true "" "plotxy year count adults"
 
 MONITOR
-1176
-482
-1274
-527
+1173
+535
+1271
+580
 Cocoon Count
 count cocoons
 17
@@ -669,10 +675,10 @@ starting_day
 Number
 
 MONITOR
-1176
-432
-1271
-477
+1173
+485
+1268
+530
 Daily Temp *C
 global_temperature
 2
@@ -690,10 +696,10 @@ obstacle_shape
 1
 
 SLIDER
-12
-412
-211
-445
+13
+339
+212
+372
 speed
 speed
 0
@@ -705,10 +711,10 @@ NIL
 HORIZONTAL
 
 INPUTBOX
-1182
-304
-1299
-386
+1179
+356
+1296
+439
 save_name
 phSim
 1
@@ -731,10 +737,10 @@ NIL
 HORIZONTAL
 
 CHOOSER
-1058
-304
-1177
-349
+1056
+356
+1175
+401
 Show:
 Show:
 "pH" "food" "temperature" "monitor" "turtle density"
@@ -752,9 +758,9 @@ Species Control
 
 SLIDER
 13
-335
+300
 209
-368
+333
 species_genetic_diversity
 species_genetic_diversity
 0
@@ -765,36 +771,21 @@ species_genetic_diversity
 NIL
 HORIZONTAL
 
-SLIDER
-12
-374
-211
-407
-species_hatch_temperature
-species_hatch_temperature
-0
-25
-15
-1
-1
-NIL
-HORIZONTAL
-
 CHOOSER
-12
-453
-112
-498
+13
+380
+113
+425
 species_number
 species_number
 1 2 3 4 5
 1
 
 BUTTON
-127
-463
-208
-496
+128
+390
+209
+423
 Add
 mouse_add_species
 T
@@ -808,10 +799,10 @@ NIL
 1
 
 BUTTON
-1057
-353
-1178
-386
+1054
+406
+1175
+439
 Recolor Patches
 recolor_patches
 NIL
@@ -825,10 +816,10 @@ NIL
 1
 
 BUTTON
-1057
-389
-1179
-422
+1054
+442
+1176
+475
 Save Environment
 save_patches save_name
 NIL
@@ -842,10 +833,10 @@ NIL
 1
 
 BUTTON
-1181
-389
-1300
-422
+1178
+442
+1297
+475
 Load Environment
 load_patches save_name
 NIL
@@ -859,10 +850,10 @@ NIL
 1
 
 BUTTON
-14
-505
-103
-538
+15
+432
+104
+465
 Save
 save_agents save_name
 NIL
@@ -876,10 +867,10 @@ NIL
 1
 
 BUTTON
-124
-505
-210
-538
+125
+432
+211
+465
 Load
 load_agents save_name
 NIL
@@ -969,10 +960,10 @@ NIL
 1
 
 SLIDER
-1321
-43
-1483
-76
+1057
+313
+1296
+346
 save_number
 save_number
 0

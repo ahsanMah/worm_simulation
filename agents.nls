@@ -22,6 +22,8 @@ globals [
   temp_population
   temp_start_x
   temp_start_y
+  temp_ph_tolerance
+  temp_temperature_tolerance
   
   shape_list
   color_list
@@ -58,8 +60,8 @@ turtles-own [
   cocoon
   prev_patch
   patch_days
-  temp_factor
-  ph_factor
+  ph_shift  ;shift in optimum ph due to tolerance
+
   ]
 cocoons-own[
  degree_days 
@@ -116,18 +118,17 @@ end
 
 
 to add_species [x y population species_num]
-  let new_species (list species_num species_genetic_diversity species_hatch_temperature population x y)
+  let new_species (list species_num species_genetic_diversity ph_tolerance temperature_tolerance population x y)
   
    
   ifelse (table:has-key? species_list species_num) [
     ;create new population with existing settings
-    set new_species array:to-list table:get species_list species_num
+    set new_species table:get species_list species_num
     set new_species fput species_num new_species
     set new_species sentence new_species (list population x y)
-    let species_info table:get species_list species_num
     
   ] 
-  [ table:put species_list species_num (array:from-list (list species_genetic_diversity species_hatch_temperature))]
+  [ table:put species_list species_num (list species_genetic_diversity ph_tolerance temperature_tolerance)]
 
   ;foreach table:to-list species_list [show ?]
   
@@ -141,10 +142,11 @@ to create_species [species]
   
   set temp_number item 0 species
   set temp_genetic_diversity item 1 species
-  set temp_hatch_temperature item 2 species
-  set temp_population item 3 species
-  set temp_start_x item 4 species
-  set temp_start_y item 5 species
+  set temp_ph_tolerance item 2 species
+  set temp_temperature_tolerance item 3 species
+  set temp_population item 4 species
+  set temp_start_x item 5 species
+  set temp_start_y item 6 species
   
   
   
@@ -158,12 +160,12 @@ to create_species [species]
 
     set maturation_wait 0;random-normal 91 22
     set wait_period 15 + random-normal 20 3;simulates a wait period of 15 to 65 days 
-    set hatch_temp temp_hatch_temperature
     set stamina 5
     set genetic_diversity temp_genetic_diversity ; 0-1 measure of genetic diversity of the species
     set max_temp_resist random-normal 25 (2 * genetic_diversity)
     set low_temp_resist random-normal temperature_tolerance (2 * genetic_diversity)
     set max_ph_resist random-normal ph_tolerance (2 * genetic_diversity)
+    set ph_shift 7 - max_ph_resist
     set death_threshold normal_death_threshold
     set reprod_min_temp one-of [13 14 15 16]
     set reprod_max_temp reprod_min_temp + 10
@@ -229,18 +231,12 @@ end
 
 to check_death  
   random-seed new-seed
-  set death_p random-float 100
-  
-  ;  ifelse (stamina < min_stamina) [
-  ;    die
-  ;    ] ;; dies if out of energy
-  ; [
+  set death_p random-float 1
+
   if (death_p < death_threshold) [
     ;show death_threshold
     die
-  ] ;; dies of cold/pH/natural causes
-    ;  ] 
-  
+  ]
 end
 
 to check_reproduction
@@ -267,37 +263,48 @@ end
 
 ;updates probablities of dying and reproducing
 to update_thresholds
-  ;cold reduces survival rate
+  ;resetting all parameters
+  let survival 0
+  let hazard_rate 0
+  let mortality_rate 0
+  let ph_cocoon_rate 0
+  let temp_cocoon_rate 0
+  let ph_factor 0
+  let temp_factor 0
   
-  ifelse (global_temperature > max_temp_resist) [ set temp_factor max_death_threshold / (periods-in-day)]
-  [ifelse (global_temperature < low_temp_resist) [ set temp_factor max_death_threshold / (periods-in-day)]
-    [set temp_factor normal_death_threshold]
-    ]
+;  ifelse (global_temperature > max_temp_resist) [ set temp_factor max_death_threshold / (periods-in-day)]
+;  [ifelse (global_temperature < low_temp_resist) [ set temp_factor max_death_threshold / (periods-in-day)]
+;    [set temp_factor normal_death_threshold]
+;  ]
+  
+  set temp_factor 1 - (item 0 table:get temp_table global_temperature)
+ ; show death_threshold
   
   ;set temp_factor 0.1
+  ;let ph_factor (3 / 42) * ((e ^ (max_ph_resist - ph) ) - 1) ; function ensures that a ph difference of 3 will have a higher death probability
   ;reproduction rate affected by temperature + pH
-  let temp_cocoon_rate 0.54 / 7
+  set temp_cocoon_rate 0.54 / 7
   
   ;;pH of soil also affects survival + reproduction rate
-  if (ph < max_ph_resist) [ 
-    let phDiff precision (max_ph_resist - ph) 1
-    let ph_cocoon_rate (item 1 table:get ph_table phDiff) / 7
-    set cocoon_rate min (list temp_cocoon_rate ph_cocoon_rate)
-
-    ;let ph_factor (3 / 42) * ((e ^ (max_ph_resist - ph) ) - 1) ; function ensures that a ph difference of 3 will have a higher death probability
-    let survival item 0 (table:get ph_table phDiff) ;gets survival chance from pH table
-    ;set ph_factor 100 - ph_factor                    ;convert to death probablity
-    ;set death_threshold (death_threshold + ph_factor) 
-    
-    ;set reprod_threshold (reprod_threshold - (ph_factor))
-    
-    let hazard_rate (ln (survival / 100)) / 3
-    let mortality_rate 1 - (e ^ (hazard_rate * patch_days))
-    set ph_factor mortality_rate * 100
-  ]
+  let mapped_ph precision (ph + ph_shift) 1
   
-  set death_threshold temp_factor + ph_factor
-  ;show death
+  ifelse table:has-key? ph_table mapped_ph [
+    set ph_cocoon_rate (item 1 table:get ph_table mapped_ph) / 7
+    set survival item 0 (table:get ph_table mapped_ph) ;gets survival chance from pH table
+  ]
+  [
+    set ph_cocoon_rate (item 1 table:get ph_table ph) / 7
+    set survival item 0 (table:get ph_table ph)
+    ]
+ 
+  set hazard_rate (ln (survival / 100)) / 3
+  set mortality_rate 1 - (e ^ (hazard_rate * patch_days))
+  set ph_factor mortality_rate ;* 100
+  
+  set cocoon_rate min (list temp_cocoon_rate ph_cocoon_rate)
+  set death_threshold temp_factor ;+ ph_factor
+  ;print word temp_factor ph_factor
+  ;show death_threshold
 end
 
 to update_maturity
@@ -321,31 +328,38 @@ to check_if_hatch
 end
 
 to check_cocoon_death
-  let randNum random 1000
-  if global_temperature <= 5
-  [
-    if randNum >= 998 [die]
-  ]
-  if global_temperature > 5 and global_temperature <= 10
-  [
-    if randNum >= 998 [die]
-  ]
-  if global_temperature > 10 and global_temperature <= 15
-  [
-    if randNum >= 998 - (998 - 996) / 5 * (global_temperature - 10) [die]
-  ]
-  if global_temperature > 15 and global_temperature <= 20
-  [
-    if randNum >= 996 - (996 - 995) / 5 * (global_temperature - 15) [die]
-  ]
-  if global_temperature >= 20 and global_temperature <= 25
-  [
-    if randNum >= 995 - (995 - 989) / 5 * (global_temperature - 20) [die]
-  ]
-  if global_temperature > 25
-  [
-    if randNum >= 989 - 5 * (global_temperature - 25) [die]
-  ]
+  let randNum random-float 1
+  let cocoon_death_thresh item 1 table:get temp_table global_temperature
+  
+  if (randNum > cocoon_death_thresh) [
+    show cocoon_death_thresh
+    die
+    ]
+
+;  if global_temperature <= 5
+;  [
+;    if randNum >= 998 [die]
+;  ]
+;  if global_temperature > 5 and global_temperature <= 10
+;  [
+;    if randNum >= 998 [die]
+;  ]
+;  if global_temperature > 10 and global_temperature <= 15
+;  [
+;    if randNum >= 998 - (998 - 996) / 5 * (global_temperature - 10) [die]
+;  ]
+;  if global_temperature > 15 and global_temperature <= 20
+;  [
+;    if randNum >= 996 - (996 - 995) / 5 * (global_temperature - 15) [die]
+;  ]
+;  if global_temperature >= 20 and global_temperature <= 25
+;  [
+;    if randNum >= 995 - (995 - 989) / 5 * (global_temperature - 20) [die]
+;  ]
+;  if global_temperature > 25
+;  [
+;    if randNum >= 989 - 5 * (global_temperature - 25) [die]
+;  ]
 end
 
 
