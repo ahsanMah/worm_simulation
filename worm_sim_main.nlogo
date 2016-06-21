@@ -63,7 +63,7 @@ to setup_sim
   print "Loading parameters..."
   let filename "data/input/pH-Table.csv"
   load_param "data/input/pH-Table.csv" ph_table
-  load_param "data/input/pH-Table.csv" temp_table
+  load_param "data/input/temp-Table.csv" temp_table
   print "Done Loading"
 end
 
@@ -464,6 +464,7 @@ to go
       update_maturity
       update_thresholds
       check_reproduction
+      ;check_death
     ]
 
     move
@@ -764,7 +765,7 @@ species_genetic_diversity
 species_genetic_diversity
 0
 1
-0.1
+0
 0.1
 1
 NIL
@@ -1009,7 +1010,7 @@ INPUTBOX
 168
 212
 worm_population
-50
+500
 1
 0
 Number

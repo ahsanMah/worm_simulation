@@ -231,7 +231,7 @@ end
 
 to check_death  
   random-seed new-seed
-  set death_p random-float 100
+  set death_p random-float 1
 
   if (death_p < death_threshold) [
     ;show death_threshold
@@ -272,10 +272,13 @@ to update_thresholds
   let ph_factor 0
   let temp_factor 0
   
-  ifelse (global_temperature > max_temp_resist) [ set temp_factor max_death_threshold / (periods-in-day)]
-  [ifelse (global_temperature < low_temp_resist) [ set temp_factor max_death_threshold / (periods-in-day)]
-    [set temp_factor normal_death_threshold]
-  ]
+;  ifelse (global_temperature > max_temp_resist) [ set temp_factor max_death_threshold / (periods-in-day)]
+;  [ifelse (global_temperature < low_temp_resist) [ set temp_factor max_death_threshold / (periods-in-day)]
+;    [set temp_factor normal_death_threshold]
+;  ]
+  
+  set temp_factor 1 - (item 0 table:get temp_table global_temperature)
+ ; show death_threshold
   
   ;set temp_factor 0.1
   ;let ph_factor (3 / 42) * ((e ^ (max_ph_resist - ph) ) - 1) ; function ensures that a ph difference of 3 will have a higher death probability
@@ -296,11 +299,12 @@ to update_thresholds
  
   set hazard_rate (ln (survival / 100)) / 3
   set mortality_rate 1 - (e ^ (hazard_rate * patch_days))
-  set ph_factor mortality_rate * 100
+  set ph_factor mortality_rate ;* 100
   
   set cocoon_rate min (list temp_cocoon_rate ph_cocoon_rate)
-  set death_threshold temp_factor + ph_factor
-  ;show death
+  set death_threshold temp_factor ;+ ph_factor
+  ;print word temp_factor ph_factor
+  ;show death_threshold
 end
 
 to update_maturity
@@ -324,31 +328,38 @@ to check_if_hatch
 end
 
 to check_cocoon_death
-  let randNum random 1000
-  if global_temperature <= 5
-  [
-    if randNum >= 998 [die]
-  ]
-  if global_temperature > 5 and global_temperature <= 10
-  [
-    if randNum >= 998 [die]
-  ]
-  if global_temperature > 10 and global_temperature <= 15
-  [
-    if randNum >= 998 - (998 - 996) / 5 * (global_temperature - 10) [die]
-  ]
-  if global_temperature > 15 and global_temperature <= 20
-  [
-    if randNum >= 996 - (996 - 995) / 5 * (global_temperature - 15) [die]
-  ]
-  if global_temperature >= 20 and global_temperature <= 25
-  [
-    if randNum >= 995 - (995 - 989) / 5 * (global_temperature - 20) [die]
-  ]
-  if global_temperature > 25
-  [
-    if randNum >= 989 - 5 * (global_temperature - 25) [die]
-  ]
+  let randNum random-float 1
+  let cocoon_death_thresh item 1 table:get temp_table global_temperature
+  
+  if (randNum > cocoon_death_thresh) [
+    show cocoon_death_thresh
+    die
+    ]
+
+;  if global_temperature <= 5
+;  [
+;    if randNum >= 998 [die]
+;  ]
+;  if global_temperature > 5 and global_temperature <= 10
+;  [
+;    if randNum >= 998 [die]
+;  ]
+;  if global_temperature > 10 and global_temperature <= 15
+;  [
+;    if randNum >= 998 - (998 - 996) / 5 * (global_temperature - 10) [die]
+;  ]
+;  if global_temperature > 15 and global_temperature <= 20
+;  [
+;    if randNum >= 996 - (996 - 995) / 5 * (global_temperature - 15) [die]
+;  ]
+;  if global_temperature >= 20 and global_temperature <= 25
+;  [
+;    if randNum >= 995 - (995 - 989) / 5 * (global_temperature - 20) [die]
+;  ]
+;  if global_temperature > 25
+;  [
+;    if randNum >= 989 - 5 * (global_temperature - 25) [die]
+;  ]
 end
 
 
