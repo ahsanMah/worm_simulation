@@ -14,7 +14,7 @@ globals[
   max_pop
   pop_data
   ph_table
-  day_count
+  temp_table
   ;index positions of data in arrays
   ;month monitor species_number population density genetic diversity
 ]
@@ -22,6 +22,7 @@ to setup
   clear-all
 
   set ph_table table:make
+  set temp_table table:make
   set species_data [] ;list of collected info of each species for each monitor
   set monthly_data [] ;list of data collected each month
   set area_list []
@@ -30,20 +31,17 @@ to setup
   set final_population 0
   set max_pop 0
   set degree_accumulation_needed 1300
-  set day_count 0
 
   print "Loading temperature data..."
   load_temperature
   print "Setting up environment..."
   setup_environment
-  print "Loading parameters..."
-  load_param
   print "Setting up agents..."
   setup_agents
   print "Done"
 
   set-default-shape sides "line"
-  ;setup_sim
+  setup_sim
   recolor_patches
   reset-ticks
 end
@@ -59,10 +57,13 @@ end
 
 to setup_sim
   ;setup
-
   print "Loading from simulation files..."
   load_patches save_name
-  load_agents save_name
+  ;load_agents save_name
+  print "Loading parameters..."
+  let filename "data/input/pH-Table.csv"
+  load_param "data/input/pH-Table.csv" ph_table
+  load_param "data/input/pH-Table.csv" temp_table
   print "Done Loading"
 end
 
@@ -326,16 +327,17 @@ to load_monitors [name]
   recolor_patches
 end
 
-to load_param
-  let filename "data/input/pH-Table.csv"
+to load_param [filename table]
+
   let data csv:from-file filename
 
   foreach data[
-    let param precision (7 - item 0 ?) 1
+    let param item 0 ?
     let values (but-first ?)
-    table:put ph_table param values
+    table:put table param values
     ]
-  print ph_table
+  print filename
+  print table
 end
 
 to export_data [name]
@@ -510,7 +512,7 @@ BUTTON
 78
 43
 Setup
-ca\nsetup\nload_patches save_name
+setup
 NIL
 1
 T
@@ -581,7 +583,7 @@ ph_tolerance
 ph_tolerance
 6.5
 7.5
-7
+6.9
 0.1
 1
 NIL
