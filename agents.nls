@@ -13,6 +13,7 @@ globals [
   max_stamina
   min_stamina
   agent_size
+
   
   species_list
 
@@ -27,6 +28,7 @@ globals [
   
   shape_list
   color_list
+  subspecies_count
   
   degree_accumulation_needed
   ]
@@ -43,6 +45,7 @@ turtles-own [
   wait_days
   hatch_temp  ;minimum temperature required for cocoons to hatch
 
+  subspecies_number
   stamina     ;helps simulate starvation
   time-since-eaten
   food-consumed-last
@@ -70,7 +73,7 @@ cocoons-own[
 ]
 
 to setup_agents
-  
+  set subspecies_count 0
   set normal_death_threshold 0.00685 / (periods-in-day) ; Simulates a 4 year life span
   set normal_reproduction_rate 0.1
   set max_death_threshold 40
@@ -158,7 +161,8 @@ to create_species [species]
     set size agent_size
 
     set shape (item parent_breed shape_list)
-
+    set subspecies_number subspecies_count
+    set subspecies_count subspecies_count + 1
     set maturation_wait 0;random-normal 91 22
     set wait_period 15 + random-normal 20 3;simulates a wait period of 15 to 65 days 
     set stamina 5
@@ -198,25 +202,24 @@ to move
   ]
   
   if (bool = true)[
-          if (random 100000 <= 99999)
-        [
-          right 180
-        ]
+    if (random 100000 <= 99999)
+      [
+        right 180
+      ]
   ]
   
   if ( count (patch-set (patch-ahead  (speed * permeability / periods-in-day))) with [pcolor = grey]) > 0
   [
-   right 180
-   
+    right 180
   ]
-
+  
   forward speed * permeability / periods-in-day
   
   ifelse (ph = prev_patch) 
-  [set patch_days patch_days + 1
-  ][set patch_days 1]
+  [set patch_days patch_days + 1]
+  [set patch_days 1]
   
-  eat
+  ;eat
   check_death
 end
 
@@ -246,27 +249,27 @@ end
 to check_reproduction
   
   if not burrow [
-  if (global_temperature > reprod_min_temp and pcolor != blue) [
-    if (global_temperature < reprod_max_temp)[
-      
-      if (maturation_wait < 1) [
-        set cocoon cocoon + cocoon_rate
-      ]
-      
-      if (cocoon >= 1)[
-        hatch-cocoons 1 [
-          set degree_accumulation item (16 - reprod_min_temp) [1300 1200 1100 1000]
-          set maturation_wait random-normal 91 22
-          set wait_days 0
-          set color (item parent_breed color_list)
-          set shape "dot"
+    if (global_temperature > reprod_min_temp and pcolor != blue) [
+      if (global_temperature < reprod_max_temp)[
+        
+        if (maturation_wait < 1) [
+          set cocoon cocoon + cocoon_rate
         ]
-        set cocoon 0
+        
+        if (cocoon >= 1)[
+          hatch-cocoons 1 [
+            set degree_accumulation item (16 - reprod_min_temp) [1300 1200 1100 1000]
+            set maturation_wait random-normal 91 22
+            set wait_days 0
+            set color (item parent_breed color_list)
+            set shape "dot"
+          ]
+          set cocoon 0
+        ]
       ]
     ]
   ]
- ]
-
+  
 end
 
 ;updates probablities of dying and reproducing
@@ -352,8 +355,8 @@ to check_cocoon_death
   
   if (randNum > cocoon_death_thresh) [
     die
-    ]
-
+  ]
+  
 ;  if global_temperature <= 5
 ;  [
 ;    if randNum >= 998 [die]

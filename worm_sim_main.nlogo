@@ -86,7 +86,7 @@ to draw_highway
     ask patch mouse-xcor mouse-ycor
     [
       set permeability road_speed
-      set pcolor turquoise
+      set pcolor magenta
       set food-here default_food_value
     ]
     display
@@ -126,7 +126,7 @@ to pen
       [
         set food-here default_food_value
         set permeability road_speed
-        set pcolor turquoise
+        set pcolor magenta
 
       ]
       if (change: = "pH" or change: = "temperature difference and pH")
@@ -460,13 +460,15 @@ to go
 
   ask adults [
     ;update_speed
-    if (ticks mod (periods-in-day) = 0) [
-      update_maturity
-      update_thresholds
-      check_reproduction
-      ;check_death
-    ]
+    update_thresholds
+    if not burrow[
+      if (ticks mod (periods-in-day) = 0) [
+        update_maturity
 
+        check_reproduction
+        ;check_death
+      ]
+    ]
     move
 
     ;set food-here food-here + organic-regen
@@ -716,7 +718,7 @@ INPUTBOX
 1296
 439
 save_name
-phSim
+roadSim
 1
 0
 String (reporter)
@@ -779,7 +781,7 @@ CHOOSER
 species_number
 species_number
 1 2 3 4 5
-0
+1
 
 BUTTON
 128
@@ -982,7 +984,7 @@ CHOOSER
 change:
 change:
 "pH" "temperature difference" "pH and temperature difference" "water" "highway"
-0
+4
 
 TEXTBOX
 1067
@@ -1001,8 +1003,8 @@ CHOOSER
 135
 change:
 change:
-"pH" "temperature difference" "pH and temperature difference" "mountain" "monitor"
-0
+"pH" "temperature difference" "pH and temperature difference" "mountain" "monitor" "highway"
+5
 
 INPUTBOX
 13

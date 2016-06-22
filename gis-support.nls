@@ -42,7 +42,7 @@ to setup_gis
   map_patches
   print "Finished setting up GIS"
   
-  ;gis:set-drawing-color turquoise
+  ;gis:set-drawing-color magenta
   ;gis:draw road_dataset 5
 end
 
@@ -105,7 +105,7 @@ to map_patches
 ;   if (road = 36)
 ;   [
 ;      set permeability road_speed
-;      set pcolor turquoise
+;      set pcolor magenta
 ;      set food-here default_food_value
 ;   ]
 
@@ -127,7 +127,7 @@ to map_patches
             ask patch item 0 road_point item 1 road_point
             [
               set permeability road_speed
-              set pcolor turquoise
+              set pcolor magenta
               set food-here default_food_value
             ]
             if not empty? last_point
@@ -149,7 +149,7 @@ to map_patches
                 ask patch x-at y-at
                 [
                   set permeability road_speed
-                  set pcolor turquoise
+                  set pcolor magenta
                   set food-here default_food_value
                   ;print "coloring in between things"
                 ]
