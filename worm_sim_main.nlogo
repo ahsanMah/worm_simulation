@@ -15,6 +15,7 @@ globals[
   pop_data
   ph_table
   temp_table
+  fishing_spots
   ;index positions of data in arrays
   ;month monitor species_number population density genetic diversity
 ]
@@ -30,7 +31,7 @@ to setup
   set report_month 0
   set final_population 0
   set max_pop 0
-  set degree_accumulation_needed 1300
+  set fishing_spots [ [67.03 242.13] [118.73 214.20] [125.4 162.5] [112.48 289.6] [135.83 175.43] ]
 
   print "Loading temperature data..."
   load_temperature
@@ -171,7 +172,7 @@ to save_patches [name]
     [
       ask patch i j
       [
-        let info (list i j ph food-here permeability local_death_threshold temp_diff_here pcolor)
+        let info (list i j ph food-here permeability local_death_threshold temp_diff_here pcolor soil_depth)
         file-open filename
         file-print csv:to-row info
         file-close
@@ -199,6 +200,7 @@ to load_patches [name]
       set temp_diff_here item 6 ?
       set being_monitored false
       set pcolor item 7 ?
+      set soil_depth item 8 ?
     ]
   ]
   load_monitors name
@@ -387,6 +389,17 @@ to collect_monthly_data
 
 end
 
+to random_insertions
+  let randNum 1000
+  if randNum > 998 [
+    let species one-of table:keys species_list
+    let spot one-of fishing_spots
+    let number 10
+    add_species (item 0 spot) (item 1 spot) number species
+    ]
+
+end
+
 to-report maxPop
   report max_pop
 end
@@ -441,6 +454,8 @@ to go
     stop
   ]
 
+  if (ticks mod 14 = 0) [ random_insertions]
+
   if (day_of_month = (item current_month num_days - 1))[ ;clears arrays a day before collection
     clear_arrays
   ]
@@ -460,14 +475,19 @@ to go
 
   ask adults [
     ;update_speed
-    if (ticks mod (periods-in-day) = 0) [
+    update_thresholds
+    if not burrow [ ;could make burrow global to speed up runtime
+      if (ticks mod (periods-in-day) = 0) [
+
       update_maturity
-      update_thresholds
+
       check_reproduction
       ;check_death
-    ]
+      ]
 
-    move
+      move
+
+    ]
 
     ;set food-here food-here + organic-regen
   ]
@@ -560,10 +580,10 @@ NIL
 1
 
 MONITOR
-1057
-486
-1165
-531
+1055
+483
+1163
+528
 Day Number
 day_num
 17
@@ -602,7 +622,7 @@ ph_tolerance
 ph_tolerance
 6.0
 7.5
-6
+7
 0.1
 1
 NIL
@@ -624,10 +644,10 @@ NIL
 HORIZONTAL
 
 MONITOR
-1058
-535
-1165
-580
+1056
+532
+1163
+577
 Population Count
 count adults
 17
@@ -635,10 +655,10 @@ count adults
 11
 
 PLOT
-1046
-591
-1310
-764
+1044
+588
+1308
+761
 Worm Population over Years
 NIL
 NIL
@@ -653,10 +673,10 @@ PENS
 "default" 1.0 1 -11221820 true "" "plotxy year count adults"
 
 MONITOR
-1173
-535
-1271
-580
+1171
+532
+1269
+577
 Cocoon Count
 count cocoons
 17
@@ -675,10 +695,10 @@ starting_day
 Number
 
 MONITOR
-1173
-485
-1268
-530
+1171
+482
+1266
+527
 Daily Temp *C
 global_temperature
 2
@@ -687,9 +707,9 @@ global_temperature
 
 CHOOSER
 1057
-41
+40
 1297
-86
+85
 obstacle_shape
 obstacle_shape
 "circle" "rectangle" "mountain" "monitor"
@@ -711,10 +731,10 @@ NIL
 HORIZONTAL
 
 INPUTBOX
-1179
-356
-1296
-439
+1177
+353
+1294
+436
 save_name
 phSim
 1
@@ -723,9 +743,9 @@ String (reporter)
 
 SLIDER
 1058
-139
+138
 1297
-172
+171
 patch_pH
 patch_pH
 0
@@ -737,10 +757,10 @@ NIL
 HORIZONTAL
 
 CHOOSER
-1056
-356
-1175
-401
+1054
+353
+1173
+398
 Show:
 Show:
 "pH" "food" "temperature" "monitor" "turtle density"
@@ -779,7 +799,7 @@ CHOOSER
 species_number
 species_number
 1 2 3 4 5
-0
+2
 
 BUTTON
 128
@@ -799,10 +819,10 @@ NIL
 1
 
 BUTTON
-1054
-406
-1175
-439
+1052
+403
+1173
+436
 Recolor Patches
 recolor_patches
 NIL
@@ -816,10 +836,10 @@ NIL
 1
 
 BUTTON
-1054
-442
-1176
-475
+1052
+439
+1174
+472
 Save Environment
 save_patches save_name
 NIL
@@ -833,10 +853,10 @@ NIL
 1
 
 BUTTON
-1178
-442
-1297
-475
+1176
+439
+1295
+472
 Load Environment
 load_patches save_name
 NIL
@@ -885,9 +905,9 @@ NIL
 
 SLIDER
 1058
-175
+174
 1297
-208
+207
 temperature_difference
 temperature_difference
 -10
@@ -910,9 +930,9 @@ Environment Controls\n
 
 BUTTON
 1057
-215
+214
 1176
-248
+247
 Draw
 pen
 T
@@ -927,9 +947,9 @@ NIL
 
 BUTTON
 1180
-215
+214
 1297
-248
+247
 Select
 edit_environment
 T
@@ -944,9 +964,9 @@ NIL
 
 BUTTON
 1057
-255
+254
 1297
-288
+287
 Edit Patch
 recolor-selected
 NIL
@@ -960,10 +980,10 @@ NIL
 1
 
 SLIDER
-1057
-313
-1296
-346
+1055
+310
+1294
+343
 save_number
 save_number
 0
@@ -976,9 +996,9 @@ HORIZONTAL
 
 CHOOSER
 1058
-90
+89
 1297
-135
+134
 change:
 change:
 "pH" "temperature difference" "pH and temperature difference" "water" "highway"
@@ -996,9 +1016,9 @@ Environment Controls\n
 
 CHOOSER
 1058
-90
+89
 1297
-135
+134
 change:
 change:
 "pH" "temperature difference" "pH and temperature difference" "mountain" "monitor"

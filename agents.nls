@@ -235,12 +235,10 @@ end
 to check_death  
   random-seed new-seed
   set death_p random-float 1
-  if (burrow = false) [
-    if (death_p > death_threshold) [
+    if (death_p < death_threshold) [
       ;show death_threshold
       die
     ]
-  ]
 end
 
 to check_reproduction
@@ -295,7 +293,7 @@ to update_thresholds
   ;set temp_factor 0.1
   ;let ph_factor (3 / 42) * ((e ^ (max_ph_resist - ph) ) - 1) ; function ensures that a ph difference of 3 will have a higher death probability
   ;reproduction rate affected by temperature + pH
-  set temp_cocoon_rate 0.65 / 7
+  set temp_cocoon_rate 0.54 / 7
   
   ;;pH of soil also affects survival + reproduction rate
   let mapped_ph precision (ph + ph_shift) 1
@@ -303,8 +301,8 @@ to update_thresholds
   
   
   ifelse table:has-key? ph_table mapped_temp [
-    set temp_factor (item 0 table:get temp_table mapped_temp)
-  ][ set temp_factor (item 0 table:get temp_table global_temperature) ]
+    set temp_factor 1 - (item 0 table:get temp_table mapped_temp)
+  ][ set temp_factor 1 - (item 0 table:get temp_table global_temperature) ]
   
   ifelse table:has-key? ph_table mapped_ph [
     set ph_cocoon_rate (item 1 table:get ph_table mapped_ph) / 7
@@ -319,8 +317,8 @@ to update_thresholds
   set mortality_rate 1 - (e ^ (hazard_rate * patch_days))
   set ph_factor mortality_rate
   
-  set cocoon_rate min (list temp_cocoon_rate ph_cocoon_rate) ;temp_factor
-  set death_threshold temp_factor ;+ ph_factor
+  set cocoon_rate temp_factor ;min (list temp_cocoon_rate ph_cocoon_rate) ;temp_factor
+  set death_threshold temp_factor + ph_factor
   ;print word temp_factor ph_factor
   ;show death_threshold
 end

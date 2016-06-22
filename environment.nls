@@ -109,8 +109,9 @@ to setup_environment
     set being_monitored false
     set monitor_index -1
     setup-initial-food
-    recolor-patch
     set soil_depth 200
+    recolor-patch
+    
   ]
   
 end
