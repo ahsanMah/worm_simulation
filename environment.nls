@@ -51,7 +51,7 @@ patches-own
   being_monitored
   monitor_size
   monitor_index
-                
+  soil_depth             
   
 ]
 
@@ -110,6 +110,7 @@ to setup_environment
     set monitor_index -1
     setup-initial-food
     recolor-patch
+    set soil_depth 200
   ]
   
 end
@@ -194,12 +195,12 @@ to recolor-patch
       ]
       if (ph < 7)
       [
-       set pcolor scale-color green ph -2 7
+       set pcolor scale-color green ph 3 7
       ]
     ]
     if (Show: = "food")
     [
-      set pcolor scale-color green food-here 6000 0
+      set pcolor scale-color brown soil_depth 350 0
     ]
     if (Show: = "temperature")
     [
@@ -223,7 +224,7 @@ to recolor-patch
     
     ifelse (Show: = "turtle density")
     [
-      if (pcolor != blue and pcolor != grey and pcolor != turquoise )
+      if (pcolor != blue and pcolor != grey and pcolor != turquoise and count turtles-here > 0)
         [
           set pcolor scale-color orange (count turtles-here) 25 0
         ]

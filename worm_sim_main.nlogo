@@ -600,9 +600,9 @@ SLIDER
 253
 ph_tolerance
 ph_tolerance
-6.5
+6.0
 7.5
-7
+6
 0.1
 1
 NIL
@@ -744,7 +744,7 @@ CHOOSER
 Show:
 Show:
 "pH" "food" "temperature" "monitor" "turtle density"
-4
+0
 
 TEXTBOX
 10
@@ -779,7 +779,7 @@ CHOOSER
 species_number
 species_number
 1 2 3 4 5
-1
+0
 
 BUTTON
 128
@@ -1010,7 +1010,7 @@ INPUTBOX
 168
 212
 worm_population
-5000
+50
 1
 0
 Number

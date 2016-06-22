@@ -62,7 +62,7 @@ turtles-own [
   patch_days
   ph_shift  ;shift in optimum ph due to tolerance
   temp_shift
-
+  burrow
   ]
 cocoons-own[
  degree_days 
@@ -174,6 +174,7 @@ to create_species [species]
     set cocoon_rate 0.093
     set prev_patch ph
     set patch_days 0
+    set burrow false
    ]
 end
 
@@ -234,14 +235,17 @@ end
 to check_death  
   random-seed new-seed
   set death_p random-float 1
-
-  if (death_p > death_threshold) [
-    ;show death_threshold
-    die
+  if (burrow = false) [
+    if (death_p > death_threshold) [
+      ;show death_threshold
+      die
+    ]
   ]
 end
 
 to check_reproduction
+  
+  if not burrow [
   if (global_temperature > reprod_min_temp and pcolor != blue) [
     if (global_temperature < reprod_max_temp)[
       
@@ -261,6 +265,7 @@ to check_reproduction
       ]
     ]
   ]
+ ]
 
 end
 
@@ -282,6 +287,10 @@ to update_thresholds
   
   
  ; show death_threshold
+ 
+ if (day_num > 90) [set burrow false]
+ if (day_num > 300) [set burrow true]
+ 
   
   ;set temp_factor 0.1
   ;let ph_factor (3 / 42) * ((e ^ (max_ph_resist - ph) ) - 1) ; function ensures that a ph difference of 3 will have a higher death probability
@@ -295,12 +304,7 @@ to update_thresholds
   
   ifelse table:has-key? ph_table mapped_temp [
     set temp_factor (item 0 table:get temp_table mapped_temp)
-  ]
-  [
-    set temp_factor (item 0 table:get temp_table global_temperature)
-    ]
-  
-  
+  ][ set temp_factor (item 0 table:get temp_table global_temperature) ]
   
   ifelse table:has-key? ph_table mapped_ph [
     set ph_cocoon_rate (item 1 table:get ph_table mapped_ph) / 7
@@ -315,7 +319,7 @@ to update_thresholds
   set mortality_rate 1 - (e ^ (hazard_rate * patch_days))
   set ph_factor mortality_rate
   
-  set cocoon_rate temp_cocoon_rate ;min (list temp_cocoon_rate ph_cocoon_rate)
+  set cocoon_rate min (list temp_cocoon_rate ph_cocoon_rate) ;temp_factor
   set death_threshold temp_factor ;+ ph_factor
   ;print word temp_factor ph_factor
   ;show death_threshold
@@ -347,7 +351,7 @@ to check_cocoon_death
   let cocoon_death_thresh item 1 table:get temp_table global_temperature
   
   if (randNum > cocoon_death_thresh) [
-
+    die
     ]
 
 ;  if global_temperature <= 5
