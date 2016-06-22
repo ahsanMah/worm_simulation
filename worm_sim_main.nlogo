@@ -16,7 +16,15 @@ globals[
   ph_table
   temp_table
   fishing_spots
-  save_number
+  xlow
+  xhigh
+  x-low
+  x-high
+  ylow
+  yhigh
+  y-low
+  y-high
+  ;save_number
   ;index positions of data in arrays
   ;month monitor species_number population density genetic diversity
 ]
@@ -54,6 +62,35 @@ to initialize_monitors
   draw_monitor 240 300 0 60
   draw_monitor 240 300 240 300
   draw_monitor 120 180 120 180
+end
+
+to xbounds
+  if count turtles > 0 [
+  ask one-of turtles[
+    set xlow xcor
+    set xhigh xcor
+  ]
+  ask turtles[
+    if xcor < xlow [set xlow xcor]
+    if xcor > xhigh [set xhigh xcor]
+  ]
+  set x-low xlow
+  set x-high xhigh
+  ]
+end
+to ybounds
+  if count turtles > 0 [
+  ask one-of turtles[
+    set ylow xcor
+    set yhigh xcor
+  ]
+  ask turtles[
+    if ycor < ylow [set ylow xcor]
+    if ycor > yhigh [set yhigh xcor]
+  ]
+  set y-low ylow
+  set y-high yhigh
+  ]
 end
 
 
@@ -455,7 +492,7 @@ to go
     stop
   ]
 
-  if (ticks mod 14 = 0) [ random_insertions]
+  ;if (ticks mod 14 = 0) [ random_insertions]
 
   if (day_of_month = (item current_month num_days - 1))[ ;clears arrays a day before collection
     clear_arrays
@@ -483,10 +520,11 @@ to go
         update_maturity
 
         check_reproduction
-        ;check_death
+        check_death
+        move
       ]
     ]
-      move
+
 
     ]
 
@@ -1037,11 +1075,49 @@ worm_population
 worm_population
 0
 500
-50
+80
 5
 1
 NIL
 HORIZONTAL
+
+PLOT
+1035
+502
+1235
+652
+plot 1
+NIL
+NIL
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" "xbounds"
+PENS
+"default" 1.0 0 -16777216 true "" "plot x-low"
+"pen-1" 1.0 0 -7500403 true "" "plot x-high"
+
+PLOT
+1244
+498
+1444
+648
+plot 2
+NIL
+NIL
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" "ybounds"
+PENS
+"default" 1.0 0 -16777216 true "" "plot y-low"
+"pen-1" 1.0 0 -7500403 true "" "plot y-high"
 
 @#$#@#$#@
 ## WHAT IS IT?
