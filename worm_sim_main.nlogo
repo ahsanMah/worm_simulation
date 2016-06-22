@@ -16,6 +16,7 @@ globals[
   ph_table
   temp_table
   fishing_spots
+  save_number
   ;index positions of data in arrays
   ;month monitor species_number population density genetic diversity
 ]
@@ -343,8 +344,8 @@ to load_param [filename table]
 end
 
 to export_data [name]
-  let filename (word "data/output/simulation" save_name ph_tolerance ".csv")
-  let filename2 (word "data/output/finalPop" save_name ph_tolerance ".csv")
+  let filename (word "data/output/simulation" save_name ph_tolerance save_number ".csv")
+  let filename2 (word "data/output/finalPop" save_name ph_tolerance save_number ".csv")
   csv:to-file filename monthly_data
   csv:to-file filename2 pop_data
   print "Exported simulation data to file"
@@ -764,7 +765,7 @@ CHOOSER
 Show:
 Show:
 "pH" "food" "temperature" "monitor" "turtle density"
-1
+0
 
 TEXTBOX
 10
@@ -978,21 +979,6 @@ NIL
 NIL
 NIL
 1
-
-SLIDER
-1055
-310
-1294
-343
-save_number
-save_number
-0
-100
-0
-1
-1
-NIL
-HORIZONTAL
 
 CHOOSER
 1058
@@ -1494,7 +1480,7 @@ setup_sim</setup>
     <setup>setup</setup>
     <go>go</go>
     <metric>count turtles</metric>
-    <enumeratedValueSet variable="amount_egested">
+    <enumeratedValueSet variable="save_number">
       <value value="2"/>
       <value value="3"/>
       <value value="4"/>
