@@ -490,7 +490,7 @@ to go
     ]
 
     ;set food-here food-here + organic-regen
-  ]
+
   ask patches with [being_monitored = true]
   [
     if (day_of_month = item current_month num_days)[
@@ -764,7 +764,7 @@ CHOOSER
 Show:
 Show:
 "pH" "food" "temperature" "monitor" "turtle density"
-0
+1
 
 TEXTBOX
 10
