@@ -87,7 +87,7 @@ to draw_highway
     ask patch mouse-xcor mouse-ycor
     [
       set permeability road_speed
-      set pcolor turquoise
+      set pcolor magenta
       set food-here default_food_value
     ]
     display
@@ -127,7 +127,7 @@ to pen
       [
         set food-here default_food_value
         set permeability road_speed
-        set pcolor turquoise
+        set pcolor magenta
 
       ]
       if (change: = "pH" or change: = "temperature difference and pH")
@@ -479,12 +479,12 @@ to go
     if not burrow [ ;could make burrow global to speed up runtime
       if (ticks mod (periods-in-day) = 0) [
 
-      update_maturity
+        update_maturity
 
-      check_reproduction
-      ;check_death
+        check_reproduction
+        ;check_death
       ]
-
+    ]
       move
 
     ]
@@ -736,7 +736,7 @@ INPUTBOX
 1294
 436
 save_name
-phSim
+roadSim
 1
 0
 String (reporter)
@@ -1002,7 +1002,7 @@ CHOOSER
 change:
 change:
 "pH" "temperature difference" "pH and temperature difference" "water" "highway"
-0
+4
 
 TEXTBOX
 1067
@@ -1021,8 +1021,8 @@ CHOOSER
 134
 change:
 change:
-"pH" "temperature difference" "pH and temperature difference" "mountain" "monitor"
-0
+"pH" "temperature difference" "pH and temperature difference" "mountain" "monitor" "highway"
+5
 
 INPUTBOX
 13

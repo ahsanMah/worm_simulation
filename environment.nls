@@ -181,7 +181,7 @@ to setup-initial-food
 end
 
 to recolor-patch
-  if (pcolor != blue and pcolor != grey and pcolor != turquoise)
+  if (pcolor != blue and pcolor != grey and pcolor != magenta)
   [
 
     if (Show: = "pH")
@@ -225,7 +225,7 @@ to recolor-patch
     
     ifelse (Show: = "turtle density")
     [
-      if (pcolor != blue and pcolor != grey and pcolor != turquoise and count turtles-here > 0)
+      if (pcolor != blue and pcolor != grey and pcolor != magenta and count turtles-here > 0)
         [
           set pcolor scale-color orange (count turtles-here) 25 0
         ]
