@@ -78,6 +78,7 @@ to xbounds
   set x-high xhigh
   ]
 end
+
 to ybounds
   if count turtles > 0 [
   ask one-of turtles[
@@ -85,8 +86,8 @@ to ybounds
     set yhigh xcor
   ]
   ask turtles[
-    if ycor < ylow [set ylow xcor]
-    if ycor > yhigh [set yhigh xcor]
+    if ycor < ylow [set ylow ycor]
+    if ycor > yhigh [set yhigh ycor]
   ]
   set y-low ylow
   set y-high yhigh
@@ -1086,7 +1087,7 @@ PLOT
 502
 1235
 652
-plot 1
+X Boundaries
 NIL
 NIL
 0.0
@@ -1097,15 +1098,15 @@ true
 false
 "" "xbounds"
 PENS
-"default" 1.0 0 -16777216 true "" "plot x-low"
-"pen-1" 1.0 0 -7500403 true "" "plot x-high"
+"high" 1.0 0 -16777216 true "" "plotxy x-low ticks"
+"low" 1.0 0 -7500403 true "" "plotxy x-high ticks"
 
 PLOT
-1244
-498
-1444
-648
-plot 2
+1239
+501
+1439
+651
+Y Boundaries
 NIL
 NIL
 0.0
@@ -1116,8 +1117,8 @@ true
 false
 "" "ybounds"
 PENS
-"default" 1.0 0 -16777216 true "" "plot y-low"
-"pen-1" 1.0 0 -7500403 true "" "plot y-high"
+"high" 1.0 0 -16777216 true "" "plot y-low"
+"low" 1.0 0 -7500403 true "" "plot y-high"
 
 @#$#@#$#@
 ## WHAT IS IT?
