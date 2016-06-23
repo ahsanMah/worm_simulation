@@ -82,8 +82,8 @@ end
 to ybounds
   if count turtles > 0 [
   ask one-of turtles[
-    set ylow xcor
-    set yhigh xcor
+    set ylow ycor
+    set yhigh ycor
   ]
   ask turtles[
     if ycor < ylow [set ylow ycor]
@@ -430,13 +430,13 @@ to collect_monthly_data
 end
 
 to random_insertions
-  let randNum 1000
-  if randNum > 998 [
+  ;let randNum 1000
+  ;if randNum > 998 [
     let species one-of table:keys species_list
     let spot one-of fishing_spots
-    let number 10
+    let number number_inserted
     add_species (item 0 spot) (item 1 spot) number species
-    ]
+    ;]
 
 end
 
@@ -474,7 +474,7 @@ to go
       set pop_data lput (list year finalPop) pop_data
       export_data save_number
       set final_population 0
-      stop
+      ;stop
     ]
   ]
 
@@ -498,7 +498,7 @@ to go
     stop
   ]
 
-  ;if (ticks mod 14 = 0) [ random_insertions]
+  if (Random_Insertions? = true and ticks mod (365 / insertion_frequency)= 0) [ random_insertions]
 
   if (day_of_month = (item current_month num_days - 1))[ ;clears arrays a day before collection
     clear_arrays
@@ -1112,6 +1112,43 @@ false
 PENS
 "low" 1.0 0 -16777216 true "" "plot y-low"
 "high" 1.0 0 -7500403 true "" "plot y-high"
+
+SWITCH
+1297
+148
+1479
+181
+Random_Insertions?
+Random_Insertions?
+1
+1
+-1000
+
+SLIDER
+1296
+184
+1479
+217
+insertion_frequency
+insertion_frequency
+1
+104
+2
+1
+1
+/year
+HORIZONTAL
+
+INPUTBOX
+1296
+223
+1479
+283
+number_inserted
+10
+1
+0
+Number
 
 @#$#@#$#@
 ## WHAT IS IT?
