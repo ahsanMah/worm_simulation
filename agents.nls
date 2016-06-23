@@ -77,7 +77,7 @@ to setup_agents
   set normal_death_threshold 0.00685 / (periods-in-day) ; Simulates a 4 year life span
   set normal_reproduction_rate 0.1
   set max_death_threshold 40
-  set agent_size 3
+  set agent_size 2
   set steps-per-ie 5
   set max_stamina 5
   set min_stamina 1
@@ -280,8 +280,9 @@ foreach prev_days_temp [
  ]
 
 ;worm starts burrowing if it senses high death chance in the past few days
-ifelse (survival_prob < 0.75) [set burrow true]
-[ set burrow false]
+ifelse (survival_prob < 0.75) 
+  [set burrow true]
+  [ set burrow false]
 
 end
 

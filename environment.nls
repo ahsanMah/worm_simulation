@@ -146,7 +146,9 @@ to draw_obstacles
 end
 
 to calculate_time
+  
   if (ticks mod (periods-in-day) = 0) [
+    set current_day current_day + 1
     set day_num day_num + 1
     set day_of_month day_of_month + 1
   ]
@@ -497,7 +499,7 @@ to update_monitor_area [index]
   show area_list
 end
 
-to collect_data
+to collect_monitor_data
     if (being_monitored) [
       let patch_population 0
       

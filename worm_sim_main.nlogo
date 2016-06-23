@@ -66,31 +66,31 @@ end
 
 to xbounds
   if count turtles > 0 [
-  ask one-of turtles[
-    set xlow xcor
-    set xhigh xcor
-  ]
-  ask turtles[
-    if xcor < xlow [set xlow xcor]
-    if xcor > xhigh [set xhigh xcor]
-  ]
-  set x-low xlow
-  set x-high xhigh
+    ask one-of turtles[
+      set xlow xcor
+      set xhigh xcor
+    ]
+    ask turtles[
+      if xcor < xlow [set xlow xcor]
+      if xcor > xhigh [set xhigh xcor]
+    ]
+    set x-low xlow
+    set x-high xhigh
   ]
 end
 
 to ybounds
   if count turtles > 0 [
-  ask one-of turtles[
-    set ylow xcor
-    set yhigh xcor
-  ]
-  ask turtles[
-    if ycor < ylow [set ylow ycor]
-    if ycor > yhigh [set yhigh ycor]
-  ]
-  set y-low ylow
-  set y-high yhigh
+    ask one-of turtles[
+      set ylow xcor
+      set yhigh xcor
+    ]
+    ask turtles[
+      if ycor < ylow [set ylow ycor]
+      if ycor > yhigh [set yhigh ycor]
+    ]
+    set y-low ylow
+    set y-high yhigh
   ]
 end
 
@@ -286,7 +286,7 @@ to load_agents [name]
     create-adults 1 [
       setxy item 0 ? item 1 ?
       set parent_breed item 2 ?
-      set size 1
+      set size agent_size
       set shape item 3 ?
       set maturation_wait 70
       set wait_period item 4 ?
@@ -321,7 +321,6 @@ to load_temperature
     table:put temperature_table days_since_start row_entry
     set days_since_start days_since_start + 1
   ]
-
 
   file-close
 
@@ -377,7 +376,7 @@ to load_param [filename table]
     let param item 0 ?
     let values (but-first ?)
     table:put table param values
-    ]
+  ]
   print filename
   print table
 end
@@ -386,7 +385,7 @@ to export_data [name]
   let filename (word "data/output/simulation" save_name ph_tolerance save_number ".csv")
   let filename2 (word "data/output/finalPop" save_name ph_tolerance save_number ".csv")
   csv:to-file filename monthly_data
-  csv:to-file filename2 pop_data
+  ;csv:to-file filename2 [1 2 3]
   print "Exported simulation data to file"
 end
 
@@ -399,7 +398,7 @@ to clear_arrays
     let current_species_number item 0 ?
     let species_info item 1 ?           ;data to be exported from species_list can be changed in add_species function
 
-    ;n*m matrix of species data for every monitor
+                                        ;n*m matrix of species data for every monitor
     let species_matrix array:from-list monitor_list  ;n = number of species charcteristics being collected, m = number of monitors
     foreach monitor_list [
       let matrix_row sentence (list report_month ? current_species_number 0 0) species_info
@@ -436,87 +435,14 @@ to random_insertions
     let spot one-of fishing_spots
     let number 10
     add_species (item 0 spot) (item 1 spot) number species
-    ]
+  ]
 
 end
 
-to-report maxPop
-  report max_pop
-end
+to simulate_agents
 
-to-report finalPop
-  report final_population / 365
-end
-
-to-report collected_data
-  report monthly_data
-end
-to go
-
-;  let filename (word "movie/" ticks ".png")
-;  export-view filename
-;
-;  if (ticks = 480) [stop]
-
-  if (count turtles = 0) [
-    export_data save_number
-    stop
-  ]
-
-  calculate_time
-
-  if (year = 1) [
-    set final_population (final_population + count adults)
-  ]
-
-  if (year = 2) [
-    if (ticks mod 365 = 1)[ ;coolects data
-      set pop_data lput (list year finalPop) pop_data
-      export_data save_number
-      set final_population 0
-      stop
-    ]
-  ]
-
-  if (year = 19) [
-    set final_population (final_population + count adults)
-  ]
-
-  if (year = 20) [
-    set pop_data lput (list year (final_population / 365)) pop_data
-    export_data save_number
-    set final_population 0
-  ]
-
-  if (year = 29) [
-    set final_population (final_population + count adults)
-  ]
-
-  if (year = 30) [
-    set pop_data lput (list year (final_population / 365)) pop_data
-    export_data save_number
-    stop
-  ]
-
-  ;if (ticks mod 14 = 0) [ random_insertions]
-
-  if (day_of_month = (item current_month num_days - 1))[ ;clears arrays a day before collection
-    clear_arrays
-  ]
-
-  if (ticks mod (periods-in-day) = 0) [
-    set current_day current_day + 1
-    set global_temperature table:get temperature_table current_day
-    if (current_day > 3) [
-
-      set prev_days_temp (list
-        table:get temperature_table (current_day - 2)
-        table:get temperature_table (current_day - 1)
-        global_temperature)
-    ]
-      ask cocoons [
-        check_if_hatch
-      ]
+  ask cocoons [
+    check_if_hatch
   ]
 
   ask adults [
@@ -532,20 +458,53 @@ to go
     ]
   ]
 
-    ;set food-here food-here + organic-regen
 
-  ask patches with [being_monitored = true]
-  [
-    if (day_of_month = item current_month num_days)[
-      if (has_collected = false)[
-        collect_data
-      ]
-    ]
+end
+
+to simulate_environment
+
+  set global_temperature table:get temperature_table current_day
+
+  if (current_day > 3) [
+    set prev_days_temp (list
+      table:get temperature_table (current_day - 2)
+      table:get temperature_table (current_day - 1)
+      global_temperature)
   ]
 
-  ;collect_monthly_data
-  ;saves monthly data to accumulutor list
+end
+
+
+to collect_data
+
+
+  if (year = 1) [
+    calculate_maxPop
+  ]
+
+  if (year = 19) [
+    calculate_maxPop
+  ]
+
+  if (year = 29) [
+    calculate_maxPop
+  ]
+
+  if (day_of_month = (item current_month num_days - 1))[ ;clears arrays a day before collection
+    clear_arrays
+  ]
+
   if (day_of_month = item current_month num_days)[
+    ask patches with [being_monitored = true]
+    [
+      if (has_collected = false)[
+        collect_monitor_data
+      ]
+    ]
+
+
+    ;collect_monthly_data
+    ;saves monthly data to accumulutor list
     if (has_collected = false) [
       ;show species_data
       foreach species_data [
@@ -558,6 +517,85 @@ to go
       set has_collected true
     ]
   ]
+
+
+end
+
+to check_stopping_conditions
+
+  if (count turtles = 0) [
+    export_data save_number
+    stop
+  ]
+
+  if (year = 2) [
+    if (ticks mod 365 = 1)[ ;coolects data
+      set pop_data lput max_pop pop_data
+      set pop_data lput max_pop pop_data
+      show pop_data
+      export_data save_number
+      set max_pop 0
+      stop
+    ]
+  ]
+
+  if (year = 20) [
+    if (ticks mod 365 = 1)[
+      set pop_data lput max_pop pop_data
+      export_data save_number
+      set max_pop 0
+    ]
+  ]
+
+  if (year = 30) [
+    if (ticks mod 365 = 1)[
+      set pop_data lput max_pop pop_data
+      export_data save_number
+      set max_pop 0
+      stop
+    ]
+  ]
+
+
+end
+
+to calculate_maxPop
+  let current_pop count adults
+  if (current_pop > max_pop) [set max_pop current_pop]
+end
+
+to-report maxPop
+  report max_pop
+end
+
+to-report finalPop
+  report final_population / 365
+end
+
+to-report collected_data
+  report monthly_data
+end
+
+
+to go
+
+  ;  let filename (word "movie/" ticks ".png")
+  ;  export-view filename
+  ;
+  ;  if (ticks = 480) [stop]
+
+  calculate_time
+
+  check_stopping_conditions
+
+  ;if (ticks mod 14 = 0) [ random_insertions]
+
+  simulate_environment
+
+  simulate_agents
+
+  collect_data
+
   tick
 end
 @#$#@#$#@
