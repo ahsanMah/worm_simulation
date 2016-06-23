@@ -211,7 +211,7 @@ to save_patches [name]
     [
       ask patch i j
       [
-        let info (list i j ph food-here permeability local_death_threshold temp_diff_here pcolor soil_depth)
+        let info (list i j ph food-here permeability local_death_threshold temp_diff_here pcolor soil_depth moisture)
         file-open filename
         file-print csv:to-row info
         file-close
@@ -240,6 +240,7 @@ to load_patches [name]
       set being_monitored false
       set pcolor item 7 ?
       set soil_depth item 8 ?
+      set moisture item 9 ?
     ]
   ]
   load_monitors name
@@ -804,7 +805,7 @@ CHOOSER
 Show:
 Show:
 "pH" "food" "temperature" "monitor" "turtle density"
-4
+0
 
 TEXTBOX
 8
