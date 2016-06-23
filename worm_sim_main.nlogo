@@ -383,9 +383,9 @@ end
 
 to export_data [name]
   let filename (word "data/output/simulation" save_name ph_tolerance save_number ".csv")
-  let filename2 (word "data/output/finalPop" save_name ph_tolerance save_number ".csv")
+  ;let filename2 (word "data/output/finalPop" save_name ph_tolerance save_number ".csv")
   csv:to-file filename monthly_data
-  ;csv:to-file filename2 [1 2 3]
+  ;csv:to-file filename2 pop_data
   print "Exported simulation data to file"
 end
 
@@ -521,21 +521,18 @@ to collect_data
 
 end
 
-to check_stopping_conditions
+to-report check_stopping_conditions
 
   if (count turtles = 0) [
     export_data save_number
-    stop
+    report true
   ]
 
   if (year = 2) [
-    if (ticks mod 365 = 1)[ ;coolects data
+    if (ticks mod 365 = 1)[ ;collects data
       set pop_data lput max_pop pop_data
-      set pop_data lput max_pop pop_data
-      show pop_data
       export_data save_number
       set max_pop 0
-      stop
     ]
   ]
 
@@ -552,10 +549,11 @@ to check_stopping_conditions
       set pop_data lput max_pop pop_data
       export_data save_number
       set max_pop 0
-      stop
+      report true
     ]
   ]
 
+  report false
 
 end
 
@@ -586,7 +584,7 @@ to go
 
   calculate_time
 
-  check_stopping_conditions
+  if check_stopping_conditions =  true [stop]
 
   ;if (ticks mod 14 = 0) [ random_insertions]
 
