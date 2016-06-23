@@ -804,7 +804,7 @@ CHOOSER
 Show:
 Show:
 "pH" "food" "temperature" "monitor" "turtle density"
-0
+4
 
 TEXTBOX
 8
@@ -1117,8 +1117,8 @@ true
 false
 "" "ybounds"
 PENS
-"high" 1.0 0 -16777216 true "" "plot y-low"
-"low" 1.0 0 -7500403 true "" "plot y-high"
+"low" 1.0 0 -16777216 true "" "plot y-low"
+"high" 1.0 0 -7500403 true "" "plot y-high"
 
 @#$#@#$#@
 ## WHAT IS IT?

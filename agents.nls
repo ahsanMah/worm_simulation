@@ -321,7 +321,7 @@ to update_thresholds
   set ph_factor mortality_rate
   
   set cocoon_rate temp_cocoon_rate ;min (list temp_cocoon_rate ph_cocoon_rate) ;temp_factor
-  set death_threshold ph_factor ;temp_factor + ph_factor
+  set death_threshold temp_factor + ph_factor
   ;print word temp_factor ph_factor
   ;show death_threshold
 end

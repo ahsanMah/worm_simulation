@@ -51,7 +51,8 @@ patches-own
   being_monitored
   monitor_size
   monitor_index
-  soil_depth             
+  soil_depth
+  moisture             
   
 ]
 

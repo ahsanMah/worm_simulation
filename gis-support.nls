@@ -51,7 +51,7 @@ to load_ph
   let filename ("data/parameters/soil/pH_key.csv")
   let ph_list csv:from-file filename
   foreach ph_list [
-    table:put ph_map (item 0 ?) (list (item 2 ?) (item 5 ?))
+    table:put ph_map (item 0 ?) (list (item 2 ?) (item 5 ?) (item 6 ?)) 
     ]
 end
 
@@ -86,10 +86,12 @@ to map_patches
     if (table:has-key? ph_map symbol)[
       let gis_ph (item 0 table:get ph_map symbol)
       let gis_depth (item 1 table:get ph_map symbol)
+      let gis_moisture (item 2 table:get ph_map symbol)
       ifelse (gis_ph != "")[
        ;set pcolor scale-color green gis_ph 14 0
        set ph gis_ph
        set soil_depth gis_depth
+       set moisture gis_moisture
        ]
        [ set pcolor grey
          set permeability 0
