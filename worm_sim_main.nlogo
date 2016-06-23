@@ -99,7 +99,7 @@ to setup_sim
   ;setup
   print "Loading from simulation files..."
   load_patches save_name
-  ;load_agents save_name
+  load_agents save_name
   print "Loading parameters..."
   let filename "data/input/pH-Table.csv"
   load_param "data/input/pH-Table.csv" ph_table
@@ -447,6 +447,9 @@ to-report finalPop
   report final_population / 365
 end
 
+to-report collected_data
+  report monthly_data
+end
 to go
 
 ;  let filename (word "movie/" ticks ".png")
@@ -470,6 +473,7 @@ to go
       set pop_data lput (list year finalPop) pop_data
       export_data save_number
       set final_population 0
+      stop
     ]
   ]
 
@@ -502,32 +506,30 @@ to go
   if (ticks mod (periods-in-day) = 0) [
     set current_day current_day + 1
     set global_temperature table:get temperature_table current_day
-    ;calculate_temp
-    ;update_organic_matter
+    if (current_day > 3) [
 
-    ;if (global_temperature > species_hatch_temperature) [
+      set prev_days_temp (list
+        table:get temperature_table (current_day - 2)
+        table:get temperature_table (current_day - 1)
+        global_temperature)
+    ]
       ask cocoons [
         check_if_hatch
       ]
-    ;]
   ]
 
   ask adults [
-    ;update_speed
-    update_thresholds
+    check_burrow
     if not burrow [ ;could make burrow global to speed up runtime
       if (ticks mod (periods-in-day) = 0) [
-
+        update_thresholds
         update_maturity
-
         check_reproduction
         check_death
         move
       ]
     ]
-
-
-    ]
+  ]
 
     ;set food-here food-here + organic-regen
 
@@ -559,10 +561,10 @@ to go
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-286
-15
-1018
-768
+283
+53
+1015
+806
 -1
 -1
 2.4
@@ -586,10 +588,10 @@ ticks
 1000.0
 
 BUTTON
-543
-777
-615
-810
+555
+10
+627
+43
 Setup
 setup
 NIL
@@ -603,10 +605,10 @@ NIL
 1
 
 BUTTON
-621
-777
-680
-811
+633
+10
+692
+44
 Go
 go
 T
@@ -621,9 +623,9 @@ NIL
 
 MONITOR
 1047
-37
+19
 1155
-82
+64
 Day Number
 day_num
 17
@@ -632,9 +634,9 @@ day_num
 
 PLOT
 1031
-137
-1294
-310
+119
+1289
+292
 Worm Population for Current Year
 Day Number
 Population
@@ -660,9 +662,9 @@ SLIDER
 158
 ph_tolerance
 ph_tolerance
-6.0
-7.5
-7
+-0.5
+0.5
+0
 0.1
 1
 NIL
@@ -685,9 +687,9 @@ HORIZONTAL
 
 MONITOR
 1048
-86
+68
 1155
-131
+113
 Population Count
 count adults
 17
@@ -696,9 +698,9 @@ count adults
 
 PLOT
 1031
-318
-1295
-491
+300
+1289
+473
 Worm Population over Years
 NIL
 NIL
@@ -714,9 +716,9 @@ PENS
 
 MONITOR
 1163
-86
+68
 1261
-131
+113
 Cocoon Count
 count cocoons
 17
@@ -724,10 +726,10 @@ count cocoons
 11
 
 INPUTBOX
-171
-381
-250
-441
+175
+371
+256
+431
 starting_day
 150
 1
@@ -736,9 +738,9 @@ Number
 
 MONITOR
 1163
-36
+18
 1258
-81
+63
 Daily Temp *C
 global_temperature
 2
@@ -746,10 +748,10 @@ global_temperature
 11
 
 CHOOSER
-14
-431
-154
-476
+13
+422
+153
+467
 obstacle_shape
 obstacle_shape
 "circle" "rectangle" "mountain" "monitor"
@@ -771,10 +773,10 @@ NIL
 HORIZONTAL
 
 INPUTBOX
-16
-664
-138
-724
+15
+655
+137
+715
 save_name
 phSim
 1
@@ -782,10 +784,10 @@ phSim
 String (reporter)
 
 SLIDER
-15
-531
-203
-564
+14
+522
+202
+555
 patch_pH
 patch_pH
 0
@@ -797,19 +799,19 @@ NIL
 HORIZONTAL
 
 CHOOSER
-15
-381
-154
-426
+14
+372
+153
+417
 Show:
 Show:
 "pH" "food" "temperature" "monitor" "turtle density"
 0
 
 TEXTBOX
-8
+18
 12
-118
+128
 30
 Species Control
 13
@@ -839,7 +841,7 @@ CHOOSER
 species_number
 species_number
 1 2 3 4 5
-2
+0
 
 BUTTON
 14
@@ -859,10 +861,10 @@ NIL
 1
 
 BUTTON
-692
-777
-802
-810
+704
+10
+814
+43
 Recolor Patches
 recolor_patches
 NIL
@@ -876,10 +878,10 @@ NIL
 1
 
 BUTTON
-13
-730
-136
-764
+12
+721
+135
+755
 Save Environment
 save_patches save_name
 NIL
@@ -893,10 +895,10 @@ NIL
 1
 
 BUTTON
-141
-730
-261
-763
+140
+721
+260
+754
 Load Environment
 load_patches save_name
 NIL
@@ -910,10 +912,10 @@ NIL
 1
 
 BUTTON
-110
-292
-180
-325
+103
+293
+173
+326
 Save
 save_agents save_name
 NIL
@@ -927,9 +929,9 @@ NIL
 1
 
 BUTTON
-196
+190
 291
-272
+266
 324
 Load
 load_agents save_name
@@ -944,10 +946,10 @@ NIL
 1
 
 SLIDER
-14
-571
-201
-604
+13
+562
+200
+595
 temperature_difference
 temperature_difference
 -10
@@ -958,21 +960,11 @@ temperature_difference
 NIL
 HORIZONTAL
 
-TEXTBOX
-18
-358
-168
-376
-Environment Controls\n
-12
-0.0
-1
-
 BUTTON
-15
-617
-83
-650
+14
+608
+82
+641
 Draw
 pen
 T
@@ -986,10 +978,10 @@ NIL
 1
 
 BUTTON
-93
-618
-163
-651
+92
+609
+162
+642
 Select
 edit_environment
 T
@@ -1003,10 +995,10 @@ NIL
 1
 
 BUTTON
-172
-618
-255
-651
+171
+609
+254
+642
 Edit Patch
 recolor-selected
 NIL
@@ -1020,30 +1012,30 @@ NIL
 1
 
 TEXTBOX
-18
-358
-168
-376
+16
+345
+176
+363
 Environment Controls\n
-12
+13
 0.0
 1
 
 CHOOSER
-16
-478
-154
-523
+15
+469
+153
+514
 change:
 change:
 "pH" "temperature difference" "pH and temperature difference" "mountain" "monitor" "highway"
 0
 
 BUTTON
-449
-777
-538
-810
+461
+10
+550
+43
 Load GIS
 setup\nsetup_gis\n
 NIL
@@ -1057,15 +1049,15 @@ NIL
 1
 
 INPUTBOX
-143
-665
-256
-725
+142
+656
+262
+716
 save_number
-0
+1
 1
 0
-String
+Number
 
 SLIDER
 12
@@ -1076,17 +1068,17 @@ worm_population
 worm_population
 0
 500
-80
+500
 5
 1
 NIL
 HORIZONTAL
 
 PLOT
-1035
-502
-1235
-652
+1032
+476
+1288
+638
 X Boundaries
 NIL
 NIL
@@ -1102,10 +1094,10 @@ PENS
 "low" 1.0 0 -7500403 true "" "plotxy x-high ticks"
 
 PLOT
-1239
-501
-1439
-651
+1032
+644
+1288
+807
 Y Boundaries
 NIL
 NIL
@@ -1558,14 +1550,13 @@ setup_sim</setup>
     <metric>finalPop</metric>
     <steppedValueSet variable="pH_tolerance" first="4.5" step="0.5" last="7"/>
   </experiment>
-  <experiment name="experiment" repetitions="1" runMetricsEveryStep="true">
+  <experiment name="experiment" repetitions="1" runMetricsEveryStep="false">
     <setup>setup</setup>
     <go>go</go>
-    <metric>count turtles</metric>
+    <metric>monthly_data</metric>
     <enumeratedValueSet variable="save_number">
+      <value value="1"/>
       <value value="2"/>
-      <value value="3"/>
-      <value value="4"/>
     </enumeratedValueSet>
   </experiment>
 </experiments>
