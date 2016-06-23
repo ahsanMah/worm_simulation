@@ -4,8 +4,8 @@ globals [
   day_num ;;day number
   year
   global_temperature
-  ;temperature ;temperature in a given day
-  var ;multi-use temporary variable
+  prev_days_temp     ;stores temps for the previous 3 days
+  
 
   current_month
   current_day
@@ -72,9 +72,9 @@ to setup_environment
 ;  ;set temperatures (list -5 -4 1 7 13 18 21 20 15 9 4 -2)
   set num_days (list 31 28 31 30 31 30 31 31 30 31 30 31)
   set current_month 0
-  set var starting_day
+  let var starting_day
   set monitor_number 0
-
+  
 
   
   while [var > 0]
@@ -88,6 +88,7 @@ to setup_environment
   ]
 ;  set global_temperature random-normal (item current_month temperatures) (1)
   set global_temperature table:get temperature_table starting_day
+  set prev_days_temp (list global_temperature global_temperature global_temperature)
   set current_day starting_day
   ;calculate_temp ;uncomment this if you want to have temperature vary between patches
   

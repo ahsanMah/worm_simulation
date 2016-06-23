@@ -322,8 +322,13 @@ to update_thresholds
   set mortality_rate 1 - (e ^ (hazard_rate * patch_days))
   set ph_factor mortality_rate
   
-  set cocoon_rate min (list temp_cocoon_rate ph_cocoon_rate)
+<<<<<<< HEAD
+  set cocoon_rate temp_cocoon_rate ;min (list temp_cocoon_rate ph_cocoon_rate) ;temp_factor
   set death_threshold temp_factor + ph_factor
+=======
+  set cocoon_rate min (list temp_cocoon_rate ph_cocoon_rate)
+  set death_threshold ph_factor
+>>>>>>> 50ee53bb3853d4e552ef339f4c6d5395d3261bb8
   ;print word temp_factor ph_factor
   ;show death_threshold
 end
