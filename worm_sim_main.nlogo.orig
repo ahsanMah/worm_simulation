@@ -81,9 +81,10 @@ end
 
 to ybounds
   if count turtles > 0 [
+<<<<<<< HEAD
     ask one-of turtles[
-    set ylow ycor
-    set yhigh ycor
+      set ylow xcor
+      set yhigh xcor
     ]
     ask turtles[
       if ycor < ylow [set ylow ycor]
@@ -91,6 +92,18 @@ to ybounds
     ]
     set y-low ylow
     set y-high yhigh
+=======
+  ask one-of turtles[
+    set ylow ycor
+    set yhigh ycor
+  ]
+  ask turtles[
+    if ycor < ylow [set ylow ycor]
+    if ycor > yhigh [set yhigh ycor]
+  ]
+  set y-low ylow
+  set y-high yhigh
+>>>>>>> 2a6eea5c71a7c6b97de2149a0d2049d1154715a0
   ]
 end
 
@@ -429,13 +442,17 @@ to collect_monthly_data
 end
 
 to random_insertions
-
-  if (Random_Insertions? = true and ticks mod (365 / insertion_frequency)= 0) [
+  ;let randNum 1000
+  ;if randNum > 998 [
     let species one-of table:keys species_list
     let spot one-of fishing_spots
     let number number_inserted
     add_species (item 0 spot) (item 1 spot) number species
+<<<<<<< HEAD
   ]
+=======
+    ;]
+>>>>>>> 2a6eea5c71a7c6b97de2149a0d2049d1154715a0
 
 end
 
@@ -458,8 +475,8 @@ to simulate_agents
     ]
   ]
 
-end
 
+end
 
 to simulate_environment
 
@@ -475,7 +492,18 @@ to simulate_environment
 end
 
 
+<<<<<<< HEAD
 to collect_data
+=======
+  if (year = 2) [
+    if (ticks mod 365 = 1)[ ;coolects data
+      set pop_data lput (list year finalPop) pop_data
+      export_data save_number
+      set final_population 0
+      ;stop
+    ]
+  ]
+>>>>>>> 2a6eea5c71a7c6b97de2149a0d2049d1154715a0
 
 
   if (year = 1) [
@@ -490,6 +518,11 @@ to collect_data
     calculate_maxPop
   ]
 
+<<<<<<< HEAD
+=======
+  if (Random_Insertions? = true and ticks mod (365 / insertion_frequency)= 0) [ random_insertions]
+
+>>>>>>> 2a6eea5c71a7c6b97de2149a0d2049d1154715a0
   if (day_of_month = (item current_month num_days - 1))[ ;clears arrays a day before collection
     clear_arrays
   ]
@@ -586,7 +619,7 @@ to go
 
   if check_stopping_conditions =  true [stop]
 
-  random_insertions
+  ;if (ticks mod 14 = 0) [ random_insertions]
 
   simulate_environment
 
@@ -1156,7 +1189,7 @@ SWITCH
 181
 Random_Insertions?
 Random_Insertions?
-0
+1
 1
 -1000
 
@@ -1169,7 +1202,7 @@ insertion_frequency
 insertion_frequency
 1
 104
-104
+2
 1
 1
 /year
