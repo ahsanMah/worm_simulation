@@ -51,17 +51,18 @@ to setup
   print "Done"
 
   set-default-shape sides "line"
-  setup_sim
   recolor_patches
   reset-ticks
 end
 
 to initialize_monitors
+  print "Initializing monitors..."
   draw_monitor 0 60 0 60
   draw_monitor 240 300 0 60
   draw_monitor 240 300 240 300
   draw_monitor 0 60 240 300
   draw_monitor 120 180 120 180
+  print "Done"
 end
 
 to xbounds
@@ -96,7 +97,6 @@ end
 
 
 to setup_sim
-  ;setup
   print "Loading from simulation files..."
   load_patches save_name
   load_agents save_name
@@ -628,7 +628,7 @@ BUTTON
 627
 43
 Setup
-setup
+setup\nsetup_sim
 NIL
 1
 T
@@ -1072,7 +1072,7 @@ BUTTON
 550
 43
 Load GIS
-setup\nsetup_gis\n
+setup\nsetup_gis\ninitialize_monitors
 NIL
 1
 T
@@ -1586,11 +1586,11 @@ NetLogo 5.3.1
 @#$#@#$#@
 @#$#@#$#@
 <experiments>
-  <experiment name="experiment" repetitions="2" runMetricsEveryStep="false">
+  <experiment name="experiment" repetitions="1" runMetricsEveryStep="false">
     <setup>setup</setup>
     <go>go</go>
     <metric>maxPop</metric>
-    <steppedValueSet variable="ph_tolerance" first="-0.2" step="0.1" last="0"/>
+    <steppedValueSet variable="ph_tolerance" first="0" step="0.1" last="0.2"/>
   </experiment>
 </experiments>
 @#$#@#$#@
