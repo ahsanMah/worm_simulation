@@ -841,7 +841,7 @@ CHOOSER
 Show:
 Show:
 "pH" "food" "temperature" "monitor" "turtle density"
-3
+0
 
 TEXTBOX
 18
