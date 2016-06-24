@@ -100,7 +100,7 @@ end
 to setup_sim
   print "Loading from simulation files..."
   load_patches save_name
-  ;load_agents save_name
+  load_agents save_name
   print "Loading parameters..."
   let filename "data/input/pH-Table.csv"
   load_param "data/input/pH-Table.csv" ph_table
@@ -184,13 +184,6 @@ to pen
     display
   ]
 end
-
-      set reprod_min_temp item 7 ?
-      set reprod_max_temp reprod_min_temp + 10
-      set cocoon_rate 0.093
-      set prev_patch ph
-      set patch_days 0
-
 
 to export_data [name]
   let filename (word "data/output/simulation" save_name ph_tolerance save_number ".csv")

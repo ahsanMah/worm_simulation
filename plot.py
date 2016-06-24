@@ -1,6 +1,7 @@
 import csv
 import matplotlib.pyplot as plt
 import numpy as np
+fig,sub = plt.subplots()
 
 def convert_to_float (item):
 	if item != '':
@@ -43,12 +44,12 @@ def make_labels (val):
 	return str(val)
 
 def draw_hist (xlabels, yvals):
-	fig,sub = plt.subplots()
+	
 	xvals = np.arange(len(xlabels))
 	# yvals5yr = [y[0] for y in yvals]
 	# yvals10yr = [y[-1] for y in yvals]
 	# width = 0.8/len(yvals[1])
-	width = 1.0/len(yvals)
+	width = 0.8/len(yvals[0])
 	e = (3, 5, 12, 13, 30, 50)
 	x_width = 0
 	plt.yscale('linear')
@@ -58,11 +59,13 @@ def draw_hist (xlabels, yvals):
 	# sub.bar(xvals+width, yvals10yr, width, color = 'b')
 	colors = ['g','y','r','m','c']
 
-	for index,y in enumerate(yvals):
-		sub.bar(xvals + x_width, y, width, color = colors[index])
-		x_width += width
+	for index,x in enumerate(xlabels):
+		x_width = 0
+		for mon_idx,y in enumerate(yvals[index]):
+			plt.bar(x + x_width, y, width, color = colors[mon_idx])
+			x_width += width
 
-	plt.show()
+
 	return
 
 def getFromBS (data_reader):
@@ -110,25 +113,33 @@ def getFromBS (data_reader):
 	#draw_hist(xlabels,yvals)
 	return
 
-data = open("phSim01.csv", "rb")
-data_reader = csv.reader(data)
-data_table = {}
-xvals = []		#values to be plotted on the x-axis
-yvals = []		#values to be plotted on the y-axis
-run_data = [] 	#data for individual runs
+def extractFromFile (filename):
+	data = open(filename, "rb")
+	data_reader = csv.reader(data)
+	data_table = {}
+	xvals = []		#values to be plotted on the x-axis
+	yvals = []		#values to be plotted on the y-axis
+	run_data = [] 	#data for individual runs
 
-for row in data_reader:
-	monitor_num = convert_to_float(row[1])
-	monitor_pop = convert_to_float(row[3])
-	if data_table.has_key(monitor_num):
-		if data_table[monitor_num][2] < monitor_pop:
+	for row in data_reader:
+		monitor_num = convert_to_float(row[1])
+		monitor_pop = convert_to_float(row[3])
+		if data_table.has_key(monitor_num):
+			if data_table[monitor_num][2] < monitor_pop:
+				data_table[monitor_num] = map(convert_to_float,row[1:])
+		else:
 			data_table[monitor_num] = map(convert_to_float,row[1:])
-	else:
-		data_table[monitor_num] = map(convert_to_float,row[1:])
 
-for val in data_table:
-	yvals.append (data_table[val][3])
+	for val in data_table:
+		yvals.append (data_table[val][3])
 
-draw_hist([0.0],yvals[5:])
+	return yvals[5:]
 
+densities = []
 
+densities.append(extractFromFile("phSim01.csv"))
+densities.append(extractFromFile("phSim01.csv"))
+densities.append(extractFromFile("phSim01.csv"))
+densities.append(extractFromFile("phSim01.csv"))
+draw_hist([0.0,1.0,2.0,3.0],densities)
+plt.show()
