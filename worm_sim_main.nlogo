@@ -58,9 +58,9 @@ end
 
 to initialize_monitors
   draw_monitor 0 60 0 60
-  draw_monitor 0 60 240 300
   draw_monitor 240 300 0 60
   draw_monitor 240 300 240 300
+  draw_monitor 0 60 240 300
   draw_monitor 120 180 120 180
 end
 
@@ -262,7 +262,7 @@ to save_agents [name]
   carefully [file-delete filename] []
   ask turtles
   [
-    let info (list xcor ycor parent_breed shape wait_period hatch_temp genetic_diversity max_temp_resist low_temp_resist max_ph_resist)
+    let info (list xcor ycor parent_breed shape wait_period hatch_temp genetic_diversity reprod_min_temp)
     file-open filename
     file-print csv:to-row info
     file-close
@@ -293,11 +293,13 @@ to load_agents [name]
       set hatch_temp item 5 ?
       set stamina 5
       set genetic_diversity item 6 ?
-      set max_temp_resist item 7 ?
-      set low_temp_resist temperature_tolerance
-      set max_ph_resist ph_tolerance
+      set reprod_min_temp item 7 ?
+      set reprod_max_temp reprod_min_temp + 10
       set color (item parent_breed color_list)
       set death_threshold normal_death_threshold
+      set cocoon_rate 0.093
+      set prev_patch ph
+      set patch_days 0
     ]
   ]
 end
@@ -441,20 +443,20 @@ end
 
 to simulate_agents
 
-  ask cocoons [
-    check_if_hatch
-  ]
+  check_burrow
 
-  ask adults [
-    check_burrow
-    if not burrow [ ;could make burrow global to speed up runtime
-      if (ticks mod (periods-in-day) = 0) [
-        update_thresholds
-        update_maturity
-        check_reproduction
-        check_death
-        move
-      ]
+  if not burrow [
+
+    ask cocoons [
+      check_if_hatch
+    ]
+
+    ask adults [
+      update_thresholds
+      update_maturity
+      check_reproduction
+      check_death
+      move
     ]
   ]
 
@@ -478,34 +480,31 @@ end
 to collect_data
 
 
-  if (year = 1) [
+  if (year = 4) [
+    calculate_maxPop
+  ]
+
+  if (year = 9) [
     calculate_maxPop
   ]
 
   if (year = 19) [
     calculate_maxPop
-  ]
 
-  if (year = 29) [
-    calculate_maxPop
-  ]
 
-  if (day_of_month = (item current_month num_days - 1))[ ;clears arrays a day before collection
-    clear_arrays
-  ]
-
-  if (day_of_month = item current_month num_days)[
-    ask patches with [being_monitored = true]
-    [
-      if (has_collected = false)[
-        collect_monitor_data
-      ]
+    if (day_of_month = (item current_month num_days - 1))[ ;clears arrays a day before collection
+      clear_arrays
     ]
 
+    if (day_of_month = item current_month num_days)[
+      ask patches with [being_monitored = true]
+      [
+        collect_monitor_data
+      ]
 
-    ;collect_monthly_data
-    ;saves monthly data to accumulutor list
-    if (has_collected = false) [
+      ;collect_monthly_data
+      ;saves monthly data to accumulutor list
+
       ;show species_data
       foreach species_data [
         let monitor_list (array:to-list ?)
@@ -514,11 +513,9 @@ to collect_data
         ]
       ]
       set report_month report_month + 1
-      set has_collected true
+
     ]
   ]
-
-
 end
 
 to-report check_stopping_conditions
@@ -528,7 +525,7 @@ to-report check_stopping_conditions
     report true
   ]
 
-  if (year = 2) [
+  if (year = 10) [
     if (ticks mod 365 = 1)[ ;collects data
       set pop_data lput max_pop pop_data
       export_data save_number
@@ -541,6 +538,7 @@ to-report check_stopping_conditions
       set pop_data lput max_pop pop_data
       export_data save_number
       set max_pop 0
+      report true
     ]
   ]
 
@@ -563,7 +561,7 @@ to calculate_maxPop
 end
 
 to-report maxPop
-  report max_pop
+  report pop_data
 end
 
 to-report finalPop
@@ -843,7 +841,7 @@ CHOOSER
 Show:
 Show:
 "pH" "food" "temperature" "monitor" "turtle density"
-0
+3
 
 TEXTBOX
 18
@@ -1105,7 +1103,7 @@ worm_population
 worm_population
 0
 500
-500
+50
 5
 1
 NIL
@@ -1169,7 +1167,7 @@ insertion_frequency
 insertion_frequency
 1
 104
-104
+1
 1
 1
 /year
@@ -1181,7 +1179,7 @@ INPUTBOX
 1479
 283
 number_inserted
-10
+0
 1
 0
 Number
@@ -1588,50 +1586,11 @@ NetLogo 5.3.1
 @#$#@#$#@
 @#$#@#$#@
 <experiments>
-  <experiment name="pH-Hypothesis" repetitions="8" runMetricsEveryStep="true">
-    <setup>setup
-setup_sim</setup>
-    <go>go</go>
-    <metric>count adults</metric>
-    <steppedValueSet variable="ph_tolerance" first="4" step="0.1" last="6"/>
-  </experiment>
-  <experiment name="FIXED-temp-Hypothesis" repetitions="8" runMetricsEveryStep="true">
-    <setup>setup
-setup_sim</setup>
-    <go>go</go>
-    <metric>finalPop</metric>
-    <steppedValueSet variable="temperature_tolerance" first="0" step="2" last="10"/>
-  </experiment>
-  <experiment name="FIXED-pH-Hypothesis" repetitions="8" runMetricsEveryStep="false">
-    <setup>setup
-setup_sim</setup>
-    <go>go</go>
-    <metric>count adults</metric>
-    <steppedValueSet variable="ph_tolerance" first="4" step="0.5" last="6"/>
-  </experiment>
-  <experiment name="Does temperature work?" repetitions="10" runMetricsEveryStep="true">
-    <setup>setup
-setup_sim</setup>
-    <go>go</go>
-    <metric>count adults</metric>
-    <steppedValueSet variable="temperature_tolerance" first="5" step="2.5" last="20"/>
-  </experiment>
-  <experiment name="Does pH work?" repetitions="1" runMetricsEveryStep="true">
-    <setup>setup
-setup_sim</setup>
-    <go>go</go>
-    <metric>count adults</metric>
-    <metric>finalPop</metric>
-    <steppedValueSet variable="pH_tolerance" first="4.5" step="0.5" last="7"/>
-  </experiment>
-  <experiment name="experiment" repetitions="1" runMetricsEveryStep="false">
+  <experiment name="experiment" repetitions="2" runMetricsEveryStep="false">
     <setup>setup</setup>
     <go>go</go>
-    <metric>monthly_data</metric>
-    <enumeratedValueSet variable="save_number">
-      <value value="1"/>
-      <value value="2"/>
-    </enumeratedValueSet>
+    <metric>maxPop</metric>
+    <steppedValueSet variable="ph_tolerance" first="-0.2" step="0.1" last="0"/>
   </experiment>
 </experiments>
 @#$#@#$#@

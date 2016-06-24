@@ -13,7 +13,7 @@ globals [
   max_stamina
   min_stamina
   agent_size
-  
+  burrow
   
   species_list
 
@@ -31,6 +31,8 @@ globals [
   subspecies_count
   
   degree_accumulation_needed
+  ph_shift  ;shift in optimum ph due to tolerance
+  temp_shift
   ]
 
 breed [cocoons]
@@ -63,9 +65,6 @@ turtles-own [
   cocoon
   prev_patch
   patch_days
-  ph_shift  ;shift in optimum ph due to tolerance
-  temp_shift
-  burrow
   ]
 cocoons-own[
  degree_days 
@@ -81,11 +80,12 @@ to setup_agents
   set steps-per-ie 5
   set max_stamina 5
   set min_stamina 1
-
+  set burrow false
   set counter 0
   set amount_egested 1
   set consumption-in-period 1
-  
+  set ph_shift ph_tolerance
+  set temp_shift 5 - temperature_tolerance
   set species_list table:make
   set shape_list (list "red_worm" "cyan_worm" "pink_worm" "orange_worm" "magenta_worm" "violet_worm")
   set color_list (list red cyan pink orange magenta violet)
@@ -167,18 +167,13 @@ to create_species [species]
     set wait_period 15 + random-normal 20 3;simulates a wait period of 15 to 65 days 
     set stamina 5
     set genetic_diversity temp_genetic_diversity ; 0-1 measure of genetic diversity of the species
-    set max_temp_resist random-normal 25 (2 * genetic_diversity)
-    set low_temp_resist random-normal temperature_tolerance (2 * genetic_diversity)
-    ;set max_ph_resist random-normal ph_tolerance (2 * genetic_diversity) ;NOTE --> use genetic diversity to change ph/temp death factors
-    set ph_shift ph_tolerance
-    set temp_shift 5 - low_temp_resist
+                                                 ;NOTE --> use genetic diversity to change ph/temp death factors
     set death_threshold normal_death_threshold
     set reprod_min_temp one-of [13 14 15 16]
     set reprod_max_temp reprod_min_temp + 10
     set cocoon_rate 0.093
     set prev_patch ph
     set patch_days 0
-    set burrow false
    ]
 end
 
@@ -186,7 +181,7 @@ end
 to move
   let bool false
   if (pcolor != blue) [
-    right (random 181) - 90
+    right (random 121) - 60
     
     ;  if ((count (patch-set (patch-ahead (speed * permeability / periods-in-day))) with [pcolor = blue]) > 
     ;     (count (patch-set (patch-here)) with [pcolor != blue]))
@@ -280,12 +275,11 @@ foreach prev_days_temp [
  ]
 
 ;worm starts burrowing if it senses high death chance in the past few days
-ifelse (survival_prob < 0.75) 
+ifelse (survival_prob < 0.7) 
   [set burrow true]
   [ set burrow false]
 
 end
-
 ;updates probablities of dying and reproducing
 to update_thresholds
   ;resetting all parameters
@@ -299,7 +293,7 @@ to update_thresholds
 
   ;let ph_factor (3 / 42) * ((e ^ (max_ph_resist - ph) ) - 1) ; function ensures that a ph difference of 3 will have a higher death probability
   ;reproduction rate affected by temperature + pH
-  set temp_cocoon_rate 0.65 / 7
+  set temp_cocoon_rate 0.54 / 7
   
   ;;pH of soil also affects survival + reproduction rate
   let mapped_ph precision (ph + ph_shift) 1

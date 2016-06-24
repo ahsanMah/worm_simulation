@@ -1,0 +1,12 @@
+"BehaviorSpace results (NetLogo 5.3.1)"
+"worm_sim_main.nlogo"
+"experiment"
+"06/23/2016 15:29:18:832 -0400"
+"min-pxcor","max-pxcor","min-pycor","max-pycor"
+"0","300","0","300"
+"[run number]","1","2","3","4","5","6"
+"ph_tolerance","-0.2","-0.1","0","0.1","0.2","0.3"
+"[steps]","3651","3651","3651","3651","3651","3651"
+
+"[initial & final values]","maxPop","maxPop","maxPop","maxPop","maxPop","maxPop"
+,"[15 42]","[30 177]","[94 762]","[133 1263]","[243 4061]","[209 4910]"
