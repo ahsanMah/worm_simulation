@@ -76,7 +76,7 @@ to save_agents [name]
   carefully [file-delete filename] []
   ask turtles
   [
-    let info (list xcor ycor parent_breed shape wait_period hatch_temp genetic_diversity max_temp_resist low_temp_resist max_ph_resist)
+    let info (list xcor ycor parent_breed shape wait_period genetic_diversity reprod_min_temp)
     file-open filename
     file-print csv:to-row info
     file-close
@@ -104,14 +104,15 @@ to load_agents [name]
       set shape item 3 ?
       set maturation_wait 70
       set wait_period item 4 ?
-      set hatch_temp item 5 ?
       set stamina 5
-      set genetic_diversity item 6 ?
-      set max_temp_resist item 7 ?
-      set low_temp_resist temperature_tolerance
-      set max_ph_resist ph_tolerance
+      set genetic_diversity item 5 ?
       set color (item parent_breed color_list)
       set death_threshold normal_death_threshold
+      set reprod_min_temp item 6 ?
+      set reprod_max_temp reprod_min_temp + 10
+      set cocoon_rate 0.093
+      set prev_patch ph
+      set patch_days 0
     ]
   ]
 end
