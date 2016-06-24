@@ -1,5 +1,5 @@
 extensions [array csv table gis]
-__includes["environment.nls" "agents.nls" "gis-support.nls"]
+__includes["environment.nls" "agents.nls" "gis-support.nls" "save-load-features.nls"]
 
 globals[
   species_data
@@ -29,6 +29,7 @@ globals[
   ;month monitor species_number population density genetic diversity
 ]
 to setup
+
   clear-all
 
   set ph_table table:make
@@ -99,7 +100,7 @@ end
 to setup_sim
   print "Loading from simulation files..."
   load_patches save_name
-  load_agents save_name
+  ;load_agents save_name
   print "Loading parameters..."
   let filename "data/input/pH-Table.csv"
   load_param "data/input/pH-Table.csv" ph_table
@@ -184,204 +185,12 @@ to pen
   ]
 end
 
-to save_obstacles [name]
-  let filename1 (word "data/parameters/myobstacle"  name ".csv")
-  csv:to-file filename1 obstacle_list
-  print "Saved to file"
-end
-
-to load_obstacles [name]
-  let filename (word "data/parameters/myobstacle"  name ".csv")
-  ;set obstacle_list csv:from-file filename
-  print "Loaded from file: "
-  print obstacle_list
-  ;;draw_obstacles
-end
-
-to save_patches [name]
-  save_monitors name
-  save_obstacles name
-  let filename (word "data/parameters/mypatches" name ".csv")
-  let i min-pxcor
-  let j min-pycor
-  carefully [file-delete filename] []
-  while [(i <= max-pxcor)]
-  [
-    while [(j <= max-pycor)]
-    [
-      ask patch i j
-      [
-        let info (list i j ph food-here permeability local_death_threshold temp_diff_here pcolor soil_depth moisture)
-        file-open filename
-        file-print csv:to-row info
-        file-close
-        set j j + 1
-      ]
-    ]
-    set j min-pycor
-    set i i + 1
-  ]
-
-end
-
-to load_patches [name]
-  load_obstacles name
-  let filename (word "data/parameters/mypatches" name ".csv")
-  let data csv:from-file filename
-  foreach (data)
-  [
-    ask patch (item 0 ?) (item 1 ?)
-    [
-      set ph item 2 ?
-      set food-here item 3 ?
-      set permeability item 4 ?
-      set local_death_threshold item 5 ?
-      set temp_diff_here item 6 ?
-      set being_monitored false
-      set pcolor item 7 ?
-      set soil_depth item 8 ?
-      set moisture item 9 ?
-    ]
-  ]
-  load_monitors name
-  calculate_temp
-  recolor_patches
-end
-
-to save_agents [name]
-  export_data name
-  let filename1 (word "data/parameters/specieslist" name ".csv")
-  let data []
-  foreach table:to-list species_list [ ;converts table into listto store as csv
-    set data lput (sentence item 0 ? item 1 ?) data
-  ]
-  csv:to-file filename1 data
-
-  let filename (word "data/parameters/myagents"  name ".csv")
-
-  carefully [file-delete filename] []
-  ask turtles
-  [
-    let info (list xcor ycor parent_breed shape wait_period hatch_temp genetic_diversity reprod_min_temp)
-    file-open filename
-    file-print csv:to-row info
-    file-close
-  ]
-  print "Saved to file"
-end
-
-to load_agents [name]
-  ;load_monitors name
-  let filename1 (word "data/parameters/specieslist"  name ".csv")
-  let filename (word "data/parameters/myagents" name ".csv")
-  let data []
-  set species_list table:make
-  set data csv:from-file filename1
-  foreach data [table:put species_list item 0 ? (list item 1 ? item 2 ? item 3 ?)]
-  print "Loaded from file: "
-  print species_list
-  set data csv:from-file filename
-  foreach (data)
-  [
-    create-adults 1 [
-      setxy item 0 ? item 1 ?
-      set parent_breed item 2 ?
-      set size agent_size
-      set shape item 3 ?
-      set maturation_wait 70
-      set wait_period item 4 ?
-      set hatch_temp item 5 ?
-      set stamina 5
-      set genetic_diversity item 6 ?
       set reprod_min_temp item 7 ?
       set reprod_max_temp reprod_min_temp + 10
-      set color (item parent_breed color_list)
-      set death_threshold normal_death_threshold
       set cocoon_rate 0.093
       set prev_patch ph
       set patch_days 0
-    ]
-  ]
-end
 
-to load_temperature
-  let filename (word "data/parameters/temperaturelist.csv")
-  file-open filename
-  set temperature_table table:make
-  let i 0
-  while [i < 8]
-  [
-    let nothing csv:from-row file-read-line
-    set i i + 1
-  ]
-  let days_since_start 0
-  while [ not file-at-end? ]
-  [
-    let row (csv:from-row file-read-line)
-    let row_entry (item 1 row)
-    ;show row_entry
-    table:put temperature_table days_since_start row_entry
-    set days_since_start days_since_start + 1
-  ]
-
-  file-close
-
-end
-
-to save_monitors [name]
-  let filename (word "data/parameters/mymonitors" name ".csv")
-  let i min-pxcor
-  let j min-pycor
-  carefully [file-delete filename] []
-  file-open filename
-  while [(i <= max-pxcor)]
-  [
-    while [(j <= max-pycor)]
-    [
-      ask patch i j
-      [
-        let info (list i j being_monitored monitor_index monitor_size monitor_number)
-        file-open filename
-        file-print csv:to-row info
-        file-close
-        set j j + 1
-      ]
-    ]
-    set j min-pycor
-    set i i + 1
-  ]
-end
-
-to load_monitors [name]
-  let filename (word "data/parameters/mymonitors" name ".csv")
-  let data csv:from-file filename
-  foreach (data)
-  [
-    ask patch (item 0 ?) (item 1 ?)
-    [
-      set being_monitored item 2 ?
-      set monitor_index item 3 ?
-      set monitor_size item 4 ?
-    ]
-    set monitor_number item 5 ?
-  ]
-  let monitor_list n-values monitor_number [?]
-  foreach monitor_list [update_monitor_area ?]
-  recolor_patches
-end
-
-to load_param [filename table]
-
-  let data csv:from-file filename
-
-  foreach data[
-    let param item 0 ?
-    let values (but-first ?)
-    table:put table param values
-  ]
-  print filename
-  print table
-end
 
 to export_data [name]
   let filename (word "data/output/simulation" save_name ph_tolerance save_number ".csv")
@@ -947,10 +756,10 @@ NIL
 1
 
 BUTTON
-103
-293
-173
-326
+105
+291
+175
+324
 Save
 save_agents save_name
 NIL
@@ -1154,7 +963,7 @@ SWITCH
 181
 Random_Insertions?
 Random_Insertions?
-0
+1
 1
 -1000
 
@@ -1183,6 +992,40 @@ number_inserted
 1
 0
 Number
+
+BUTTON
+1316
+44
+1422
+77
+Hide Turtles
+ask turtles [hide-turtle]
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+1327
+89
+1438
+122
+Show Turtles
+ask turtles[show-turtle]
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
 
 @#$#@#$#@
 ## WHAT IS IT?
