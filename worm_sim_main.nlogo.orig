@@ -1,5 +1,5 @@
 extensions [array csv table gis]
-__includes["environment.nls" "agents.nls" "gis-support.nls"]
+__includes["environment.nls" "agents.nls" "gis-support.nls" "save-load-features.nls"]
 
 globals[
   species_data
@@ -29,6 +29,7 @@ globals[
   ;month monitor species_number population density genetic diversity
 ]
 to setup
+
   clear-all
 
   set ph_table table:make
@@ -51,17 +52,18 @@ to setup
   print "Done"
 
   set-default-shape sides "line"
-  setup_sim
   recolor_patches
   reset-ticks
 end
 
 to initialize_monitors
+  print "Initializing monitors..."
   draw_monitor 0 60 0 60
-  draw_monitor 0 60 240 300
   draw_monitor 240 300 0 60
   draw_monitor 240 300 240 300
+  draw_monitor 0 60 240 300
   draw_monitor 120 180 120 180
+  print "Done"
 end
 
 to xbounds
@@ -81,10 +83,9 @@ end
 
 to ybounds
   if count turtles > 0 [
-<<<<<<< HEAD
     ask one-of turtles[
-      set ylow xcor
-      set yhigh xcor
+    set ylow ycor
+    set yhigh ycor
     ]
     ask turtles[
       if ycor < ylow [set ylow ycor]
@@ -92,27 +93,14 @@ to ybounds
     ]
     set y-low ylow
     set y-high yhigh
-=======
-  ask one-of turtles[
-    set ylow ycor
-    set yhigh ycor
-  ]
-  ask turtles[
-    if ycor < ylow [set ylow ycor]
-    if ycor > yhigh [set yhigh ycor]
-  ]
-  set y-low ylow
-  set y-high yhigh
->>>>>>> 2a6eea5c71a7c6b97de2149a0d2049d1154715a0
   ]
 end
 
 
 to setup_sim
-  ;setup
   print "Loading from simulation files..."
   load_patches save_name
-  load_agents save_name
+  ;load_agents save_name
   print "Loading parameters..."
   let filename "data/input/pH-Table.csv"
   load_param "data/input/pH-Table.csv" ph_table
@@ -197,6 +185,8 @@ to pen
   ]
 end
 
+<<<<<<< HEAD
+=======
 to save_obstacles [name]
   let filename1 (word "data/parameters/myobstacle"  name ".csv")
   csv:to-file filename1 obstacle_list
@@ -275,7 +265,7 @@ to save_agents [name]
   carefully [file-delete filename] []
   ask turtles
   [
-    let info (list xcor ycor parent_breed shape wait_period hatch_temp genetic_diversity max_temp_resist low_temp_resist max_ph_resist)
+    let info (list xcor ycor parent_breed shape wait_period hatch_temp genetic_diversity reprod_min_temp)
     file-open filename
     file-print csv:to-row info
     file-close
@@ -306,11 +296,13 @@ to load_agents [name]
       set hatch_temp item 5 ?
       set stamina 5
       set genetic_diversity item 6 ?
-      set max_temp_resist item 7 ?
-      set low_temp_resist temperature_tolerance
-      set max_ph_resist ph_tolerance
+      set reprod_min_temp item 7 ?
+      set reprod_max_temp reprod_min_temp + 10
       set color (item parent_breed color_list)
       set death_threshold normal_death_threshold
+      set cocoon_rate 0.093
+      set prev_patch ph
+      set patch_days 0
     ]
   ]
 end
@@ -384,15 +376,8 @@ end
 to load_param [filename table]
 
   let data csv:from-file filename
+>>>>>>> e464172b7a487625221de8ca11c94086da7c16e1
 
-  foreach data[
-    let param item 0 ?
-    let values (but-first ?)
-    table:put table param values
-  ]
-  print filename
-  print table
-end
 
 to export_data [name]
   let filename (word "data/output/simulation" save_name ph_tolerance save_number ".csv")
@@ -442,41 +427,37 @@ to collect_monthly_data
 end
 
 to random_insertions
-  ;let randNum 1000
-  ;if randNum > 998 [
+
+  if (Random_Insertions? = true and ticks mod (365 / insertion_frequency)= 0) [
     let species one-of table:keys species_list
     let spot one-of fishing_spots
     let number number_inserted
     add_species (item 0 spot) (item 1 spot) number species
-<<<<<<< HEAD
   ]
-=======
-    ;]
->>>>>>> 2a6eea5c71a7c6b97de2149a0d2049d1154715a0
 
 end
 
 to simulate_agents
 
-  ask cocoons [
-    check_if_hatch
-  ]
+  check_burrow
 
-  ask adults [
-    check_burrow
-    if not burrow [ ;could make burrow global to speed up runtime
-      if (ticks mod (periods-in-day) = 0) [
-        update_thresholds
-        update_maturity
-        check_reproduction
-        check_death
-        move
-      ]
+  if not burrow [
+
+    ask cocoons [
+      check_if_hatch
+    ]
+
+    ask adults [
+      update_thresholds
+      update_maturity
+      check_reproduction
+      check_death
+      move
     ]
   ]
 
-
 end
+
 
 to simulate_environment
 
@@ -492,53 +473,34 @@ to simulate_environment
 end
 
 
-<<<<<<< HEAD
 to collect_data
-=======
-  if (year = 2) [
-    if (ticks mod 365 = 1)[ ;coolects data
-      set pop_data lput (list year finalPop) pop_data
-      export_data save_number
-      set final_population 0
-      ;stop
-    ]
+
+
+  if (year = 4) [
+    calculate_maxPop
   ]
->>>>>>> 2a6eea5c71a7c6b97de2149a0d2049d1154715a0
 
-
-  if (year = 1) [
+  if (year = 9) [
     calculate_maxPop
   ]
 
   if (year = 19) [
     calculate_maxPop
-  ]
 
-  if (year = 29) [
-    calculate_maxPop
-  ]
 
-<<<<<<< HEAD
-=======
-  if (Random_Insertions? = true and ticks mod (365 / insertion_frequency)= 0) [ random_insertions]
-
->>>>>>> 2a6eea5c71a7c6b97de2149a0d2049d1154715a0
-  if (day_of_month = (item current_month num_days - 1))[ ;clears arrays a day before collection
-    clear_arrays
-  ]
-
-  if (day_of_month = item current_month num_days)[
-    ask patches with [being_monitored = true]
-    [
-      if (has_collected = false)[
-        collect_monitor_data
-      ]
+    if (day_of_month = (item current_month num_days - 1))[ ;clears arrays a day before collection
+      clear_arrays
     ]
 
+    if (day_of_month = item current_month num_days)[
+      ask patches with [being_monitored = true]
+      [
+        collect_monitor_data
+      ]
 
-    ;collect_monthly_data
-    ;saves monthly data to accumulutor list
-    if (has_collected = false) [
+      ;collect_monthly_data
+      ;saves monthly data to accumulutor list
+
       ;show species_data
       foreach species_data [
         let monitor_list (array:to-list ?)
@@ -547,11 +509,9 @@ to collect_data
         ]
       ]
       set report_month report_month + 1
-      set has_collected true
+
     ]
   ]
-
-
 end
 
 to-report check_stopping_conditions
@@ -561,7 +521,7 @@ to-report check_stopping_conditions
     report true
   ]
 
-  if (year = 2) [
+  if (year = 10) [
     if (ticks mod 365 = 1)[ ;collects data
       set pop_data lput max_pop pop_data
       export_data save_number
@@ -574,6 +534,7 @@ to-report check_stopping_conditions
       set pop_data lput max_pop pop_data
       export_data save_number
       set max_pop 0
+      report true
     ]
   ]
 
@@ -596,7 +557,7 @@ to calculate_maxPop
 end
 
 to-report maxPop
-  report max_pop
+  report pop_data
 end
 
 to-report finalPop
@@ -619,7 +580,7 @@ to go
 
   if check_stopping_conditions =  true [stop]
 
-  ;if (ticks mod 14 = 0) [ random_insertions]
+  random_insertions
 
   simulate_environment
 
@@ -663,7 +624,7 @@ BUTTON
 627
 43
 Setup
-setup
+setup\nsetup_sim
 NIL
 1
 T
@@ -982,10 +943,10 @@ NIL
 1
 
 BUTTON
-103
-293
-173
-326
+105
+291
+175
+324
 Save
 save_agents save_name
 NIL
@@ -1107,7 +1068,7 @@ BUTTON
 550
 43
 Load GIS
-setup\nsetup_gis\n
+setup\nsetup_gis\ninitialize_monitors
 NIL
 1
 T
@@ -1138,7 +1099,7 @@ worm_population
 worm_population
 0
 500
-500
+50
 5
 1
 NIL
@@ -1202,7 +1163,11 @@ insertion_frequency
 insertion_frequency
 1
 104
-2
+<<<<<<< HEAD
+8
+=======
+1
+>>>>>>> e464172b7a487625221de8ca11c94086da7c16e1
 1
 1
 /year
@@ -1214,10 +1179,44 @@ INPUTBOX
 1479
 283
 number_inserted
-10
+0
 1
 0
 Number
+
+BUTTON
+1316
+44
+1422
+77
+Hide Turtles
+ask turtles [hide-turtle]
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+1327
+89
+1438
+122
+Show Turtles
+ask turtles[show-turtle]
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -1621,50 +1620,11 @@ NetLogo 5.3.1
 @#$#@#$#@
 @#$#@#$#@
 <experiments>
-  <experiment name="pH-Hypothesis" repetitions="8" runMetricsEveryStep="true">
-    <setup>setup
-setup_sim</setup>
-    <go>go</go>
-    <metric>count adults</metric>
-    <steppedValueSet variable="ph_tolerance" first="4" step="0.1" last="6"/>
-  </experiment>
-  <experiment name="FIXED-temp-Hypothesis" repetitions="8" runMetricsEveryStep="true">
-    <setup>setup
-setup_sim</setup>
-    <go>go</go>
-    <metric>finalPop</metric>
-    <steppedValueSet variable="temperature_tolerance" first="0" step="2" last="10"/>
-  </experiment>
-  <experiment name="FIXED-pH-Hypothesis" repetitions="8" runMetricsEveryStep="false">
-    <setup>setup
-setup_sim</setup>
-    <go>go</go>
-    <metric>count adults</metric>
-    <steppedValueSet variable="ph_tolerance" first="4" step="0.5" last="6"/>
-  </experiment>
-  <experiment name="Does temperature work?" repetitions="10" runMetricsEveryStep="true">
-    <setup>setup
-setup_sim</setup>
-    <go>go</go>
-    <metric>count adults</metric>
-    <steppedValueSet variable="temperature_tolerance" first="5" step="2.5" last="20"/>
-  </experiment>
-  <experiment name="Does pH work?" repetitions="1" runMetricsEveryStep="true">
-    <setup>setup
-setup_sim</setup>
-    <go>go</go>
-    <metric>count adults</metric>
-    <metric>finalPop</metric>
-    <steppedValueSet variable="pH_tolerance" first="4.5" step="0.5" last="7"/>
-  </experiment>
   <experiment name="experiment" repetitions="1" runMetricsEveryStep="false">
     <setup>setup</setup>
     <go>go</go>
-    <metric>monthly_data</metric>
-    <enumeratedValueSet variable="save_number">
-      <value value="1"/>
-      <value value="2"/>
-    </enumeratedValueSet>
+    <metric>maxPop</metric>
+    <steppedValueSet variable="ph_tolerance" first="0" step="0.1" last="0.2"/>
   </experiment>
 </experiments>
 @#$#@#$#@
