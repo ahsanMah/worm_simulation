@@ -1,6 +1,7 @@
 import csv
 import matplotlib.pyplot as plt
 import numpy as np
+
 fig,sub = plt.subplots()
 
 def convert_to_float (item):
@@ -62,7 +63,9 @@ def draw_hist (xlabels, yvals):
 	for index,x in enumerate(xlabels):
 		x_width = 0
 		for mon_idx,y in enumerate(yvals[index]):
-			plt.bar(x + x_width, y, width, color = colors[mon_idx])
+			print (x,mon_idx,y)
+			if y > 0.0:
+				plt.bar(x + x_width, y, width, color = colors[mon_idx])
 			x_width += width
 
 
@@ -116,7 +119,7 @@ def getFromBS (data_reader):
 def extractFromFile (filename):
 	data = open(filename, "rb")
 	data_reader = csv.reader(data)
-	data_table = {}
+	data_table = {} #temporary table that stores info from files
 	xvals = []		#values to be plotted on the x-axis
 	yvals = []		#values to be plotted on the y-axis
 	run_data = [] 	#data for individual runs
@@ -126,20 +129,37 @@ def extractFromFile (filename):
 		monitor_pop = convert_to_float(row[3])
 		if data_table.has_key(monitor_num):
 			if data_table[monitor_num][2] < monitor_pop:
-				data_table[monitor_num] = map(convert_to_float,row[1:])
-		else:
-			data_table[monitor_num] = map(convert_to_float,row[1:])
+				data_table[monitor_num] = map(convert_to_float,row[1:]) #data from
+		else:															#species number onward
+			data_table[monitor_num] = map(convert_to_float,row[1:])		#is stored
 
 	for val in data_table:
 		yvals.append (data_table[val][3])
 
-	return yvals[5:]
+	return yvals #[5:]
 
+def extractFromFiles(filename, repetitions):
+	sim_list = []
+	new_list = []
+	avg_pop = []
+	sim_list = (extractFromFile(filename + "1.csv"))
+	print sim_list
+	if repetitions > 1:
+		for rep in range(repetitions - 1):
+			name = filename + str(rep+2) + ".csv"
+			new_list = extractFromFile(name)
+			print new_list
+			sim_list= map(add, sim_list,new_list)
+
+		map(lambda x: x/3.0, sim_list)
+	return sim_list
+
+repetitions = 3
 densities = []
 
-densities.append(extractFromFile("phSim01.csv"))
-densities.append(extractFromFile("phSim01.csv"))
-densities.append(extractFromFile("phSim01.csv"))
-densities.append(extractFromFile("phSim01.csv"))
-draw_hist([0.0,1.0,2.0,3.0],densities)
+densities.append(extractFromFiles("simulationphSim0",2))
+densities.append(extractFromFiles("phSim0", 1)[5:])
+densities.append(extractFromFile("simulationphSim04.csv"))
+print densities
+draw_hist([0.0, 1.0, 2.0],densities)
 plt.show()

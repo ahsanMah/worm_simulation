@@ -100,7 +100,7 @@ end
 to setup_sim
   print "Loading from simulation files..."
   load_patches save_name
-  load_agents save_name
+  ;load_agents save_name
   print "Loading parameters..."
   let filename "data/input/pH-Table.csv"
   load_param "data/input/pH-Table.csv" ph_table
@@ -377,10 +377,11 @@ end
 
 to go
 
-  ;  let filename (word "movie/" ticks ".png")
-  ;  export-view filename
-  ;
-  ;  if (ticks = 480) [stop]
+    let filename (word "movie/" ticks ".png")
+    if (ticks mod 2 = 0) [
+      export-interface filename
+    ]
+    if (ticks = 1800) [stop]
 
   calculate_time
 
@@ -398,10 +399,10 @@ to go
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-283
-53
-1015
-806
+550
+79
+1282
+832
 -1
 -1
 2.4
@@ -425,10 +426,10 @@ ticks
 1000.0
 
 BUTTON
-555
-10
-627
-43
+737
+27
+809
+60
 Setup
 setup\nsetup_sim
 NIL
@@ -442,10 +443,10 @@ NIL
 1
 
 BUTTON
-633
-10
-692
-44
+815
+27
+874
+61
 Go
 go
 T
@@ -459,10 +460,10 @@ NIL
 1
 
 MONITOR
-1047
-19
-1155
-64
+1317
+32
+1425
+77
 Day Number
 day_num
 17
@@ -470,10 +471,10 @@ day_num
 11
 
 PLOT
-1031
-119
-1289
-292
+1302
+139
+1560
+312
 Worm Population for Current Year
 Day Number
 Population
@@ -493,10 +494,10 @@ PENS
 "pen-5" 1.0 0 -5825686 true "" "plotxy day_num count adults with [parent_breed = 4]\nif (day_num = 365) [clear-plot]"
 
 SLIDER
-12
-125
-206
-158
+282
+138
+476
+171
 ph_tolerance
 ph_tolerance
 -0.5
@@ -508,10 +509,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-11
-167
-205
-200
+281
+180
+475
+213
 temperature_tolerance
 temperature_tolerance
 0
@@ -523,10 +524,10 @@ NIL
 HORIZONTAL
 
 MONITOR
-1048
-68
-1155
-113
+1318
+81
+1425
+126
 Population Count
 count adults
 17
@@ -534,10 +535,10 @@ count adults
 11
 
 PLOT
-1031
-300
-1289
-473
+1302
+320
+1560
+493
 Worm Population over Years
 NIL
 NIL
@@ -552,10 +553,10 @@ PENS
 "default" 1.0 1 -11221820 true "" "plotxy year count adults"
 
 MONITOR
-1163
-68
-1261
-113
+1433
+81
+1531
+126
 Cocoon Count
 count cocoons
 17
@@ -563,10 +564,10 @@ count cocoons
 11
 
 INPUTBOX
-175
-371
-256
-431
+436
+447
+537
+507
 starting_day
 150
 1
@@ -574,10 +575,10 @@ starting_day
 Number
 
 MONITOR
-1163
-18
-1258
-63
+1433
+31
+1528
+76
 Daily Temp *C
 global_temperature
 2
@@ -585,20 +586,20 @@ global_temperature
 11
 
 CHOOSER
-13
-422
-153
-467
+284
+497
+424
+542
 obstacle_shape
 obstacle_shape
 "circle" "rectangle" "mountain" "monitor"
 1
 
 SLIDER
-12
-244
-206
-277
+282
+257
+476
+290
 speed
 speed
 0
@@ -610,10 +611,10 @@ NIL
 HORIZONTAL
 
 INPUTBOX
-15
-655
-137
-715
+286
+730
+408
+790
 save_name
 phSim
 1
@@ -621,10 +622,10 @@ phSim
 String (reporter)
 
 SLIDER
-14
-522
-202
-555
+285
+597
+473
+630
 patch_pH
 patch_pH
 0
@@ -636,30 +637,30 @@ NIL
 HORIZONTAL
 
 CHOOSER
-14
-372
-153
-417
+285
+447
+424
+492
 Show:
 Show:
 "pH" "food" "temperature" "monitor" "turtle density"
 0
 
 TEXTBOX
-18
-12
-128
-30
+288
+25
+398
+43
 Species Control
 13
 0.0
 1
 
 SLIDER
-12
-205
-206
-238
+282
+218
+476
+251
 species_genetic_diversity
 species_genetic_diversity
 0
@@ -671,20 +672,20 @@ NIL
 HORIZONTAL
 
 CHOOSER
-13
-37
-145
-82
+283
+50
+415
+95
 species_number
 species_number
 1 2 3 4 5
 0
 
 BUTTON
-14
-292
-91
-325
+284
+378
+361
+411
 Add
 mouse_add_species
 T
@@ -698,10 +699,10 @@ NIL
 1
 
 BUTTON
-704
-10
-814
-43
+886
+27
+996
+60
 Recolor Patches
 recolor_patches
 NIL
@@ -715,10 +716,10 @@ NIL
 1
 
 BUTTON
-12
-721
-135
-755
+283
+796
+406
+830
 Save Environment
 save_patches save_name
 NIL
@@ -732,10 +733,10 @@ NIL
 1
 
 BUTTON
-140
-721
-260
-754
+411
+796
+531
+829
 Load Environment
 load_patches save_name
 NIL
@@ -749,10 +750,10 @@ NIL
 1
 
 BUTTON
-105
-291
-175
-324
+375
+377
+445
+410
 Save
 save_agents save_name
 NIL
@@ -766,10 +767,10 @@ NIL
 1
 
 BUTTON
-190
-291
-266
-324
+460
+377
+536
+410
 Load
 load_agents save_name
 NIL
@@ -783,10 +784,10 @@ NIL
 1
 
 SLIDER
-13
-562
-200
-595
+284
+637
+471
+670
 temperature_difference
 temperature_difference
 -10
@@ -798,10 +799,10 @@ NIL
 HORIZONTAL
 
 BUTTON
-14
-608
-82
-641
+285
+683
+353
+716
 Draw
 pen
 T
@@ -815,10 +816,10 @@ NIL
 1
 
 BUTTON
-92
-609
-162
-642
+363
+684
+433
+717
 Select
 edit_environment
 T
@@ -832,10 +833,10 @@ NIL
 1
 
 BUTTON
-171
-609
-254
-642
+442
+684
+525
+717
 Edit Patch
 recolor-selected
 NIL
@@ -849,30 +850,30 @@ NIL
 1
 
 TEXTBOX
-16
-345
-176
-363
+287
+420
+447
+438
 Environment Controls\n
 13
 0.0
 1
 
 CHOOSER
-15
-469
-153
-514
+286
+544
+424
+589
 change:
 change:
 "pH" "temperature difference" "pH and temperature difference" "mountain" "monitor" "highway"
 0
 
 BUTTON
-461
-10
-550
-43
+643
+27
+732
+60
 Load GIS
 setup\nsetup_gis\ninitialize_monitors
 NIL
@@ -886,10 +887,10 @@ NIL
 1
 
 INPUTBOX
-142
-656
-262
-716
+413
+731
+533
+791
 save_number
 1
 1
@@ -897,10 +898,10 @@ save_number
 Number
 
 SLIDER
-12
-86
-206
-119
+282
+99
+476
+132
 worm_population
 worm_population
 0
@@ -912,10 +913,10 @@ NIL
 HORIZONTAL
 
 PLOT
-1032
-476
-1288
-638
+1303
+496
+1559
+658
 X Boundaries
 NIL
 NIL
@@ -931,10 +932,10 @@ PENS
 "low" 1.0 0 -7500403 true "" "plotxy x-high ticks"
 
 PLOT
-1032
-644
-1288
-807
+1303
+664
+1559
+827
 Y Boundaries
 NIL
 NIL
@@ -950,10 +951,10 @@ PENS
 "high" 1.0 0 -7500403 true "" "plot y-high"
 
 SWITCH
-1297
-148
-1479
-181
+280
+296
+476
+329
 Random_Insertions?
 Random_Insertions?
 1
@@ -961,10 +962,10 @@ Random_Insertions?
 -1000
 
 SLIDER
-1296
-184
-1479
-217
+281
+335
+478
+368
 insertion_frequency
 insertion_frequency
 1
@@ -976,10 +977,10 @@ insertion_frequency
 HORIZONTAL
 
 INPUTBOX
-1296
-223
-1479
-283
+434
+511
+539
+571
 number_inserted
 0
 1
@@ -987,10 +988,10 @@ number_inserted
 Number
 
 BUTTON
-1316
-44
-1422
-77
+1003
+27
+1109
+60
 Hide Turtles
 ask turtles [hide-turtle]
 NIL
@@ -1004,10 +1005,10 @@ NIL
 1
 
 BUTTON
-1327
-89
-1438
-122
+1116
+27
+1227
+60
 Show Turtles
 ask turtles[show-turtle]
 NIL
@@ -1423,10 +1424,18 @@ NetLogo 5.3.1
 @#$#@#$#@
 <experiments>
   <experiment name="experiment" repetitions="1" runMetricsEveryStep="false">
-    <setup>setup</setup>
+    <setup>setup
+setup_sim</setup>
     <go>go</go>
     <metric>maxPop</metric>
-    <steppedValueSet variable="ph_tolerance" first="0" step="0.1" last="0.2"/>
+    <enumeratedValueSet variable="ph_tolerance">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="save_number">
+      <value value="1"/>
+      <value value="2"/>
+      <value value="3"/>
+    </enumeratedValueSet>
   </experiment>
 </experiments>
 @#$#@#$#@
