@@ -135,11 +135,22 @@ def extractFromFile (filename):
 
 	return yvals[5:]
 
+def extractFromFiles(filename, repetitions):
+	sim_list = []
+	avg_pop = []
+	for rep in range(repetitions):
+		name = filename + "1.csv"
+		sim_list.append(extractFromFile(name))
+
+	for sim in range(3):
+		avg_pop[0] += sim_list[sim][0]
+	return avg_pop
+repetitions = 3
 densities = []
 
+# densities.append(extractFromFiles("phSim0",3))
 densities.append(extractFromFile("phSim01.csv"))
-densities.append(extractFromFile("phSim01.csv"))
-densities.append(extractFromFile("phSim01.csv"))
-densities.append(extractFromFile("phSim01.csv"))
-draw_hist([0.0,1.0,2.0,3.0],densities)
+# densities.append(extractFromFile("phSim01.csv"))
+# densities.append(extractFromFile("phSim01.csv"))
+draw_hist([0.0],densities)
 plt.show()

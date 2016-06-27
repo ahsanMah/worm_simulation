@@ -1423,10 +1423,18 @@ NetLogo 5.3.1
 @#$#@#$#@
 <experiments>
   <experiment name="experiment" repetitions="1" runMetricsEveryStep="false">
-    <setup>setup</setup>
+    <setup>setup
+setup_sim</setup>
     <go>go</go>
     <metric>maxPop</metric>
-    <steppedValueSet variable="ph_tolerance" first="0" step="0.1" last="0.2"/>
+    <enumeratedValueSet variable="ph_tolerance">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="save_number">
+      <value value="1"/>
+      <value value="2"/>
+      <value value="3"/>
+    </enumeratedValueSet>
   </experiment>
 </experiments>
 @#$#@#$#@
