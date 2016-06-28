@@ -44,32 +44,6 @@ def make_labels (val):
 		return "+" + str(val)
 	return str(val)
 
-def draw_hist (xlabels, yvals):
-	
-	xvals = np.arange(len(xlabels))
-	# yvals5yr = [y[0] for y in yvals]
-	# yvals10yr = [y[-1] for y in yvals]
-	# width = 0.8/len(yvals[1])
-	width = 0.8/len(yvals[0])
-	e = (3, 5, 12, 13, 30, 50)
-	x_width = 0
-	plt.yscale('linear')
-	sub.set_xticks(xvals + 0.5)
-	sub.set_xticklabels(xlabels)
-	# sub.bar(xvals, yvals5yr, width, color = 'g', yerr = e)
-	# sub.bar(xvals+width, yvals10yr, width, color = 'b')
-	colors = ['g','y','r','m','c']
-
-	for index,x in enumerate(xlabels):
-		x_width = 0
-		for mon_idx,y in enumerate(yvals[index]):
-			print (x,mon_idx,y)
-			if y > 0.0:
-				plt.bar(x + x_width, y, width, color = colors[mon_idx])
-			x_width += width
-
-
-	return
 
 def getFromBS (data_reader):
 	data = open("test.csv", "rb")
@@ -116,6 +90,73 @@ def getFromBS (data_reader):
 	#draw_hist(xlabels,yvals)
 	return
 
+
+'''
+Draws a histogram with the given data
+
+parameters -> (x-axis labels, heights of the bars)
+
+'''
+def draw_hist (xlabels, yvals):
+	
+	xvals = np.arange(len(xlabels))
+	width = 0.9/len(yvals)
+	# err_list = (3, 5, 12, 13, 30, 50)
+	x_width = 0
+	plt.yscale('symlog')
+	sub.set_xticks(xvals + 0.5)
+	sub.set_xticklabels(xlabels)
+	plt.xlabel("Region Number")
+	plt.ylabel("Density in Region")
+	# sub.bar(xvals, yvals5yr, width, color = 'g', yerr = e)
+	# sub.bar(xvals+width, yvals10yr, width, color = 'b')
+	colors = ['g','y','r','m','c']
+
+	for idx in range(len(yvals)): #for every ph value
+		for mon_idx,y in enumerate(yvals[idx]):
+			print (idx,mon_idx,y)
+			# plt.bar(x + x_width, y, width, color = colors[mon_idx])
+			sub.bar(mon_idx + x_width,y,width, color = colors[mon_idx])
+		x_width += width
+
+	return
+
+def draw_hist_err (xlabels, yvals, err_list):
+	
+	xvals = np.arange(len(xlabels))
+	width = 0.9/len(yvals)
+	# err_list = (3, 5, 12, 13, 30, 50)
+	x_width = 0
+	plt.yscale('symlog')
+	sub.set_xticks(xvals + 0.5)
+	sub.set_xticklabels(xlabels)
+	plt.xlabel("Region Number")
+	plt.ylabel("Density in Region")
+	# sub.bar(xvals, yvals5yr, width, color = 'g', yerr = e)
+	# sub.bar(xvals+width, yvals10yr, width, color = 'b')
+	colors = ['g','c','r','m','y']
+
+	for idx in range(len(yvals)): #for every parameter value
+		mon_list = yvals[idx]
+		std_err = err_list[idx]
+		clr = colors[idx]
+		print mon_list
+		print std_err
+		# for mon_idx,y in enumerate(mon_list): #for every monitor get its index and height
+		# 	print (idx,mon_idx,y,std_err[mon_idx])
+		# 	plt.bar(mon_idx + x_width,y,width, color = colors[mon_idx], yerr = std_err[mon_idx])
+		plt.bar(xvals + x_width,mon_list,width, color = clr, yerr = std_err)
+		x_width += width
+
+	return
+
+
+
+'''
+Parses the file and returns a list of the max densities of the data file given
+
+(filename) --> list of y-values to be plotted
+'''
 def extractFromFile (filename):
 	data = open(filename, "rb")
 	data_reader = csv.reader(data)
@@ -136,30 +177,62 @@ def extractFromFile (filename):
 	for val in data_table:
 		yvals.append (data_table[val][3])
 
-	return yvals #[5:]
+	return yvals
 
-def extractFromFiles(filename, repetitions):
-	sim_list = []
-	new_list = []
+def getPlotVals(sim_name, repetitions):
+	multi_run = []
 	avg_pop = []
-	sim_list = (extractFromFile(filename + "1.csv"))
-	print sim_list
-	if repetitions > 1:
-		for rep in range(repetitions - 1):
-			name = filename + str(rep+2) + ".csv"
-			new_list = extractFromFile(name)
-			print new_list
-			sim_list= map(add, sim_list,new_list)
+	std_err = []
+	rep = 1
+	filename = ""
 
-		map(lambda x: x/3.0, sim_list)
-	return sim_list
+	while rep <= repetitions:
+		filename = sim_name + str(rep) + ".csv"
+		multi_run.append(extractFromFile(filename))
+		rep += 1
+	
+	avg_pop = np.mean(multi_run, axis = 0)
+	std_err = np.std(multi_run, axis = 0)
+
+	for idx,val in enumerate(avg_pop):
+	 	print val,std_err[idx]
+
+	return avg_pop, std_err
+
+def askUser():
+	save_name = raw_input("Enter the save name as seen in NetLogo: ")
+	param = raw_input("Value of starting parameter: ")
+	inc = raw_input("Increment: ")
+	rep = raw_input("Repetitions per simulation: ")
 
 repetitions = 3
 densities = []
+err_list = []
+mon_list = [0,1,2,3,4]
+param = 0.0
+inc = 0.1
+num_param = 1
+num_rep = 3
+i = 0
+save_name = "simulationphSim"
 
-densities.append(extractFromFiles("simulationphSim0",2))
-densities.append(extractFromFiles("phSim0", 1)[5:])
-densities.append(extractFromFile("simulationphSim04.csv"))
-print densities
-draw_hist([0.0, 1.0, 2.0],densities)
+askUser()
+
+for i in range(num_param):
+	sim_name =  save_name + str(param)
+	if param == 0.0 : sim_name = save_name + str(0) #since Netlogo appends '0' to files instead of '0.0'
+	val,err = getPlotVals(sim_name,num_rep)
+	param += inc
+	densities.append(val)
+	err_list.append(err)
+
+densities.append(extractFromFile("phSim01.csv")[5:])
+densities.append(extractFromFile("simulationphSim03.csv"))
+err_list.append(err_list[0])
+err_list.append(err_list[0])
+
+# draw_hist(mon_list,densities)
+draw_hist_err(mon_list,densities,err_list)
+plt.title("pH Tolerance")
+# plt.grid(True)
 plt.show()
