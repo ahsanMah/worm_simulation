@@ -268,13 +268,9 @@ end
 to check_burrow
 <<<<<<< HEAD
   
-  let survival_prob 1
-  
-  ;gets cumulative probabilities of the past 3 days
-  foreach prev_days_temp [
-    set survival_prob survival_prob * (item 0 table:get temp_table (? + temp_shift))
 =======
    
+>>>>>>> 9d0cef2adb57476390545477b97e84dc3c5b4f64
   let survival_prob 1
   let day_prob 1
   let mapped_temp 0
@@ -288,7 +284,6 @@ to check_burrow
     
     ;set survival_prob survival_prob * day_prob
     set survival_prob survival_prob * (item 0 table:get temp_table ?)
->>>>>>> 9d0cef2adb57476390545477b97e84dc3c5b4f64
   ]
   
   ;worm starts burrowing if it senses high death chance in the past few days

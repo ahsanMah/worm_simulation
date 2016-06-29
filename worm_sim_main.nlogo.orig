@@ -508,7 +508,11 @@ ph_tolerance
 ph_tolerance
 -0.5
 0.5
+<<<<<<< HEAD
+-0.1
+=======
 0
+>>>>>>> 9d0cef2adb57476390545477b97e84dc3c5b4f64
 0.1
 1
 NIL
@@ -919,7 +923,7 @@ worm_population
 worm_population
 0
 500
-50
+500
 5
 1
 NIL

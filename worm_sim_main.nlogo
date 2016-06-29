@@ -618,7 +618,7 @@ INPUTBOX
 403
 90
 save_name
-phSim
+tempSim
 1
 0
 String (reporter)
