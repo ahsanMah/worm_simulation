@@ -164,7 +164,7 @@ def extractFromFile (filename):
         xvals = []              #values to be plotted on the x-axis
         yvals = []              #values to be plotted on the y-axis
         run_data = []   #data for individual runs
-        data_reader.next()
+
         for row in data_reader:
                 monitor_num = convert_to_float(row[1])
                 monitor_pop = convert_to_float(row[3])
@@ -200,10 +200,9 @@ def getPlotVals(sim_name, repetitions):
         return avg_pop, std_err
 
 def askUser():
-        save_name = raw_input("Enter the name of the simulation as seen in NetLogo: ")
+        save_name = raw_input("Enter the save name as seen in NetLogo: ")
         param = raw_input("Value of starting parameter: ")
         inc = raw_input("Increment: ")
-        final = raw_input("Value of stopping parameter: ")
         rep = raw_input("Repetitions per simulation: ")
 
 repetitions = 3
@@ -215,14 +214,13 @@ inc = 0.1
 num_param = 3
 num_rep = 3
 i = 0
-folder_name = "phSim"
-file_pathway = "simulations/" + folder_name + "/output/"
+save_name = "simulationphSim"
 
 #askUser()
 
 for i in range(num_param):
-        sim_name =  file_pathway + str(param)
-        if param == 0 : sim_name = file_pathway + str(0) #since Netlogo appends '0' to files instead of '0.0'
+        sim_name =  save_name + str(param)
+        if param == 0 : sim_name = save_name + str(0) #since Netlogo appends '0' to files instead of '0.0'
         print sim_name
         val,err = getPlotVals(sim_name,num_rep)
         param += inc

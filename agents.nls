@@ -85,7 +85,7 @@ to setup_agents
   set amount_egested 1
   set consumption-in-period 1
   set ph_shift ph_tolerance
-  set temp_shift 5 - temperature_tolerance
+  set temp_shift temperature_tolerance
   set species_list table:make
   set shape_list (list "red_worm" "cyan_worm" "pink_worm" "orange_worm" "magenta_worm" "violet_worm")
   set color_list (list red cyan pink orange magenta violet)
@@ -267,18 +267,26 @@ end
 
 to check_burrow
    
-let survival_prob 1
-
-;gets cumulative probabilities of the past 3 days
-foreach prev_days_temp [
-  set survival_prob survival_prob * (item 0 table:get temp_table (? + temp_shift))
- ]
-
-;worm starts burrowing if it senses high death chance in the past few days
-ifelse (survival_prob < 0.7) 
+  let survival_prob 1
+  let day_prob 1
+  let mapped_temp 0
+  ;gets cumulative probabilities of the past 3 days
+  foreach prev_days_temp [
+    set mapped_temp precision (? + temp_shift) 1
+    
+    ifelse table:has-key? temp_table mapped_temp [
+      set day_prob (item 0 table:get temp_table mapped_temp)
+    ][ set day_prob (item 0 table:get temp_table ?) ]
+    
+    ;set survival_prob survival_prob * day_prob
+    set survival_prob survival_prob * (item 0 table:get temp_table ?)
+  ]
+  
+  ;worm starts burrowing if it senses high death chance in the past few days
+  ifelse (survival_prob < 0.7) 
   [set burrow true]
   [ set burrow false]
-
+  
 end
 ;updates probablities of dying and reproducing
 to update_thresholds

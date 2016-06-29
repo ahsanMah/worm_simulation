@@ -102,7 +102,7 @@ to load_agents [name]
       set parent_breed item 2 ?
       set size agent_size
       set shape item 3 ?
-      set maturation_wait 70
+      set maturation_wait 0
       set wait_period item 4 ?
       set stamina 5
       set genetic_diversity item 5 ?
@@ -192,6 +192,4 @@ to load_param [filename table]
     let values (but-first ?)
     table:put table param values
   ]
-  print filename
-  print table
 end
