@@ -36,6 +36,8 @@ to setup
   set temp_table table:make
   set species_data [] ;list of collected info of each species for each monitor
   set monthly_data [] ;list of data collected each month
+  let header ["Month Number" "Monitor Number" "Species Number" "Population" "Density" "Genetic Diversity" "pH Tolerance" "Temperature Tolerance"]
+  set monthly_data lput header monthly_data
   set area_list []
   set pop_data []
   set report_month 0
@@ -330,7 +332,7 @@ to-report check_stopping_conditions
   if (year = 10) [
     if (ticks mod 365 = 1)[ ;collects data
       set pop_data lput max_pop pop_data
-      export_data save_number
+      ;export_data save_number
       set max_pop 0
     ]
   ]
@@ -419,8 +421,8 @@ GRAPHICS-WINDOW
 300
 0
 300
-0
-0
+1
+1
 1
 ticks
 1000.0
@@ -502,7 +504,7 @@ ph_tolerance
 ph_tolerance
 -0.5
 0.5
-0.1
+-0.1
 0.1
 1
 NIL
@@ -515,10 +517,10 @@ SLIDER
 286
 temperature_tolerance
 temperature_tolerance
-0
-100
-5
-1
+-2
+2
+-0.5
+0.1
 1
 NIL
 HORIZONTAL
@@ -892,7 +894,7 @@ INPUTBOX
 528
 91
 save_number
-1
+2
 1
 0
 Number
@@ -906,7 +908,7 @@ worm_population
 worm_population
 0
 500
-50
+500
 5
 1
 NIL
@@ -1471,6 +1473,31 @@ load_agents save_name</setup>
     <go>go</go>
     <metric>maxPop</metric>
     <steppedValueSet variable="ph_tolerance" first="-0.1" step="0.1" last="0.1"/>
+    <enumeratedValueSet variable="save_number">
+      <value value="1"/>
+      <value value="2"/>
+      <value value="3"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="experiment" repetitions="1" runMetricsEveryStep="false">
+    <setup>setup
+setup_sim
+load_agents save_name</setup>
+    <go>go</go>
+    <metric>maxPop</metric>
+    <enumeratedValueSet variable="save_number">
+      <value value="1"/>
+      <value value="2"/>
+      <value value="3"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="temperature" repetitions="1" runMetricsEveryStep="false">
+    <setup>setup
+setup_sim
+load_agents save_name</setup>
+    <go>go</go>
+    <metric>maxPop</metric>
+    <steppedValueSet variable="temperature_tolerance" first="-0.5" step="0.5" last="0.5"/>
     <enumeratedValueSet variable="save_number">
       <value value="1"/>
       <value value="2"/>

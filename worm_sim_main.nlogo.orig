@@ -36,6 +36,8 @@ to setup
   set temp_table table:make
   set species_data [] ;list of collected info of each species for each monitor
   set monthly_data [] ;list of data collected each month
+  let header ["Month Number" "Monitor Number" "Species Number" "Population" "Density" "Genetic Diversity" "pH Tolerance" "Temperature Tolerance"]
+  set monthly_data lput header monthly_data
   set area_list []
   set pop_data []
   set report_month 0
@@ -102,9 +104,9 @@ to setup_sim
   load_patches save_name
   ;load_agents save_name
   print "Loading parameters..."
-  let filename "data/input/pH-Table.csv"
-  load_param "data/input/pH-Table.csv" ph_table
-  load_param "data/input/temp-Table.csv" temp_table
+  ;let filename "data/input/pH-Table.csv"
+  load_param (word "simulations/" save_name "/input/parameters/pH-Table.csv") ph_table
+  load_param (word "simulations/" save_name "/input/parameters/temp-Table.csv") temp_table
   print "Done Loading"
 end
 
@@ -185,202 +187,12 @@ to pen
   ]
 end
 
-<<<<<<< HEAD
-=======
-to save_obstacles [name]
-  let filename1 (word "data/parameters/myobstacle"  name ".csv")
-  csv:to-file filename1 obstacle_list
-  print "Saved to file"
-end
-
-to load_obstacles [name]
-  let filename (word "data/parameters/myobstacle"  name ".csv")
-  ;set obstacle_list csv:from-file filename
-  print "Loaded from file: "
-  print obstacle_list
-  ;;draw_obstacles
-end
-
-to save_patches [name]
-  save_monitors name
-  save_obstacles name
-  let filename (word "data/parameters/mypatches" name ".csv")
-  let i min-pxcor
-  let j min-pycor
-  carefully [file-delete filename] []
-  while [(i <= max-pxcor)]
-  [
-    while [(j <= max-pycor)]
-    [
-      ask patch i j
-      [
-        let info (list i j ph food-here permeability local_death_threshold temp_diff_here pcolor soil_depth moisture)
-        file-open filename
-        file-print csv:to-row info
-        file-close
-        set j j + 1
-      ]
-    ]
-    set j min-pycor
-    set i i + 1
-  ]
-
-end
-
-to load_patches [name]
-  load_obstacles name
-  let filename (word "data/parameters/mypatches" name ".csv")
-  let data csv:from-file filename
-  foreach (data)
-  [
-    ask patch (item 0 ?) (item 1 ?)
-    [
-      set ph item 2 ?
-      set food-here item 3 ?
-      set permeability item 4 ?
-      set local_death_threshold item 5 ?
-      set temp_diff_here item 6 ?
-      set being_monitored false
-      set pcolor item 7 ?
-      set soil_depth item 8 ?
-      set moisture item 9 ?
-    ]
-  ]
-  load_monitors name
-  calculate_temp
-  recolor_patches
-end
-
-to save_agents [name]
-  export_data name
-  let filename1 (word "data/parameters/specieslist" name ".csv")
-  let data []
-  foreach table:to-list species_list [ ;converts table into listto store as csv
-    set data lput (sentence item 0 ? item 1 ?) data
-  ]
-  csv:to-file filename1 data
-
-  let filename (word "data/parameters/myagents"  name ".csv")
-
-  carefully [file-delete filename] []
-  ask turtles
-  [
-    let info (list xcor ycor parent_breed shape wait_period hatch_temp genetic_diversity reprod_min_temp)
-    file-open filename
-    file-print csv:to-row info
-    file-close
-  ]
-  print "Saved to file"
-end
-
-to load_agents [name]
-  ;load_monitors name
-  let filename1 (word "data/parameters/specieslist"  name ".csv")
-  let filename (word "data/parameters/myagents" name ".csv")
-  let data []
-  set species_list table:make
-  set data csv:from-file filename1
-  foreach data [table:put species_list item 0 ? (list item 1 ? item 2 ? item 3 ?)]
-  print "Loaded from file: "
-  print species_list
-  set data csv:from-file filename
-  foreach (data)
-  [
-    create-adults 1 [
-      setxy item 0 ? item 1 ?
-      set parent_breed item 2 ?
-      set size agent_size
-      set shape item 3 ?
-      set maturation_wait 70
-      set wait_period item 4 ?
-      set hatch_temp item 5 ?
-      set stamina 5
-      set genetic_diversity item 6 ?
-      set reprod_min_temp item 7 ?
-      set reprod_max_temp reprod_min_temp + 10
-      set color (item parent_breed color_list)
-      set death_threshold normal_death_threshold
-      set cocoon_rate 0.093
-      set prev_patch ph
-      set patch_days 0
-    ]
-  ]
-end
-
-to load_temperature
-  let filename (word "data/parameters/temperaturelist.csv")
-  file-open filename
-  set temperature_table table:make
-  let i 0
-  while [i < 8]
-  [
-    let nothing csv:from-row file-read-line
-    set i i + 1
-  ]
-  let days_since_start 0
-  while [ not file-at-end? ]
-  [
-    let row (csv:from-row file-read-line)
-    let row_entry (item 1 row)
-    ;show row_entry
-    table:put temperature_table days_since_start row_entry
-    set days_since_start days_since_start + 1
-  ]
-
-  file-close
-
-end
-
-to save_monitors [name]
-  let filename (word "data/parameters/mymonitors" name ".csv")
-  let i min-pxcor
-  let j min-pycor
-  carefully [file-delete filename] []
-  file-open filename
-  while [(i <= max-pxcor)]
-  [
-    while [(j <= max-pycor)]
-    [
-      ask patch i j
-      [
-        let info (list i j being_monitored monitor_index monitor_size monitor_number)
-        file-open filename
-        file-print csv:to-row info
-        file-close
-        set j j + 1
-      ]
-    ]
-    set j min-pycor
-    set i i + 1
-  ]
-end
-
-to load_monitors [name]
-  let filename (word "data/parameters/mymonitors" name ".csv")
-  let data csv:from-file filename
-  foreach (data)
-  [
-    ask patch (item 0 ?) (item 1 ?)
-    [
-      set being_monitored item 2 ?
-      set monitor_index item 3 ?
-      set monitor_size item 4 ?
-    ]
-    set monitor_number item 5 ?
-  ]
-  let monitor_list n-values monitor_number [?]
-  foreach monitor_list [update_monitor_area ?]
-  recolor_patches
-end
-
-to load_param [filename table]
-
-  let data csv:from-file filename
->>>>>>> e464172b7a487625221de8ca11c94086da7c16e1
-
-
 to export_data [name]
-  let filename (word "data/output/simulation" save_name ph_tolerance save_number ".csv")
+<<<<<<< HEAD
+  let filename (word "simulations/" save_name "/output/temp" temperature_tolerance "ph" ph_tolerance "save" save_number ".csv")
+=======
+  let filename (word "data/output/simulation" save_name temperature_tolerance save_number ".csv")
+>>>>>>> 9d0cef2adb57476390545477b97e84dc3c5b4f64
   ;let filename2 (word "data/output/finalPop" save_name ph_tolerance save_number ".csv")
   csv:to-file filename monthly_data
   ;csv:to-file filename2 pop_data
@@ -428,7 +240,7 @@ end
 
 to random_insertions
 
-  if (Random_Insertions? = true and ticks mod (365 / insertion_frequency)= 0) [
+  if (Random_Insertions? = true and ticks mod (365 / frequency)= 0) [
     let species one-of table:keys species_list
     let spot one-of fishing_spots
     let number number_inserted
@@ -524,7 +336,7 @@ to-report check_stopping_conditions
   if (year = 10) [
     if (ticks mod 365 = 1)[ ;collects data
       set pop_data lput max_pop pop_data
-      export_data save_number
+      ;export_data save_number
       set max_pop 0
     ]
   ]
@@ -571,10 +383,11 @@ end
 
 to go
 
-  ;  let filename (word "movie/" ticks ".png")
-  ;  export-view filename
-  ;
-  ;  if (ticks = 480) [stop]
+;    let filename (word "movie/" ticks ".png")
+;    if (ticks mod 2 = 0) [
+;      export-interface filename
+;    ]
+;    if (ticks = 1800) [stop]
 
   calculate_time
 
@@ -592,10 +405,10 @@ to go
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-283
-53
-1015
-806
+550
+79
+1282
+832
 -1
 -1
 2.4
@@ -619,10 +432,10 @@ ticks
 1000.0
 
 BUTTON
-555
-10
-627
-43
+737
+27
+809
+60
 Setup
 setup\nsetup_sim
 NIL
@@ -636,10 +449,10 @@ NIL
 1
 
 BUTTON
-633
-10
-692
-44
+815
+27
+874
+61
 Go
 go
 T
@@ -653,10 +466,10 @@ NIL
 1
 
 MONITOR
-1047
-19
-1155
-64
+1317
+32
+1425
+77
 Day Number
 day_num
 17
@@ -664,10 +477,10 @@ day_num
 11
 
 PLOT
-1031
-119
-1289
-292
+1302
+139
+1560
+312
 Worm Population for Current Year
 Day Number
 Population
@@ -687,10 +500,10 @@ PENS
 "pen-5" 1.0 0 -5825686 true "" "plotxy day_num count adults with [parent_breed = 4]\nif (day_num = 365) [clear-plot]"
 
 SLIDER
-12
-125
-206
-158
+281
+211
+534
+244
 ph_tolerance
 ph_tolerance
 -0.5
@@ -702,25 +515,32 @@ NIL
 HORIZONTAL
 
 SLIDER
-11
-167
-205
-200
+<<<<<<< HEAD
+280
+253
+535
+286
+=======
+281
+180
+485
+213
+>>>>>>> 9d0cef2adb57476390545477b97e84dc3c5b4f64
 temperature_tolerance
 temperature_tolerance
-0
-100
-5
-1
+-2
+2
+-0.5
+0.1
 1
 NIL
 HORIZONTAL
 
 MONITOR
-1048
-68
-1155
-113
+1318
+81
+1425
+126
 Population Count
 count adults
 17
@@ -728,10 +548,10 @@ count adults
 11
 
 PLOT
-1031
-300
-1289
-473
+1302
+320
+1560
+493
 Worm Population over Years
 NIL
 NIL
@@ -746,10 +566,10 @@ PENS
 "default" 1.0 1 -11221820 true "" "plotxy year count adults"
 
 MONITOR
-1163
-68
-1261
-113
+1433
+81
+1531
+126
 Cocoon Count
 count cocoons
 17
@@ -757,10 +577,10 @@ count cocoons
 11
 
 INPUTBOX
-175
-371
-256
-431
+434
+561
+535
+653
 starting_day
 150
 1
@@ -768,10 +588,10 @@ starting_day
 Number
 
 MONITOR
-1163
-18
-1258
-63
+1433
+31
+1528
+76
 Daily Temp *C
 global_temperature
 2
@@ -779,20 +599,20 @@ global_temperature
 11
 
 CHOOSER
-13
+282
+611
 422
-153
-467
+656
 obstacle_shape
 obstacle_shape
 "circle" "rectangle" "mountain" "monitor"
 1
 
 SLIDER
-12
-244
-206
-277
+281
+330
+535
+363
 speed
 speed
 0
@@ -804,56 +624,56 @@ NIL
 HORIZONTAL
 
 INPUTBOX
-15
-655
-137
-715
+281
+30
+403
+90
 save_name
-phSim
+tempSim
 1
 0
 String (reporter)
 
 SLIDER
-14
-522
-202
-555
+283
+711
+534
+744
 patch_pH
 patch_pH
 0
 14
-4
+3
 0.1
 1
 NIL
 HORIZONTAL
 
 CHOOSER
-14
-372
-153
-417
+283
+561
+422
+606
 Show:
 Show:
 "pH" "food" "temperature" "monitor" "turtle density"
 0
 
 TEXTBOX
-18
-12
-128
-30
+287
+98
+397
+116
 Species Control
 13
 0.0
 1
 
 SLIDER
-12
-205
-206
-238
+281
+291
+535
+324
 species_genetic_diversity
 species_genetic_diversity
 0
@@ -865,20 +685,20 @@ NIL
 HORIZONTAL
 
 CHOOSER
-13
-37
-145
-82
+282
+123
+534
+168
 species_number
 species_number
 1 2 3 4 5
 0
 
 BUTTON
-14
-292
-91
-325
+283
+451
+360
+484
 Add
 mouse_add_species
 T
@@ -892,10 +712,10 @@ NIL
 1
 
 BUTTON
-704
-10
-814
-43
+886
+27
+996
+60
 Recolor Patches
 recolor_patches
 NIL
@@ -909,10 +729,10 @@ NIL
 1
 
 BUTTON
-12
-721
-135
-755
+283
+796
+406
+830
 Save Environment
 save_patches save_name
 NIL
@@ -926,10 +746,10 @@ NIL
 1
 
 BUTTON
-140
-721
-260
-754
+411
+796
+531
+829
 Load Environment
 load_patches save_name
 NIL
@@ -943,10 +763,10 @@ NIL
 1
 
 BUTTON
-105
-291
-175
-324
+374
+450
+444
+483
 Save
 save_agents save_name
 NIL
@@ -960,10 +780,10 @@ NIL
 1
 
 BUTTON
-190
-291
-266
-324
+459
+450
+535
+483
 Load
 load_agents save_name
 NIL
@@ -977,25 +797,25 @@ NIL
 1
 
 SLIDER
-13
-562
-200
-595
+282
+751
+535
+784
 temperature_difference
 temperature_difference
 -10
 10
--6
+-10
 0.5
 1
 NIL
 HORIZONTAL
 
 BUTTON
-14
-608
-82
-641
+285
+517
+366
+550
 Draw
 pen
 T
@@ -1009,10 +829,10 @@ NIL
 1
 
 BUTTON
-92
-609
-162
-642
+372
+517
+446
+550
 Select
 edit_environment
 T
@@ -1026,10 +846,10 @@ NIL
 1
 
 BUTTON
-171
-609
-254
-642
+451
+517
+534
+550
 Edit Patch
 recolor-selected
 NIL
@@ -1043,30 +863,30 @@ NIL
 1
 
 TEXTBOX
-16
-345
-176
-363
+286
+493
+446
+511
 Environment Controls\n
 13
 0.0
 1
 
 CHOOSER
-15
-469
-153
-514
+284
+658
+534
+703
 change:
 change:
-"pH" "temperature difference" "pH and temperature difference" "mountain" "monitor" "highway"
+"pH" "temperature difference" "pH and temperature difference" "monitor" "highway" "water"
 0
 
 BUTTON
-461
-10
-550
-43
+643
+27
+732
+60
 Load GIS
 setup\nsetup_gis\ninitialize_monitors
 NIL
@@ -1080,21 +900,21 @@ NIL
 1
 
 INPUTBOX
-142
-656
-262
-716
+408
+31
+528
+91
 save_number
-1
+2
 1
 0
 Number
 
 SLIDER
-12
-86
-206
-119
+281
+172
+534
+205
 worm_population
 worm_population
 0
@@ -1106,15 +926,15 @@ NIL
 HORIZONTAL
 
 PLOT
-1032
-476
-1288
-638
+1303
+496
+1559
+658
 X Boundaries
 NIL
 NIL
 0.0
-10.0
+300.0
 0.0
 10.0
 true
@@ -1125,17 +945,17 @@ PENS
 "low" 1.0 0 -7500403 true "" "plotxy x-high ticks"
 
 PLOT
-1032
-644
-1288
-807
+1303
+664
+1559
+827
 Y Boundaries
 NIL
 NIL
 0.0
 10.0
 0.0
-10.0
+300.0
 true
 false
 "" "ybounds"
@@ -1144,10 +964,10 @@ PENS
 "high" 1.0 0 -7500403 true "" "plot y-high"
 
 SWITCH
-1297
-148
-1479
-181
+279
+369
+438
+402
 Random_Insertions?
 Random_Insertions?
 1
@@ -1155,29 +975,25 @@ Random_Insertions?
 -1000
 
 SLIDER
-1296
-184
-1479
-217
-insertion_frequency
-insertion_frequency
+279
+406
+438
+439
+frequency
+frequency
 1
 104
-<<<<<<< HEAD
-8
-=======
 1
->>>>>>> e464172b7a487625221de8ca11c94086da7c16e1
 1
 1
 /year
 HORIZONTAL
 
 INPUTBOX
-1296
-223
-1479
-283
+441
+369
+536
+440
 number_inserted
 0
 1
@@ -1185,10 +1001,10 @@ number_inserted
 Number
 
 BUTTON
-1316
-44
-1422
-77
+1003
+27
+1109
+60
 Hide Turtles
 ask turtles [hide-turtle]
 NIL
@@ -1202,10 +1018,10 @@ NIL
 1
 
 BUTTON
-1327
-89
-1438
-122
+1116
+27
+1227
+60
 Show Turtles
 ask turtles[show-turtle]
 NIL
@@ -1229,7 +1045,48 @@ NIL
 
 ## HOW TO USE IT
 
-(how to use the model, including a description of each of the items in the Interface tab)
+###Setting Up a Simulation:
+If parameters and GIS data are located in the proper folders, then pressing the Setup button will load them into the NetLogo environment.  Then, to add worms, adjust the sliders to the desired parameters, select the number of worms to add to the simulation, and press the Add button.  If you want to add worms to random locations within a selected region, press "Select" and select an area, then press add. Note: after adding worms, click somewhere within the environment again while "Select" is still pressed in order to deselect the region. Once agents have been added, a simulation can be started by pressing "Go" and the simulation will run until "Go" is pressed again, it has simulated 30 years of invasion, or all of the worms have died.
+
+###Using BehaviorSpace for Multiple Simulations:
+BehaviorSpace is a useful tool in NetLogo to run multiple simulations simultaneously. To run a BehaviorSpace experiment, click on "Tools -> BehaviorSpace". You can either edit the existing experiment, or create your own.  The first box will allow you to choose which variable to change in your simulations, follow the instructions below the box to choose which values are used in the simulations.  If you want to run a simulation multiple times with the same parameters, include the line ["save_number" [1 1 *number_of_runs*]] with the variables.  The following commands must be in the corresponding boxes for a simulation to work properly.
+####Reporters:
+maxPop
+####Setup commands:
+setup
+setup_sim
+load_agents save_name
+####Go commands:
+go
+
+###Manipulating the Environment:
+The user has the ability to manipulate an existing environment or create an entire environemnt of their own.
+####Draw:
+
+
+Note: Make sure to not have "Draw" selected at the same time as "Add" or "Select"
+
+####Select:
+
+####Add:
+
+
+
+ There are two methods for manipulating the environment: selecting and drawing. If users currently have "Select" chosen, they can select a rectangle, within which they can modify the temperature and/or pH. The patches can be modified in the entire rectangle, for a circle within the rectangle, or a mountain (modifies characteristics on a gradient in a circle). In addition to changing pH and Temperature, users can use the "Draw" buton to draw in highways and water features.
+Users can also draw monitors, which will keep track of the population and density within the monitor during a simulation.
+
+
+###How to Upload Data:
+GIS data on soil should be retrieved from the USDA Web Soil Survey (http://websoilsurvey.sc.egov.usda.gov/App/WebSoilSurvey.aspx).
+GIS highway data: provide link
+Temperature data was retrieved from PRISM (http://www.prism.oregonstate.edu/historical/)
+
+###How to Modify Paramters:
+In a folder there exists parameters.  If you want to modify the parameters, modify the .csv with the corresponding parameters that need to be modified.
+
+###Save/Load Features:
+The buttons "Save" and "Load" will save or load the locations of worms in the simulation with "save_name"
+
 
 ## THINGS TO NOTICE
 
@@ -1621,10 +1478,42 @@ NetLogo 5.3.1
 @#$#@#$#@
 <experiments>
   <experiment name="experiment" repetitions="1" runMetricsEveryStep="false">
-    <setup>setup</setup>
+    <setup>setup
+setup_sim
+load_agents save_name</setup>
     <go>go</go>
     <metric>maxPop</metric>
-    <steppedValueSet variable="ph_tolerance" first="0" step="0.1" last="0.2"/>
+    <steppedValueSet variable="ph_tolerance" first="-0.1" step="0.1" last="0.1"/>
+    <enumeratedValueSet variable="save_number">
+      <value value="1"/>
+      <value value="2"/>
+      <value value="3"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="experiment" repetitions="1" runMetricsEveryStep="false">
+    <setup>setup
+setup_sim
+load_agents save_name</setup>
+    <go>go</go>
+    <metric>maxPop</metric>
+    <enumeratedValueSet variable="save_number">
+      <value value="1"/>
+      <value value="2"/>
+      <value value="3"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="temperature" repetitions="1" runMetricsEveryStep="false">
+    <setup>setup
+setup_sim
+load_agents save_name</setup>
+    <go>go</go>
+    <metric>maxPop</metric>
+    <steppedValueSet variable="temperature_tolerance" first="-0.5" step="0.5" last="0.5"/>
+    <enumeratedValueSet variable="save_number">
+      <value value="1"/>
+      <value value="2"/>
+      <value value="3"/>
+    </enumeratedValueSet>
   </experiment>
 </experiments>
 @#$#@#$#@
