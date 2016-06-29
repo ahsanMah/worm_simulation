@@ -207,6 +207,15 @@ def askUser():
 
 repetitions = 3
 densities = []
+<<<<<<< HEAD
+
+densities.append(extractFromFiles("simulationphSim-0.1",3))
+densities.append(extractFromFiles("simulationphSim0",3))
+densities.append(extractFromFiles("simulationphSim0.1",3))
+
+print densities
+draw_hist([0.0, 1.0, 2.0],densities)
+=======
 err_list = []
 mon_list = [0,1,2,3,4]
 param = 0.0
@@ -235,4 +244,5 @@ err_list.append(err_list[0])
 draw_hist_err(mon_list,densities,err_list)
 plt.title("pH Tolerance")
 # plt.grid(True)
+>>>>>>> 0d428c00c87c112a95fba640ef7172f8f1f68d79
 plt.show()
