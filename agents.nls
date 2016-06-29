@@ -266,19 +266,19 @@ to check_reproduction
 end
 
 to check_burrow
-   
-let survival_prob 1
-
-;gets cumulative probabilities of the past 3 days
-foreach prev_days_temp [
-  set survival_prob survival_prob * (item 0 table:get temp_table (? + temp_shift))
- ]
-
-;worm starts burrowing if it senses high death chance in the past few days
-ifelse (survival_prob < 0.7) 
+  
+  let survival_prob 1
+  
+  ;gets cumulative probabilities of the past 3 days
+  foreach prev_days_temp [
+    set survival_prob survival_prob * (item 0 table:get temp_table (? + temp_shift))
+  ]
+  
+  ;worm starts burrowing if it senses high death chance in the past few days
+  ifelse (survival_prob < 0.7) 
   [set burrow true]
   [ set burrow false]
-
+  
 end
 ;updates probablities of dying and reproducing
 to update_thresholds

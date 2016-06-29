@@ -102,9 +102,9 @@ to setup_sim
   load_patches save_name
   ;load_agents save_name
   print "Loading parameters..."
-  let filename "data/input/pH-Table.csv"
-  load_param "data/input/pH-Table.csv" ph_table
-  load_param "data/input/temp-Table.csv" temp_table
+  ;let filename "data/input/pH-Table.csv"
+  load_param (word "simulations/" save_name "/input/parameters/pH-Table.csv") ph_table
+  load_param (word "simulations/" save_name "/input/parameters/temp-Table.csv") temp_table
   print "Done Loading"
 end
 
@@ -186,7 +186,7 @@ to pen
 end
 
 to export_data [name]
-  let filename (word "data/output/simulation" save_name ph_tolerance save_number ".csv")
+  let filename (word "simulations/" save_name "/output/temp" temperature_tolerance "ph" ph_tolerance "save" save_number ".csv")
   ;let filename2 (word "data/output/finalPop" save_name ph_tolerance save_number ".csv")
   csv:to-file filename monthly_data
   ;csv:to-file filename2 pop_data
@@ -234,7 +234,7 @@ end
 
 to random_insertions
 
-  if (Random_Insertions? = true and ticks mod (365 / insertion_frequency)= 0) [
+  if (Random_Insertions? = true and ticks mod (365 / frequency)= 0) [
     let species one-of table:keys species_list
     let spot one-of fishing_spots
     let number number_inserted
@@ -494,10 +494,10 @@ PENS
 "pen-5" 1.0 0 -5825686 true "" "plotxy day_num count adults with [parent_breed = 4]\nif (day_num = 365) [clear-plot]"
 
 SLIDER
-282
-138
-476
-171
+281
+211
+534
+244
 ph_tolerance
 ph_tolerance
 -0.5
@@ -509,10 +509,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-281
-180
-475
-213
+280
+253
+535
+286
 temperature_tolerance
 temperature_tolerance
 0
@@ -564,10 +564,10 @@ count cocoons
 11
 
 INPUTBOX
-436
-447
-537
-507
+434
+561
+535
+653
 starting_day
 150
 1
@@ -586,20 +586,20 @@ global_temperature
 11
 
 CHOOSER
-284
-497
-424
-542
+282
+611
+422
+656
 obstacle_shape
 obstacle_shape
 "circle" "rectangle" "mountain" "monitor"
-2
+1
 
 SLIDER
-282
-257
-476
-290
+281
+330
+535
+363
 speed
 speed
 0
@@ -611,10 +611,10 @@ NIL
 HORIZONTAL
 
 INPUTBOX
-286
-730
-408
-790
+281
+30
+403
+90
 save_name
 phSim
 1
@@ -622,50 +622,15 @@ phSim
 String (reporter)
 
 SLIDER
-285
-597
-473
-630
+283
+711
+534
+744
 patch_pH
 patch_pH
 0
 14
-3.5
-0.1
-1
-NIL
-HORIZONTAL
-
-CHOOSER
-285
-447
-424
-492
-Show:
-Show:
-"pH" "food" "temperature" "monitor" "turtle density"
-0
-
-TEXTBOX
-288
-25
-398
-43
-Species Control
-13
-0.0
-1
-
-SLIDER
-282
-218
-476
-251
-species_genetic_diversity
-species_genetic_diversity
-0
-1
-0
+3
 0.1
 1
 NIL
@@ -673,19 +638,54 @@ HORIZONTAL
 
 CHOOSER
 283
-50
-415
-95
+561
+422
+606
+Show:
+Show:
+"pH" "food" "temperature" "monitor" "turtle density"
+0
+
+TEXTBOX
+287
+98
+397
+116
+Species Control
+13
+0.0
+1
+
+SLIDER
+281
+291
+535
+324
+species_genetic_diversity
+species_genetic_diversity
+0
+1
+0
+0.1
+1
+NIL
+HORIZONTAL
+
+CHOOSER
+282
+123
+534
+168
 species_number
 species_number
 1 2 3 4 5
 0
 
 BUTTON
-284
-378
-361
-411
+283
+451
+360
+484
 Add
 mouse_add_species
 T
@@ -750,10 +750,10 @@ NIL
 1
 
 BUTTON
-375
-377
-445
-410
+374
+450
+444
+483
 Save
 save_agents save_name
 NIL
@@ -767,10 +767,10 @@ NIL
 1
 
 BUTTON
-460
-377
-536
-410
+459
+450
+535
+483
 Load
 load_agents save_name
 NIL
@@ -784,15 +784,15 @@ NIL
 1
 
 SLIDER
-284
-637
-471
-670
+282
+751
+535
+784
 temperature_difference
 temperature_difference
 -10
 10
--6
+-10
 0.5
 1
 NIL
@@ -800,9 +800,9 @@ HORIZONTAL
 
 BUTTON
 285
-683
-353
-716
+517
+366
+550
 Draw
 pen
 T
@@ -816,10 +816,10 @@ NIL
 1
 
 BUTTON
-363
-684
-433
-717
+372
+517
+446
+550
 Select
 edit_environment
 T
@@ -833,10 +833,10 @@ NIL
 1
 
 BUTTON
-442
-684
-525
-717
+451
+517
+534
+550
 Edit Patch
 recolor-selected
 NIL
@@ -850,24 +850,24 @@ NIL
 1
 
 TEXTBOX
-287
-420
-447
-438
+286
+493
+446
+511
 Environment Controls\n
 13
 0.0
 1
 
 CHOOSER
-286
-544
-424
-589
+284
+658
+534
+703
 change:
 change:
 "pH" "temperature difference" "pH and temperature difference" "monitor" "highway" "water"
-5
+0
 
 BUTTON
 643
@@ -887,10 +887,10 @@ NIL
 1
 
 INPUTBOX
-413
-731
-533
-791
+408
+31
+528
+91
 save_number
 1
 1
@@ -898,10 +898,10 @@ save_number
 Number
 
 SLIDER
-282
-99
-476
-132
+281
+172
+534
+205
 worm_population
 worm_population
 0
@@ -951,10 +951,10 @@ PENS
 "high" 1.0 0 -7500403 true "" "plot y-high"
 
 SWITCH
-280
-296
-476
-329
+279
+369
+438
+402
 Random_Insertions?
 Random_Insertions?
 1
@@ -962,12 +962,12 @@ Random_Insertions?
 -1000
 
 SLIDER
-281
-335
-478
-368
-insertion_frequency
-insertion_frequency
+279
+406
+438
+439
+frequency
+frequency
 1
 104
 1
@@ -977,10 +977,10 @@ insertion_frequency
 HORIZONTAL
 
 INPUTBOX
-434
-511
-539
-571
+441
+369
+536
+440
 number_inserted
 0
 1
@@ -1032,26 +1032,46 @@ NIL
 
 ## HOW TO USE IT
 
-Setting Up a Simulation:
-If parameters and GIS data are located in the proper folders, then pressing the Setup button will load them into the NetLogo environment.  Then, to add worms, adjust the sliders to the desired parameters, selected the number of worms to add to the simulation, and press the Add button.  If you want to add worms to random locations within a selected region, press "Select" and select an area, then press add. Note: after adding worms, one must click somewhere within the environment again while "Select" is still pressed in order to deselect the region. Once agents have been added, a simulation can be started by pressing "Go" and the simulation will run until "Go" is pressed again, it has simulated 30 years of invasion, or all of the worms have died.
+###Setting Up a Simulation:
+If parameters and GIS data are located in the proper folders, then pressing the Setup button will load them into the NetLogo environment.  Then, to add worms, adjust the sliders to the desired parameters, select the number of worms to add to the simulation, and press the Add button.  If you want to add worms to random locations within a selected region, press "Select" and select an area, then press add. Note: after adding worms, click somewhere within the environment again while "Select" is still pressed in order to deselect the region. Once agents have been added, a simulation can be started by pressing "Go" and the simulation will run until "Go" is pressed again, it has simulated 30 years of invasion, or all of the worms have died.
 
-Using BehaviorSpace for Multiple Simulations:
-BehaviorSpace is a useful tool in NetLogo to run multiple simulations simultaneously. To run a BehaviorSpace experiment, click on "Tools -> BehaviorSpace". You can either edit the existing experiment, or create your own.  The first box will allow you to choose which variable to change in your simulations.  The following commands must follow the corresponding boxes, on new lines where there are commas, for a simulation to work properly.  Reporters: maxPop.  Setup Commands: setup, setup_sim, load_agents save_name.  Go commands: go.
+###Using BehaviorSpace for Multiple Simulations:
+BehaviorSpace is a useful tool in NetLogo to run multiple simulations simultaneously. To run a BehaviorSpace experiment, click on "Tools -> BehaviorSpace". You can either edit the existing experiment, or create your own.  The first box will allow you to choose which variable to change in your simulations, follow the instructions below the box to choose which values are used in the simulations.  If you want to run a simulation multiple times with the same parameters, include the line ["save_number" [1 1 *number_of_runs*]] with the variables.  The following commands must be in the corresponding boxes for a simulation to work properly.
+####Reporters:
+maxPop
+####Setup commands:
+setup
+setup_sim
+load_agents save_name
+####Go commands:
+go
 
-Manipulating the Environment:
-The user has the ability to manipulate an existing environment or create an entire environemnt of their own. There are two methods for manipulating the environment: selecting and drawing. If users currently have "Select" chosen, they can select a rectangle, within which they can modify the temperature and/or pH. The patches can be modified in the entire rectangle, for a circle within the rectangle, or a mountain (modifies characteristics on a gradient in a circle). In addition to changing pH and Temperature, users can use the "Draw" buton to draw in highways and water features.
+###Manipulating the Environment:
+The user has the ability to manipulate an existing environment or create an entire environemnt of their own.
+####Draw:
+
+
+Note: Make sure to not have "Draw" selected at the same time as "Add" or "Select"
+
+####Select:
+
+####Add:
+
+
+
+ There are two methods for manipulating the environment: selecting and drawing. If users currently have "Select" chosen, they can select a rectangle, within which they can modify the temperature and/or pH. The patches can be modified in the entire rectangle, for a circle within the rectangle, or a mountain (modifies characteristics on a gradient in a circle). In addition to changing pH and Temperature, users can use the "Draw" buton to draw in highways and water features.
 Users can also draw monitors, which will keep track of the population and density within the monitor during a simulation.
 
 
-How to UploadData:
-GIS data on soil should be retrieved from the Web Soil Survey (http://websoilsurvey.sc.egov.usda.gov/App/WebSoilSurvey.aspx).
+###How to Upload Data:
+GIS data on soil should be retrieved from the USDA Web Soil Survey (http://websoilsurvey.sc.egov.usda.gov/App/WebSoilSurvey.aspx).
 GIS highway data: provide link
 Temperature data was retrieved from PRISM (http://www.prism.oregonstate.edu/historical/)
 
-How to Modify Paramters:
+###How to Modify Paramters:
 In a folder there exists parameters.  If you want to modify the parameters, modify the .csv with the corresponding parameters that need to be modified.
 
-Save/Load Features:
+###Save/Load Features:
 The buttons "Save" and "Load" will save or load the locations of worms in the simulation with "save_name"
 
 

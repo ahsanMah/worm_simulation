@@ -1,11 +1,11 @@
 to save_obstacles [name]
-  let filename1 (word "data/parameters/myobstacle"  name ".csv")
+  let filename1 (word "simulations/" name "/input/environment/myobstacle.csv")
   csv:to-file filename1 obstacle_list
   print "Saved to file"
 end
 
 to load_obstacles [name]
-  let filename (word "data/parameters/myobstacle"  name ".csv")
+  let filename (word "simulations/" name "/input/environment/myobstacle.csv")
   ;set obstacle_list csv:from-file filename
   print "Loaded from file: "
   print obstacle_list
@@ -15,7 +15,7 @@ end
 to save_patches [name]
   save_monitors name
   save_obstacles name
-  let filename (word "data/parameters/mypatches" name ".csv")
+  let filename (word "simulations/" name "/input/environment/mypatches.csv")
   let i min-pxcor
   let j min-pycor
   carefully [file-delete filename] []
@@ -40,7 +40,7 @@ end
 
 to load_patches [name]
   load_obstacles name
-  let filename (word "data/parameters/mypatches" name ".csv")
+  let filename (word "simulations/" name "/input/environment/mypatches.csv")
   let data csv:from-file filename
   foreach (data)
   [
@@ -64,14 +64,14 @@ end
 
 to save_agents [name]
   export_data name
-  let filename1 (word "data/parameters/specieslist" name ".csv")
+  let filename1 (word "simulations/" name "/input/environment/specieslist.csv")
   let data []
   foreach table:to-list species_list [ ;converts table into listto store as csv
     set data lput (sentence item 0 ? item 1 ?) data
   ]
   csv:to-file filename1 data
 
-  let filename (word "data/parameters/myagents"  name ".csv")
+  let filename (word "simulations/" name "/input/environment/myagents.csv")
 
   carefully [file-delete filename] []
   ask turtles
@@ -86,8 +86,8 @@ end
 
 to load_agents [name]
   ;load_monitors name
-  let filename1 (word "data/parameters/specieslist"  name ".csv")
-  let filename (word "data/parameters/myagents" name ".csv")
+  let filename1 (word "simulations/" name "/input/environment/specieslist.csv")
+  let filename (word "simulations/" name "/input/environment/myagents.csv")
   let data []
   set species_list table:make
   set data csv:from-file filename1
@@ -105,7 +105,7 @@ to load_agents [name]
       set maturation_wait 70
       set wait_period item 4 ?
       set stamina 5
-      set genetic_diversity item 5 ?
+      set genetic_diversity species_genetic_diversity
       set color (item parent_breed color_list)
       set death_threshold normal_death_threshold
       set reprod_min_temp item 6 ?
@@ -118,7 +118,7 @@ to load_agents [name]
 end
 
 to load_temperature
-  let filename (word "data/parameters/temperaturelist.csv")
+  let filename (word "simulations/" save_name "/input/environment/temperaturelist.csv")
   file-open filename
   set temperature_table table:make
   let i 0
@@ -142,7 +142,7 @@ to load_temperature
 end
 
 to save_monitors [name]
-  let filename (word "data/parameters/mymonitors" name ".csv")
+  let filename (word "simulations/" name "/input/environment/mymonitors.csv")
   let i min-pxcor
   let j min-pycor
   carefully [file-delete filename] []
@@ -166,7 +166,7 @@ to save_monitors [name]
 end
 
 to load_monitors [name]
-  let filename (word "data/parameters/mymonitors" name ".csv")
+  let filename (word "simulations/" name "/input/environment/mymonitors.csv")
   let data csv:from-file filename
   foreach (data)
   [

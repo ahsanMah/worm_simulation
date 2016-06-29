@@ -17,11 +17,11 @@ patches-own[
 
 to setup_gis
   print "Loading GIS data..."
-  set soil_dataset gis:load-dataset "data/parameters/soil/spatial/soilmu_a_aoi.shp"
+  set soil_dataset gis:load-dataset (word "simulations/" save_name "/input/soil/spatial/soilmu_a_aoi.shp")
 
   print "Setting up world..."
   gis:set-world-envelope-ds (gis:envelope-of soil_dataset)
-  set road_dataset gis:load-dataset "data/parameters/roads/roadmap.shp"
+  set road_dataset gis:load-dataset (word "simulations/" save_name "/input/roads/roadmap.shp")
   gis:apply-coverage soil_dataset "MUSYM" symbol
   ;gis:apply-coverage road_dataset "STATE_CODE" road
   set road_features gis:feature-list-of road_dataset
@@ -37,9 +37,10 @@ to setup_gis
   ]
   load_ph
   print "Drawing map..." 
-  draw_map
+  ;draw_map
   print "Mapping GIS features to patches..."
   map_patches
+  recolor_patches
   print "Finished setting up GIS"
   
   ;gis:set-drawing-color magenta
@@ -48,7 +49,7 @@ end
 
 to load_ph
   set ph_map table:make
-  let filename ("data/parameters/soil/pH_key.csv")
+  let filename (word "simulations/" save_name "/input/soil/pH_key.csv")
   let ph_list csv:from-file filename
   foreach ph_list [
     table:put ph_map (item 0 ?) (list (item 2 ?) (item 5 ?) (item 6 ?)) 
