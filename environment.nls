@@ -316,8 +316,8 @@ to recolor-selected
     [
       if selected? pxcor pycor and (distancexy temp_x temp_y) < mt_size
       [
-        if (change: = "pH" or change: = "pH and temperature difference")[set ph (ph - ((ph - patch_ph) / mt_size) * (mt_size - distancexy temp_x temp_y) )]
-        if (change: = "temperature difference" or change: = "pH and temperature difference")[set temp_diff_here (temp_diff_here + ((temperature_difference) / mt_size) * (mt_size - distancexy temp_x temp_y))]
+        if (change: = "pH" or change: = "pH and temperature difference")[set ph (precision (ph - ((ph - patch_ph) / mt_size) * (mt_size - distancexy temp_x temp_y) ) 1)]
+        if (change: = "temperature difference" or change: = "pH and temperature difference")[set temp_diff_here precision (temp_diff_here + ((temperature_difference) / mt_size) * (mt_size - distancexy temp_x temp_y)) 1]
         recolor-patch
       ]
     ]

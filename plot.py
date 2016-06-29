@@ -157,9 +157,10 @@ def extractFromFiles(filename, repetitions):
 repetitions = 3
 densities = []
 
-densities.append(extractFromFiles("simulationphSim0",2))
-densities.append(extractFromFiles("phSim0", 1)[5:])
-densities.append(extractFromFile("simulationphSim04.csv"))
+densities.append(extractFromFiles("simulationphSim-0.1",3))
+densities.append(extractFromFiles("simulationphSim0",3))
+densities.append(extractFromFiles("simulationphSim0.1",3))
+
 print densities
 draw_hist([0.0, 1.0, 2.0],densities)
 plt.show()

@@ -377,11 +377,11 @@ end
 
 to go
 
-    let filename (word "movie/" ticks ".png")
-    if (ticks mod 2 = 0) [
-      export-interface filename
-    ]
-    if (ticks = 1800) [stop]
+;    let filename (word "movie/" ticks ".png")
+;    if (ticks mod 2 = 0) [
+;      export-interface filename
+;    ]
+;    if (ticks = 1800) [stop]
 
   calculate_time
 
@@ -419,8 +419,8 @@ GRAPHICS-WINDOW
 300
 0
 300
-1
-1
+0
+0
 1
 ticks
 1000.0
@@ -502,7 +502,7 @@ ph_tolerance
 ph_tolerance
 -0.5
 0.5
-0
+0.1
 0.1
 1
 NIL
@@ -593,7 +593,7 @@ CHOOSER
 obstacle_shape
 obstacle_shape
 "circle" "rectangle" "mountain" "monitor"
-1
+2
 
 SLIDER
 282
@@ -630,7 +630,7 @@ patch_pH
 patch_pH
 0
 14
-4
+3.5
 0.1
 1
 NIL
@@ -866,8 +866,8 @@ CHOOSER
 589
 change:
 change:
-"pH" "temperature difference" "pH and temperature difference" "mountain" "monitor" "highway"
-0
+"pH" "temperature difference" "pH and temperature difference" "monitor" "highway" "water"
+5
 
 BUTTON
 643
@@ -921,7 +921,7 @@ X Boundaries
 NIL
 NIL
 0.0
-10.0
+300.0
 0.0
 10.0
 true
@@ -942,7 +942,7 @@ NIL
 0.0
 10.0
 0.0
-10.0
+300.0
 true
 false
 "" "ybounds"
@@ -1032,7 +1032,28 @@ NIL
 
 ## HOW TO USE IT
 
-(how to use the model, including a description of each of the items in the Interface tab)
+Setting Up a Simulation:
+If parameters and GIS data are located in the proper folders, then pressing the Setup button will load them into the NetLogo environment.  Then, to add worms, adjust the sliders to the desired parameters, selected the number of worms to add to the simulation, and press the Add button.  If you want to add worms to random locations within a selected region, press "Select" and select an area, then press add. Note: after adding worms, one must click somewhere within the environment again while "Select" is still pressed in order to deselect the region. Once agents have been added, a simulation can be started by pressing "Go" and the simulation will run until "Go" is pressed again, it has simulated 30 years of invasion, or all of the worms have died.
+
+Using BehaviorSpace for Multiple Simulations:
+BehaviorSpace is a useful tool in NetLogo to run multiple simulations simultaneously. To run a BehaviorSpace experiment, click on "Tools -> BehaviorSpace". You can either edit the existing experiment, or create your own.  The first box will allow you to choose which variable to change in your simulations.  The following commands must follow the corresponding boxes, on new lines where there are commas, for a simulation to work properly.  Reporters: maxPop.  Setup Commands: setup, setup_sim, load_agents save_name.  Go commands: go.
+
+Manipulating the Environment:
+The user has the ability to manipulate an existing environment or create an entire environemnt of their own. There are two methods for manipulating the environment: selecting and drawing. If users currently have "Select" chosen, they can select a rectangle, within which they can modify the temperature and/or pH. The patches can be modified in the entire rectangle, for a circle within the rectangle, or a mountain (modifies characteristics on a gradient in a circle). In addition to changing pH and Temperature, users can use the "Draw" buton to draw in highways and water features.
+Users can also draw monitors, which will keep track of the population and density within the monitor during a simulation.
+
+
+How to UploadData:
+GIS data on soil should be retrieved from the Web Soil Survey (http://websoilsurvey.sc.egov.usda.gov/App/WebSoilSurvey.aspx).
+GIS highway data: provide link
+Temperature data was retrieved from PRISM (http://www.prism.oregonstate.edu/historical/)
+
+How to Modify Paramters:
+In a folder there exists parameters.  If you want to modify the parameters, modify the .csv with the corresponding parameters that need to be modified.
+
+Save/Load Features:
+The buttons "Save" and "Load" will save or load the locations of worms in the simulation with "save_name"
+
 
 ## THINGS TO NOTICE
 
@@ -1425,12 +1446,11 @@ NetLogo 5.3.1
 <experiments>
   <experiment name="experiment" repetitions="1" runMetricsEveryStep="false">
     <setup>setup
-setup_sim</setup>
+setup_sim
+load_agents save_name</setup>
     <go>go</go>
     <metric>maxPop</metric>
-    <enumeratedValueSet variable="ph_tolerance">
-      <value value="0"/>
-    </enumeratedValueSet>
+    <steppedValueSet variable="ph_tolerance" first="-0.1" step="0.1" last="0.1"/>
     <enumeratedValueSet variable="save_number">
       <value value="1"/>
       <value value="2"/>
