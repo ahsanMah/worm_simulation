@@ -14,14 +14,15 @@ globals [
   temperatures
   day_of_month
   
+  monitor_names
   monitor_number
   obstacle
   obstacle_list
   temp_arr
   speed_in_water
   road_speed
+  patch_area
   
-
   temp_shape
   temp_size
   temp_x
@@ -76,8 +77,8 @@ to setup_environment
   set current_month 0
   let var starting_day
   set monitor_number 0
-  
-
+  set monitor_names []
+  set patch_area (max-pxcor * max-pycor) / 100
   
   while [var > 0]
   [
@@ -343,34 +344,37 @@ to recolor-selected
     
     if (obstacle_shape = "monitor")
     [
-      set monitor_number monitor_number + 1
       ask patches
       [
         if selected? pxcor pycor
         [
           set being_monitored true
-          set monitor_index monitor_number - 1
+          set monitor_index monitor_number
           set monitor_size temp_size
           recolor-patch
         ]
         
       ]
-      update_monitor_area (monitor_number - 1)
+      update_monitor_area monitor_number
+      set monitor_number monitor_number + 1
   ]
 end
 
-to draw_monitor [xmin xmax ymin ymax]
-  set monitor_number monitor_number + 1
+to draw_monitor [xmin xmax ymin ymax name]
+  name_monitor name
+   
   ask patches
   [
     if (pxcor >= xmin and pxcor <= xmax and pycor >= ymin and pycor <= ymax)
       [
         set being_monitored true
-        set monitor_index monitor_number - 1
+        set monitor_index monitor_number
         set monitor_size temp_size
         recolor-patch
       ]
   ]
+  update_monitor_area monitor_number
+  set monitor_number monitor_number + 1
 end
 
 to handle-select
@@ -510,10 +514,17 @@ to setup-obstacles [one_obstacle]
   ]
 end
 
+to name_monitor [name]
+  set monitor_names lput name monitor_names 
+end
+
+to change_monitor_name [idx name]
+  set monitor_names replace-item idx monitor_names name
+end
 
 
 to update_monitor_area [index]
-  set area_list lput ((count patches with [monitor_index = index and pcolor != blue and pcolor != grey]) / 900) area_list
+  set area_list lput ((count patches with [monitor_index = index and pcolor != blue and pcolor != grey]) / patch_area) area_list
   show area_list
 end
 

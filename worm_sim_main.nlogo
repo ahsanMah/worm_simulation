@@ -24,7 +24,10 @@ globals[
   yhigh
   y-low
   y-high
-  ;save_number
+  header
+  bs_run ;set to true if simulation is being run from Behaviour Space
+  reps
+
   ;index positions of data in arrays
   ;month monitor species_number population density genetic diversity
 ]
@@ -36,8 +39,9 @@ to setup
   set temp_table table:make
   set species_data [] ;list of collected info of each species for each monitor
   set monthly_data [] ;list of data collected each month
-  let header ["Month Number" "Monitor Number" "Species Number" "Population" "Density" "Genetic Diversity" "pH Tolerance" "Temperature Tolerance"]
-  set monthly_data lput header monthly_data
+  set header ["Month Number" "Monitor Number" "Species Number" "Population" "Density" "Genetic Diversity" "pH Tolerance" "Temperature Tolerance"]
+  set bs_run false
+  set reps 1
   set area_list []
   set pop_data []
   set report_month 0
@@ -64,11 +68,11 @@ end
 
 to initialize_monitors
   print "Initializing monitors..."
-  draw_monitor 0 60 0 60
-  draw_monitor 240 300 0 60
-  draw_monitor 240 300 240 300
-  draw_monitor 0 60 240 300
-  draw_monitor 120 180 120 180
+  draw_monitor 0 60 0 60 "A"
+  draw_monitor 240 300 0 60 "B"
+  draw_monitor 240 300 240 300 "C"
+  draw_monitor 0 60 240 300 "D"
+  draw_monitor 120 180 120 180 "E"
   print "Done"
 end
 
@@ -90,8 +94,8 @@ end
 to ybounds
   if count turtles > 0 [
     ask one-of turtles[
-    set ylow ycor
-    set yhigh ycor
+      set ylow ycor
+      set yhigh ycor
     ]
     ask turtles[
       if ycor < ylow [set ylow ycor]
@@ -189,11 +193,17 @@ to pen
   ]
 end
 
-to export_data [name]
-  let filename (word "simulations/" save_name "/output/temp" temperature_tolerance "ph" ph_tolerance "save" save_number ".csv")
-  ;let filename2 (word "data/output/finalPop" save_name ph_tolerance save_number ".csv")
-  csv:to-file filename monthly_data
-  ;csv:to-file filename2 pop_data
+to export_data
+  let filename (word "simulations/" save_name "/output/" temperature_tolerance "_" ph_tolerance "_" species_genetic_diversity "_" frequency "_" reps ".csv")
+  ; ;deletes the file if it exists otherwise does nothing
+  ifelse not bs_run [
+    carefully [file-delete filename][]
+    file-open filename
+    file-print csv:to-row header
+    ][file-open filename]
+
+  foreach monthly_data [ file-print csv:to-row ? ]
+  file-close
   print "Exported simulation data to file"
 end
 
@@ -201,44 +211,46 @@ end
 to clear_arrays
 
   set species_data []
-  let monitor_list n-values monitor_number [?] ;(?) allows to create a list from 0 to monitor number
+  let monitor_idx_list n-values monitor_number [?] ;(?) allows to create a list from 0 to monitor number
   foreach table:to-list species_list [  ; --> [species_num, [species info] ]
     let current_species_number item 0 ?
     let species_info item 1 ?           ;data to be exported from species_list can be changed in add_species function
 
                                         ;n*m matrix of species data for every monitor
-    let species_matrix array:from-list monitor_list  ;n = number of species charcteristics being collected, m = number of monitors
-    foreach monitor_list [
-      let matrix_row sentence (list report_month ? current_species_number 0 0) species_info
+    let species_matrix array:from-list monitor_idx_list  ;n = number of species charcteristics being collected, m = number of monitors
+    foreach monitor_idx_list [
+      let matrix_row sentence (list report_month (item ? monitor_names) current_species_number 0 0) species_info
       array:set species_matrix ? array:from-list matrix_row ;resets population, density
     ]
     set species_data lput species_matrix species_data ;list of matrices
   ]
-  set has_collected false
+
 end
 
 to collect_monthly_data
 
+  ask patches with [being_monitored = true]
+    [
+      collect_monitor_data
+    ]
+
   ;saves monthly data to accumulutor list
   if (day_of_month = item current_month num_days)[
-    if (has_collected = false) [
-      ;show species_data
-      foreach species_data [
-        let monitor_list (array:to-list ?)
-        foreach monitor_list [
-          set monthly_data lput (array:to-list ?) monthly_data
-        ]
+    ;show species_data
+    foreach species_data [
+      let monitor_list (array:to-list ?)
+      foreach monitor_list [
+        set monthly_data lput (array:to-list ?) monthly_data
       ]
-      set report_month report_month + 1
-      set has_collected true
     ]
+    set report_month report_month + 1
   ]
 
 end
 
 to random_insertions
 
-  if (Random_Insertions? = true and ticks mod (precision (365 / frequency) 0)= 0 and count (patches with [can-insert?]) > 0) [
+  if (Random_Insertions? = true and ticks mod (precision (365 / frequency) 0) = 0 and count (patches with [can-insert?]) > 0) [
     ;show year
     let species one-of table:keys species_list
     let spot one-of patches with [can-insert?];fishing_spots
@@ -250,20 +262,20 @@ end
 
 to simulate_agents
 
-    ask cocoons [
-      check_if_hatch
-    ]
+  ask cocoons [
+    check_if_hatch
+  ]
 
-    ask adults [
-      check_burrow
+  ask adults [
+    check_burrow
 
-      if not burrow [
-        update_maturity
-        check_reproduction
-        move
+    if not burrow [
+      update_maturity
+      check_reproduction
+      move
     ]
-      update_thresholds
-      check_death
+    update_thresholds
+    check_death
   ]
 
 end
@@ -285,41 +297,18 @@ end
 
 to collect_data
 
-
-  if (year = 4) [
-    calculate_maxPop
-  ]
-
   if (year = 9) [
     calculate_maxPop
   ]
 
   if (year = 19) [
-    calculate_maxPop
-
 
     if (day_of_month = (item current_month num_days - 1))[ ;clears arrays a day before collection
       clear_arrays
     ]
 
     if (day_of_month = item current_month num_days)[
-      ask patches with [being_monitored = true]
-      [
-        collect_monitor_data
-      ]
-
-      ;collect_monthly_data
-      ;saves monthly data to accumulutor list
-
-      ;show species_data
-      foreach species_data [
-        let monitor_list (array:to-list ?)
-        foreach monitor_list [
-          set monthly_data lput (array:to-list ?) monthly_data
-        ]
-      ]
-      set report_month report_month + 1
-
+      collect_monthly_data
     ]
   ]
 end
@@ -327,22 +316,23 @@ end
 to-report check_stopping_conditions
 
   if (count turtles = 0) [
-    export_data save_number
+    export_data
     report true
   ]
 
   if (year = 10) [
-    if (ticks mod 365 = 1)[ ;collects data
+    if (ticks mod 365 = 1)[
       set pop_data lput max_pop pop_data
-      ;export_data save_number
+      export_data
       set max_pop 0
+      report true
     ]
   ]
 
   if (year = 20) [
     if (ticks mod 365 = 1)[
       set pop_data lput max_pop pop_data
-      export_data save_number
+      export_data
       set max_pop 0
       ;report true
     ]
@@ -351,7 +341,7 @@ to-report check_stopping_conditions
   if (year = 30) [
     if (ticks mod 365 = 1)[
       set pop_data lput max_pop pop_data
-      export_data save_number
+      export_data
       set max_pop 0
       report true
     ]
@@ -381,11 +371,11 @@ end
 
 to go
 
-;    let filename (word "movie/" ticks ".png")
-;    if (ticks mod 2 = 0) [
-;      export-interface filename
-;    ]
-;    if (ticks = 1800) [stop]
+  ;    let filename (word "movie/" ticks ".png")
+  ;    if (ticks mod 2 = 0) [
+  ;      export-interface filename
+  ;    ]
+  ;    if (ticks = 1800) [stop]
 
   calculate_time
 
@@ -568,9 +558,9 @@ count cocoons
 11
 
 INPUTBOX
-434
-564
-533
+435
+561
+534
 655
 starting_day
 150
@@ -620,7 +610,7 @@ INPUTBOX
 403
 90
 save_name
-phSim
+monTest
 1
 0
 String (reporter)
@@ -683,7 +673,7 @@ CHOOSER
 species_number
 species_number
 1 2 3 4 5
-0
+1
 
 BUTTON
 283
@@ -879,7 +869,7 @@ BUTTON
 1044
 61
 Load GIS
-setup\nsetup_gis\n;initialize_monitors
+setup\nsetup_gis\n
 NIL
 1
 T
@@ -889,17 +879,6 @@ NIL
 NIL
 NIL
 1
-
-INPUTBOX
-408
-31
-528
-91
-save_number
-1
-1
-0
-Number
 
 SLIDER
 281
@@ -972,9 +951,9 @@ SLIDER
 439
 frequency
 frequency
-1
+0
 104
-2
+0
 1
 1
 /year

@@ -64,7 +64,6 @@ to load_patches [name]
 end
 
 to save_agents [name]
-  export_data name
   let filename1 (word "simulations/" name "/input/environment/specieslist.csv")
   let data []
   foreach table:to-list species_list [ ;converts table into listto store as csv
@@ -90,7 +89,6 @@ to load_agents [name]
   let filename1 (word "simulations/" name "/input/environment/specieslist.csv")
   let filename (word "simulations/" name "/input/environment/myagents.csv")
   let data []
-  set species_list table:make
   set data csv:from-file filename1
   foreach data [table:put species_list item 0 ? (list item 1 ? item 2 ? item 3 ?)]
   print "Loaded from file: "
@@ -147,8 +145,10 @@ to save_monitors [name]
   let filename (word "simulations/" name "/input/environment/mymonitors.csv")
   let i min-pxcor
   let j min-pycor
-  carefully [file-delete filename] []
+  carefully [file-delete filename][] ;deletes the file if it exists otherwise does nothing
   file-open filename
+  file-print csv:to-row monitor_names
+  file-close
   while [(i <= max-pxcor)]
   [
     while [(j <= max-pycor)]
@@ -162,6 +162,7 @@ to save_monitors [name]
         set j j + 1
       ]
     ]
+    
     set j min-pycor
     set i i + 1
   ]
@@ -170,6 +171,8 @@ end
 to load_monitors [name]
   let filename (word "simulations/" name "/input/environment/mymonitors.csv")
   let data csv:from-file filename
+  set monitor_names item 0 data
+  set data remove-item 0 data
   foreach (data)
   [
     ask patch (item 0 ?) (item 1 ?)
