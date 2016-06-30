@@ -193,10 +193,12 @@ to setup_export
   set header ["Month Number" "Monitor Number" "Species Number" "Population" "Density" "Genetic Diversity" "pH Tolerance" "Temperature Tolerance"]
   set export_file (word "simulations/" save_name "/output/" temperature_tolerance "_" ph_tolerance "_" species_genetic_diversity "_" frequency ".csv")
 
-  carefully [file-delete export_file][] ;deletes the file if it exists otherwise does nothing
-  file-open export_file
-  file-print csv:to-row header
-  file-close
+  ;carefully [file-delete export_file][] ;deletes the file if it exists otherwise does nothing
+  if (not file-exists? export_file) [
+    file-open export_file
+    file-print csv:to-row header
+    file-close
+  ]
 end
 
 
@@ -235,7 +237,6 @@ to collect_monthly_data
 
   ;saves monthly data to accumulutor list
   if (day_of_month = item current_month num_days)[
-    show day_num
 
     ask patches with [being_monitored = true]
     [
@@ -248,7 +249,6 @@ to collect_monthly_data
         set monthly_data lput (array:to-list ?) monthly_data
       ]
     ]
-    show monthly_data
     set report_month report_month + 1
 
   ]
