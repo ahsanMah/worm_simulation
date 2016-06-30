@@ -205,6 +205,7 @@ end
 to export_data
   file-open export_file
   foreach monthly_data [ file-print csv:to-row ? ]
+  file-print csv:to-row ["END SIM"]
   file-close
   print "Exported simulation data to file"
 end
