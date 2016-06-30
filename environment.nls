@@ -20,6 +20,7 @@ globals [
   temp_arr
   speed_in_water
   road_speed
+  
 
   temp_shape
   temp_size
@@ -52,7 +53,8 @@ patches-own
   monitor_size
   monitor_index
   soil_depth
-  moisture             
+  moisture   
+  can-insert?          
   
 ]
 
@@ -112,6 +114,7 @@ to setup_environment
     set monitor_index -1
     setup-initial-food
     set soil_depth 200
+    set can-insert? false
     recolor-patch
     
   ]
@@ -187,23 +190,23 @@ end
 to recolor-patch
   if (pcolor != blue and pcolor != grey and pcolor != magenta)
   [
-
+    
     if (Show: = "pH")
     [
       if (ph = 7)
       [
-       set pcolor white 
+        set pcolor white 
       ]
       if (ph > 7)
       [
-       set pcolor scale-color yellow ph 16 7 
+        set pcolor scale-color yellow ph 16 7 
       ]
       if (ph < 7)
       [
-       set pcolor scale-color green ph 3 7
+        set pcolor scale-color green ph 3 7
       ]
     ]
-    if (Show: = "food")
+    if (Show: = "depth")
     [
       set pcolor scale-color brown soil_depth 350 0
     ]
@@ -222,7 +225,7 @@ to recolor-patch
         set pcolor scale-color violet temp_diff_here -10 0
       ]
     ]
-
+    
     if (Show: = "monitor") [
       if (being_monitored) [set pcolor orange]
     ]
@@ -245,6 +248,19 @@ to recolor-patch
       ]
     ]
     
+    if (Show: = "insertion points")
+    [
+      if (pcolor != blue and pcolor != grey and pcolor != magenta)
+      [
+        ifelse (can-insert?)
+        [
+          set pcolor orange
+        ]
+        [
+          set pcolor white
+        ]
+      ]
+    ]
     
   ]
 end
@@ -283,6 +299,7 @@ to recolor-selected
    [
     if (change: = "pH" or change: = "pH and temperature difference")[set ph patch_ph]
     if (change: = "temperature difference" or change: = "pH and temperature difference")[set temp_diff_here temperature_difference]
+    if (change: = "insertion point" and pcolor != blue) [set can-insert? true]
     recolor-patch
    ] 
   ]
@@ -300,6 +317,7 @@ to recolor-selected
       [ 
         if (change: = "pH" or change: = "pH and temperature difference")[set ph patch_ph]
         if (change: = "temperature difference" or change: = "pH and temperature difference")[set temp_diff_here temperature_difference]
+        if (change: = "insertion point" and pcolor != blue) [set can-insert? true]
         recolor-patch
       ]
     ]

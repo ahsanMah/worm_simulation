@@ -31,7 +31,7 @@ globals[
 to setup
 
   clear-all
-
+  set year 0
   set ph_table table:make
   set temp_table table:make
   set species_data [] ;list of collected info of each species for each monitor
@@ -52,6 +52,10 @@ to setup
   print "Setting up agents..."
   setup_agents
   print "Done"
+  print "Loading parameters..."
+  ;let filename "data/input/pH-Table.csv"
+  load_param (word "simulations/" save_name "/input/parameters/pH-Table.csv") ph_table
+  load_param (word "simulations/" save_name "/input/parameters/temp-Table.csv") temp_table
 
   set-default-shape sides "line"
   recolor_patches
@@ -103,10 +107,7 @@ to setup_sim
   print "Loading from simulation files..."
   load_patches save_name
   ;load_agents save_name
-  print "Loading parameters..."
-  ;let filename "data/input/pH-Table.csv"
-  load_param (word "simulations/" save_name "/input/parameters/pH-Table.csv") ph_table
-  load_param (word "simulations/" save_name "/input/parameters/temp-Table.csv") temp_table
+
   print "Done Loading"
 end
 
@@ -236,11 +237,12 @@ end
 
 to random_insertions
 
-  if (Random_Insertions? = true and ticks mod (365 / frequency)= 0) [
+  if (Random_Insertions? = true and ticks mod (precision (365 / frequency) 0)= 0 and count (patches with [can-insert?]) > 0) [
+    ;show year
     let species one-of table:keys species_list
-    let spot one-of fishing_spots
+    let spot one-of patches with [can-insert?];fishing_spots
     let number number_inserted
-    add_species (item 0 spot) (item 1 spot) number species
+    add_species [pxcor] of spot [pycor] of spot number species ;(item 0 spot) (item 1 spot) number species
   ]
 
 end
@@ -428,12 +430,12 @@ ticks
 1000.0
 
 BUTTON
-737
-27
-809
-60
+551
+28
+623
+61
 Setup
-setup\nsetup_sim
+setup\n;setup_sim
 NIL
 1
 T
@@ -445,10 +447,10 @@ NIL
 1
 
 BUTTON
-815
-27
-874
-61
+776
+28
+835
+62
 Go
 go
 T
@@ -567,9 +569,9 @@ count cocoons
 
 INPUTBOX
 434
-561
-535
-653
+564
+533
+655
 starting_day
 150
 1
@@ -590,7 +592,7 @@ global_temperature
 CHOOSER
 282
 611
-422
+430
 656
 obstacle_shape
 obstacle_shape
@@ -618,7 +620,7 @@ INPUTBOX
 403
 90
 save_name
-tempSim
+phSim
 1
 0
 String (reporter)
@@ -632,7 +634,7 @@ patch_pH
 patch_pH
 0
 14
-3
+5.1
 0.1
 1
 NIL
@@ -641,11 +643,11 @@ HORIZONTAL
 CHOOSER
 283
 561
-422
+430
 606
 Show:
 Show:
-"pH" "food" "temperature" "monitor" "turtle density"
+"pH" "depth" "temperature" "monitor" "turtle density" "insertion points"
 0
 
 TEXTBOX
@@ -701,10 +703,10 @@ NIL
 1
 
 BUTTON
-886
-27
-996
-60
+840
+28
+950
+61
 Recolor Patches
 recolor_patches
 NIL
@@ -839,7 +841,7 @@ BUTTON
 517
 534
 550
-Edit Patch
+Modify
 recolor-selected
 NIL
 1
@@ -863,21 +865,21 @@ Environment Controls\n
 
 CHOOSER
 284
-658
+661
 534
-703
+706
 change:
 change:
-"pH" "temperature difference" "pH and temperature difference" "monitor" "highway" "water"
-0
+"pH" "temperature difference" "pH and temperature difference" "monitor" "highway" "water" "insertion point"
+6
 
 BUTTON
-643
-27
-732
-60
+954
+28
+1044
+61
 Load GIS
-setup\nsetup_gis\ninitialize_monitors
+setup\nsetup_gis\n;initialize_monitors
 NIL
 1
 T
@@ -894,7 +896,7 @@ INPUTBOX
 528
 91
 save_number
-2
+1
 1
 0
 Number
@@ -908,7 +910,7 @@ worm_population
 worm_population
 0
 500
-500
+100
 5
 1
 NIL
@@ -972,7 +974,7 @@ frequency
 frequency
 1
 104
-1
+2
 1
 1
 /year
@@ -984,16 +986,16 @@ INPUTBOX
 536
 440
 number_inserted
-0
+12
 1
 0
 Number
 
 BUTTON
-1003
-27
-1109
-60
+1049
+28
+1155
+61
 Hide Turtles
 ask turtles [hide-turtle]
 NIL
@@ -1007,12 +1009,29 @@ NIL
 1
 
 BUTTON
-1116
-27
-1227
-60
+1162
+28
+1273
+61
 Show Turtles
 ask turtles[show-turtle]
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+633
+28
+767
+61
+Setup Simulation
+setup_sim
 NIL
 1
 T
