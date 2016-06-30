@@ -70,9 +70,9 @@ to setup_environment
   set speed_in_water 0.4
   set road_speed 2
   set default_food_value 5000
-
+  
   ;set temperatures (list January February March April May June July August September October November December)
-;  ;set temperatures (list -5 -4 1 7 13 18 21 20 15 9 4 -2)
+  ;  ;set temperatures (list -5 -4 1 7 13 18 21 20 15 9 4 -2)
   set num_days (list 31 28 31 30 31 30 31 31 30 31 30 31)
   set current_month 0
   let var starting_day
@@ -80,29 +80,21 @@ to setup_environment
   set monitor_names []
   set patch_area (max-pxcor * max-pycor) / 100
   
-  while [var > 0]
+  while [var > item current_month num_days]
   [
-    if var > item current_month num_days
-    [
-     set current_month current_month + 1
-
-    ]
     set var var - item current_month num_days
+    set current_month current_month + 1    
   ]
-;  set global_temperature random-normal (item current_month temperatures) (1)
+  
+  set day_of_month var ;(var + (item ((current_month - 1) mod 12) num_days))
   set global_temperature table:get temperature_table starting_day
   set prev_days_temp (list global_temperature global_temperature global_temperature)
   set current_day starting_day
   ;calculate_temp ;uncomment this if you want to have temperature vary between patches
   
-  set day_of_month (var + (item ((current_month - 1) mod 12) num_days))
-  ;;set next_month current_month + 1 mod 12
-  
-  ;set organic-regen 0.3 ;;0.004;; / 5
- 
- ;array used to temporarily store obstacle parameters
+  ;array used to temporarily store obstacle parameters
   set obstacle n-values 6 [0]
-
+  
   ;print obstacle
   set obstacle_list []
   

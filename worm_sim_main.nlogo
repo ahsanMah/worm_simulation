@@ -25,8 +25,7 @@ globals[
   y-low
   y-high
   header
-  bs_run ;set to true if simulation is being run from Behaviour Space
-  reps
+  export_file
 
   ;index positions of data in arrays
   ;month monitor species_number population density genetic diversity
@@ -37,11 +36,6 @@ to setup
   set year 0
   set ph_table table:make
   set temp_table table:make
-  set species_data [] ;list of collected info of each species for each monitor
-  set monthly_data [] ;list of data collected each month
-  set header ["Month Number" "Monitor Number" "Species Number" "Population" "Density" "Genetic Diversity" "pH Tolerance" "Temperature Tolerance"]
-  set bs_run false
-  set reps 1
   set area_list []
   set pop_data []
   set report_month 0
@@ -193,15 +187,21 @@ to pen
   ]
 end
 
-to export_data
-  let filename (word "simulations/" save_name "/output/" temperature_tolerance "_" ph_tolerance "_" species_genetic_diversity "_" frequency "_" reps ".csv")
-  ; ;deletes the file if it exists otherwise does nothing
-  ifelse not bs_run [
-    carefully [file-delete filename][]
-    file-open filename
-    file-print csv:to-row header
-    ][file-open filename]
+to setup_export
+  set species_data [] ;list of collected info of each species for each monitor
+  set monthly_data [] ;list of data collected each month
+  set header ["Month Number" "Monitor Number" "Species Number" "Population" "Density" "Genetic Diversity" "pH Tolerance" "Temperature Tolerance"]
+  set export_file (word "simulations/" save_name "/output/" temperature_tolerance "_" ph_tolerance "_" species_genetic_diversity "_" frequency ".csv")
 
+  carefully [file-delete export_file][] ;deletes the file if it exists otherwise does nothing
+  file-open export_file
+  file-print csv:to-row header
+  file-close
+end
+
+
+to export_data
+  file-open export_file
   foreach monthly_data [ file-print csv:to-row ? ]
   file-close
   print "Exported simulation data to file"
@@ -229,21 +229,28 @@ end
 
 to collect_monthly_data
 
-  ask patches with [being_monitored = true]
+  if (day_of_month = (item current_month num_days - 1))[ ;clears arrays a day before collection
+    clear_arrays
+  ]
+
+  ;saves monthly data to accumulutor list
+  if (day_of_month = item current_month num_days)[
+    show day_num
+
+    ask patches with [being_monitored = true]
     [
       collect_monitor_data
     ]
 
-  ;saves monthly data to accumulutor list
-  if (day_of_month = item current_month num_days)[
-    ;show species_data
     foreach species_data [
       let monitor_list (array:to-list ?)
       foreach monitor_list [
         set monthly_data lput (array:to-list ?) monthly_data
       ]
     ]
+    show monthly_data
     set report_month report_month + 1
+
   ]
 
 end
@@ -298,18 +305,11 @@ end
 to collect_data
 
   if (year = 9) [
-    calculate_maxPop
+    collect_monthly_data
   ]
 
   if (year = 19) [
-
-    if (day_of_month = (item current_month num_days - 1))[ ;clears arrays a day before collection
-      clear_arrays
-    ]
-
-    if (day_of_month = item current_month num_days)[
-      collect_monthly_data
-    ]
+    collect_monthly_data
   ]
 end
 
@@ -379,8 +379,6 @@ to go
 
   calculate_time
 
-  if check_stopping_conditions =  true [stop]
-
   random_insertions
 
   simulate_environment
@@ -388,6 +386,8 @@ to go
   simulate_agents
 
   collect_data
+
+  if check_stopping_conditions =  true [stop]
 
   tick
 end
@@ -1010,7 +1010,7 @@ BUTTON
 767
 61
 Setup Simulation
-setup_sim
+setup_sim\nsetup_export
 NIL
 1
 T
@@ -1464,18 +1464,13 @@ NetLogo 5.3.1
 @#$#@#$#@
 @#$#@#$#@
 <experiments>
-  <experiment name="experiment" repetitions="1" runMetricsEveryStep="false">
+  <experiment name="experiment" repetitions="3" runMetricsEveryStep="false">
     <setup>setup
 setup_sim
-load_agents save_name</setup>
+load_agents save_name
+setup_export</setup>
     <go>go</go>
     <metric>maxPop</metric>
-    <steppedValueSet variable="ph_tolerance" first="-0.1" step="0.1" last="0.1"/>
-    <enumeratedValueSet variable="save_number">
-      <value value="1"/>
-      <value value="2"/>
-      <value value="3"/>
-    </enumeratedValueSet>
   </experiment>
   <experiment name="experiment" repetitions="1" runMetricsEveryStep="false">
     <setup>setup
