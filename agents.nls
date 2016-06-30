@@ -336,7 +336,7 @@ to update_thresholds
     set ph_cocoon_rate (item 1 table:get ph_table ph) / 7
     set survival item 0 (table:get ph_table ph)
     ]
- 
+
   set ph_hazard_rate (0 - ln (survival)) / 3
   
   set ph_factor mortality_fn ph_hazard_rate patch_days

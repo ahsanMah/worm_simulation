@@ -106,6 +106,7 @@ to setup_sim
   print "Loading parameters..."
   ;let filename "data/input/pH-Table.csv"
   load_param (word "simulations/" save_name "/input/parameters/pH-Table.csv") ph_table
+  show ph_table
   load_param (word "simulations/" save_name "/input/parameters/temp-Table.csv") temp_table
   print "Done Loading"
 end
