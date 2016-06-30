@@ -283,7 +283,7 @@ to check_burrow
   ]
   
   ;worm starts burrowing if it senses high death chance in the past few days
-  ifelse (survival_prob < 0.7) 
+  ifelse (survival_prob < 0.7 and pcolor != blue) 
   [set burrow true]
   [ set burrow false]
   
