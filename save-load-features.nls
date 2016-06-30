@@ -113,6 +113,7 @@ to load_agents [name]
       set cocoon_rate 0.093
       set prev_patch ph
       set patch_days 0
+      set age 0
     ]
   ]
 end

@@ -247,21 +247,20 @@ end
 
 to simulate_agents
 
-  check_burrow
-
-  if not burrow [
-
     ask cocoons [
       check_if_hatch
     ]
 
     ask adults [
-      update_thresholds
-      update_maturity
-      check_reproduction
-      check_death
-      move
+      check_burrow
+
+      if not burrow [
+        update_maturity
+        check_reproduction
+        move
     ]
+      update_thresholds
+      check_death
   ]
 
 end
@@ -342,7 +341,7 @@ to-report check_stopping_conditions
       set pop_data lput max_pop pop_data
       export_data save_number
       set max_pop 0
-      report true
+      ;report true
     ]
   ]
 
@@ -504,7 +503,7 @@ ph_tolerance
 ph_tolerance
 -0.5
 0.5
--0.1
+0
 0.1
 1
 NIL
@@ -519,7 +518,7 @@ temperature_tolerance
 temperature_tolerance
 -2
 2
--0.5
+0
 0.1
 1
 NIL
@@ -618,7 +617,7 @@ INPUTBOX
 403
 90
 save_name
-tempSim
+phSim
 1
 0
 String (reporter)
@@ -894,7 +893,7 @@ INPUTBOX
 528
 91
 save_number
-2
+1
 1
 0
 Number
@@ -908,7 +907,7 @@ worm_population
 worm_population
 0
 500
-500
+50
 5
 1
 NIL
@@ -1497,7 +1496,6 @@ setup_sim
 load_agents save_name</setup>
     <go>go</go>
     <metric>maxPop</metric>
-    <steppedValueSet variable="temperature_tolerance" first="-0.5" step="0.5" last="0.5"/>
     <enumeratedValueSet variable="save_number">
       <value value="1"/>
       <value value="2"/>

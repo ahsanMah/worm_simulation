@@ -1,4 +1,5 @@
 globals [
+  age_mortality_rate
   ;annual globals
   normal_death_threshold max_death_threshold  ;;probability of death
   normal_reproduction_rate  ;;probablity of reproducing
@@ -39,6 +40,7 @@ breed [cocoons]
 breed [adults]
 
 turtles-own [
+  age
   death_p     ;probability of death
   reprod_p    ;probability of reproduction
   
@@ -73,7 +75,7 @@ cocoons-own[
 
 to setup_agents
   set subspecies_count 0
-  set normal_death_threshold 0.00685 / (periods-in-day) ; Simulates a 4 year life span
+  set age_mortality_rate 1.0 / 2190 ; Simulates a 6 year life span --> Type 2 survivorship curve
   set normal_reproduction_rate 0.1
   set max_death_threshold 40
   set agent_size 4
@@ -159,7 +161,7 @@ to create_species [species]
     ;move-to one-of patches with [permeability > 0]
     setxy temp_start_x temp_start_y
     set size agent_size
-
+    set age 0
     set shape (item parent_breed shape_list)
     set subspecies_number subspecies_count
     set subspecies_count subspecies_count + 1
@@ -209,11 +211,7 @@ to move
   ]
   
   forward speed * permeability / periods-in-day
-  
-  ifelse (ph = prev_patch) 
-  [set patch_days patch_days + 1]
-  [set patch_days 1]
-  
+
   ;eat
   ;check_death
 end
@@ -237,6 +235,7 @@ to check_death
       ;show death_threshold
       die
     ]
+    
 end
 
 to check_reproduction
@@ -253,6 +252,7 @@ to check_reproduction
           hatch-cocoons 1 [
             set degree_accumulation item (16 - reprod_min_temp) [1300 1200 1100 1000]
             set maturation_wait random-normal 91 22
+            set age 0
             set wait_days 0
             set color (item parent_breed color_list)
             set shape "dot"
@@ -288,16 +288,32 @@ to check_burrow
   [ set burrow false]
   
 end
+
+to-report mortality_fn [hazard_rate day_number]
+  let mortality_rate 1 - (e ^ ((0 - hazard_rate) * day_number))
+  report mortality_rate
+end
+
+
 ;updates probablities of dying and reproducing
 to update_thresholds
-  ;resetting all parameters
+  
+  set age age + 1
+    
+  ifelse (ph = prev_patch) 
+  [set patch_days patch_days + 1]
+  [set patch_days 1]
+  
+  
+  ;resetting all values
   let survival 0
-  let hazard_rate 0
+  let ph_hazard_rate 0
   let mortality_rate 0
   let ph_cocoon_rate 0
   let temp_cocoon_rate 0
   let ph_factor 0
   let temp_factor 0
+  let age_factor 0
 
   ;let ph_factor (3 / 42) * ((e ^ (max_ph_resist - ph) ) - 1) ; function ensures that a ph difference of 3 will have a higher death probability
   ;reproduction rate affected by temperature + pH
@@ -321,14 +337,22 @@ to update_thresholds
     set survival item 0 (table:get ph_table ph)
     ]
  
-  set hazard_rate (ln (survival / 100)) / 3
-  set mortality_rate 1 - (e ^ (hazard_rate * patch_days))
-  set ph_factor mortality_rate
+  set ph_hazard_rate (0 - ln (survival / 100)) / 3
+  
+  set ph_factor mortality_fn ph_hazard_rate patch_days
+  set age_factor age_mortality_rate * age
   
   set cocoon_rate min (list temp_cocoon_rate ph_cocoon_rate)
   set death_threshold temp_factor + ph_factor
-  ;print word temp_factor ph_factor
-  ;show death_threshold
+  
+  if burrow [
+    set death_threshold ph_factor
+  ]
+  
+  if (age mod 365 = 0) [
+    set death_threshold age_factor
+  ]
+   
 end
 
 to update_maturity
@@ -359,31 +383,6 @@ to check_cocoon_death
   if (randNum > cocoon_death_thresh) [
     die
   ]
-  
-;  if global_temperature <= 5
-;  [
-;    if randNum >= 998 [die]
-;  ]
-;  if global_temperature > 5 and global_temperature <= 10
-;  [
-;    if randNum >= 998 [die]
-;  ]
-;  if global_temperature > 10 and global_temperature <= 15
-;  [
-;    if randNum >= 998 - (998 - 996) / 5 * (global_temperature - 10) [die]
-;  ]
-;  if global_temperature > 15 and global_temperature <= 20
-;  [
-;    if randNum >= 996 - (996 - 995) / 5 * (global_temperature - 15) [die]
-;  ]
-;  if global_temperature >= 20 and global_temperature <= 25
-;  [
-;    if randNum >= 995 - (995 - 989) / 5 * (global_temperature - 20) [die]
-;  ]
-;  if global_temperature > 25
-;  [
-;    if randNum >= 989 - 5 * (global_temperature - 25) [die]
-;  ]
 end
 
 
