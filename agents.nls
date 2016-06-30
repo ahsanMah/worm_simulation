@@ -41,7 +41,7 @@ breed [adults]
 
 turtles-own [
   age
-  death_p     ;probability of death
+  survival_p     ;probability of death
   reprod_p    ;probability of reproduction
   
   maturation_wait
@@ -230,8 +230,8 @@ end
 
 to check_death  
   random-seed new-seed
-  set death_p random-float 1
-    if (death_p < death_threshold) [
+  set survival_p random-float 1
+    if (survival_p < death_threshold) [
       ;show death_threshold
       die
     ]
@@ -337,7 +337,7 @@ to update_thresholds
     set survival item 0 (table:get ph_table ph)
     ]
  
-  set ph_hazard_rate (0 - ln (survival / 100)) / 3
+  set ph_hazard_rate (0 - ln (survival)) / 3
   
   set ph_factor mortality_fn ph_hazard_rate patch_days
   set age_factor age_mortality_rate * age
