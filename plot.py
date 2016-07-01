@@ -144,26 +144,26 @@ def extractFromFile (filename, reps):
         multi_run = []
         data_reader.next() #skips the header line
         for i in range(reps):
-			yvals = []
-			row = data_reader.next()
-			data_table = {}
-		
-			while row[0] != "END SIM":
+                yvals = []
+                row = data_reader.next()
+                data_table = {}
+        
+                while row[0] != "END SIM":
 
-				monitor_num = row[1]
-				monitor_pop = convert_to_float(row[3])
-				if data_table.has_key(monitor_num):
-					if data_table[monitor_num][2] < monitor_pop:
-						data_table[monitor_num] = map(convert_to_float,row[2:]) #data from
-				else:                                                                   #species number onward
-					data_table[monitor_num] = map(convert_to_float,row[2:])         #is stored
+                        monitor_num = row[1]
+                        monitor_pop = convert_to_float(row[3])
+                        if data_table.has_key(monitor_num):
+                                if data_table[monitor_num][2] < monitor_pop:
+                                        data_table[monitor_num] = map(convert_to_float,row[2:]) #data from
+                        else:                                                                   #species number onward
+                                data_table[monitor_num] = map(convert_to_float,row[2:])         #is stored
 
-				row = data_reader.next()
+                        row = data_reader.next()
 
-			for key in sorted(data_table.keys()):
-				yvals.append (data_table[key][2])        
-			
-			multi_run.append(yvals)
+                for key in sorted(data_table.keys()):
+                        yvals.append (data_table[key][2])        
+                
+                multi_run.append(yvals)
 
         if reps > 1:
                 avg_pop = np.mean(multi_run, axis = 0)
@@ -235,14 +235,23 @@ param_ids = {1: "Temperature", 2: "pH", 3: "Genetic Diversity", 4: "Frequency of
 
 # usr_input = askUser(param_ids)
 # print usr_input
-usr_input = ['monTest', 'Temperature', -0.5, 0.5, 0.5, 3]
+
+
+
+
+
+plt.subplot(1,2,1)
 usr_input = ['monTest', 'pH', -0.1, 0.1, 0.1, 3]
-
-
 densities,err_list,mon_list,legend = getPlotVals(usr_input)
 print legend
 draw_hist_err(mon_list,densities,err_list, legend)
 plt.title("pH Tolerance")
 legend = plt.legend(loc='best', shadow=True, fontsize='medium', title = usr_input[1] + " Levels")
-
+plt.subplot(1,2,2)
+usr_input = ['monTest', 'Temperature', -0.5, 0.5, 0.5, 3]
+densities,err_list,mon_list,legend = getPlotVals(usr_input)
+print legend
+draw_hist_err(mon_list,densities,err_list, legend)
+plt.title("Temperature Tolerance")
+legend = plt.legend(loc='best', shadow=True, fontsize='medium', title = usr_input[1] + " Levels")
 plt.show()
