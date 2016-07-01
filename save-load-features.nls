@@ -7,8 +7,7 @@ end
 to load_obstacles [name]
   let filename (word "simulations/" name "/input/environment/myobstacle.csv")
   ;set obstacle_list csv:from-file filename
-  print "Loaded from file: "
-  print obstacle_list
+  print "Loaded obstacles "
   ;;draw_obstacles
 end
 
@@ -58,9 +57,9 @@ to load_patches [name]
       set can-insert? item 10 ?
     ]
   ]
+  print "Loaded patches"
   load_monitors name
   calculate_temp
-  recolor_patches
 end
 
 to save_agents [name]
@@ -85,14 +84,12 @@ to save_agents [name]
 end
 
 to load_agents [name]
-  ;load_monitors name
   let filename1 (word "simulations/" name "/input/environment/specieslist.csv")
   let filename (word "simulations/" name "/input/environment/myagents.csv")
   let data []
   set data csv:from-file filename1
   foreach data [table:put species_list item 0 ? (list item 1 ? item 2 ? item 3 ?)]
-  print "Loaded from file: "
-  print species_list
+  
   set data csv:from-file filename
   foreach (data)
   [
@@ -115,6 +112,7 @@ to load_agents [name]
       set age 0
     ]
   ]
+  print "Loaded agents"
 end
 
 to load_temperature
@@ -185,7 +183,7 @@ to load_monitors [name]
   ]
   let monitor_list n-values monitor_number [?]
   foreach monitor_list [update_monitor_area ?]
-  recolor_patches
+  print "Loaded monitors"
 end
 
 to load_param [filename table]

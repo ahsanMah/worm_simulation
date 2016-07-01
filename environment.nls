@@ -151,6 +151,7 @@ to calculate_time
     if day_of_month > item current_month num_days
     [
       set current_month (current_month + 1) mod 12
+      set report_month report_month + 1
       set day_of_month 1
       ;show current_month
   ]
@@ -517,7 +518,6 @@ end
 
 to update_monitor_area [index]
   set area_list lput ((count patches with [monitor_index = index and pcolor != blue and pcolor != grey]) / patch_area) area_list
-  show area_list
 end
 
 to collect_monitor_data

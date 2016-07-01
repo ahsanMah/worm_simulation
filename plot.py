@@ -121,7 +121,7 @@ def draw_hist (xlabels, yvals):
 
         return
 
-def draw_hist_err (xlabels, yvals, err_list):
+def draw_hist_err (xlabels, yvals, err_list, legend):
         
         xvals = np.arange(len(xlabels))
         width = 0.9/len(yvals)
@@ -136,7 +136,7 @@ def draw_hist_err (xlabels, yvals, err_list):
         # sub.bar(xvals+width, yvals10yr, width, color = 'b')
         colors = ['g','c','m','r','y']
 
-        for idx in range(len(yvals)): #for every parameter value
+        for idx in range(len(legend)): #for every parameter value
                 mon_list = yvals[idx]
                 std_err = err_list[idx]
                 clr = colors[idx]
@@ -145,7 +145,7 @@ def draw_hist_err (xlabels, yvals, err_list):
                 # for mon_idx,y in enumerate(mon_list): #for every monitor get its index and height
                 #       print (idx,mon_idx,y,std_err[mon_idx])
                 #       plt.bar(mon_idx + x_width,y,width, color = colors[mon_idx], yerr = std_err[mon_idx])
-                plt.bar(xvals + x_width,mon_list,width, color = clr, yerr = std_err)
+                plt.bar(xvals + x_width,mon_list,width, color = clr, yerr = std_err, label = legend[idx])
                 x_width += width
 
         return
@@ -155,58 +155,9 @@ def draw_hist_err (xlabels, yvals, err_list):
 '''
 Parses the file and returns a list of the max densities of the data file given
 
-(filename) --> list of y-values to be plotted
+(filename) --> average population, standard errors, x-axis labels
 '''
-def extractFromFile (filename):
-        data = open(filename, "rb")
-        data_reader = csv.reader(data)
-        data_table = {} #temporary table that stores info from files
-        xvals = []              #values to be plotted on the x-axis
-        yvals = []              #values to be plotted on the y-axis
-        run_data = []   #data for individual runs
-        data_reader.next() #skips the header line
-        for row in data_reader:
-                monitor_num = convert_to_float(row[1])
-                monitor_pop = convert_to_float(row[3])
-                if data_table.has_key(monitor_num):
-                        if data_table[monitor_num][2] < monitor_pop:
-                                data_table[monitor_num] = map(convert_to_float,row[1:]) #data from
-                else:                                                                                                                   #species number onward
-                        data_table[monitor_num] = map(convert_to_float,row[1:])         #is stored
-
-        for val in data_table:
-                yvals.append (data_table[val][3])
-
-        return yvals
-
-def getPlotVals(sim_name, repetitions):
-        multi_run = []
-        avg_pop = []
-        std_err = []
-        rep = 1
-        filename = ""
-
-        while rep <= repetitions:
-                filename = sim_name + str(rep) + ".csv"
-                multi_run.append(extractFromFile(filename))
-                rep += 1
-        
-        avg_pop = np.mean(multi_run, axis = 0)
-        std_err = np.std(multi_run, axis = 0) / np.sqrt(repetitions)
-
-        for idx,val in enumerate(avg_pop):
-                print val,std_err[idx]
-
-        return avg_pop, std_err
-
-def askUser():
-        save_name = raw_input("Enter the name of the simulation as seen in NetLogo: ")
-        param = raw_input("Value of starting parameter: ")
-        inc = raw_input("Increment: ")
-        final = raw_input("Value of stopping parameter: ")
-        rep = raw_input("Repetitions per simulation: ")
-
-def test (filename, reps):
+def extractFromFile (filename, reps):
         data = open(filename, "rb")
         data_reader = csv.reader(data)
         data_table = {} #temporary table that stores info from files
@@ -217,68 +168,105 @@ def test (filename, reps):
         multi_run = []
         data_reader.next() #skips the header line
         for i in range(reps):
-                yvals = []
-                row = data_reader.next()
+			yvals = []
+			row = data_reader.next()
+			data_table = {}
+		
+			while row[0] != "END SIM":
 
-                while row[0] != "END SIM":
-                        
-                        monitor_num = row[1]
-                        monitor_pop = convert_to_float(row[3])
-                        if data_table.has_key(monitor_num):
-                                if data_table[monitor_num][2] < monitor_pop:
-                                        data_table[monitor_num] = map(convert_to_float,row[2:]) #data from
-                        else:                                                                   #species number onward
-                                data_table[monitor_num] = map(convert_to_float,row[2:])         #is stored
+				monitor_num = row[1]
+				monitor_pop = convert_to_float(row[3])
+				if data_table.has_key(monitor_num):
+					if data_table[monitor_num][2] < monitor_pop:
+						data_table[monitor_num] = map(convert_to_float,row[2:]) #data from
+				else:                                                                   #species number onward
+					data_table[monitor_num] = map(convert_to_float,row[2:])         #is stored
 
-                        for val in data_table:
-                                yvals.append (data_table[val][2])
+				row = data_reader.next()
 
-                        row = data_reader.next()
+			for key in sorted(data_table.keys()):
+				yvals.append (data_table[key][2])        
+			
+			multi_run.append(yvals)
 
-                multi_run.append(yvals)
+        if reps > 1:
+                avg_pop = np.mean(multi_run, axis = 0)
+                std_err = np.std(multi_run, axis = 0) / np.sqrt(reps)        
+        else:
+                avg_pop = multi_run[0]
+                std_err = [0]*len(avg_pop) #creates an array of 0s
 
-        print multi_run
-        avg_pop = np.mean(multi_run, axis = 0)
-        std_err = np.std(multi_run, axis = 0) / np.sqrt(repetitions)
+        xlabels = sorted(data_table.keys())
 
         for idx,val in enumerate(avg_pop):
-                print val,std_err[idx]
+                print xlabels[idx],val,std_err[idx]
 
-        return avg_pop, std_err
+        return avg_pop, std_err, xlabels
+
+def getFileName(folder_name,param, val):
+        std_name = list("0_0_0_0")
+        std_name[param] = str(val)             #changes the parameter value at the correct position  
+        if val == 0 : std_name[param] = str(0) #since Netlogo appends '0' to files instead of '0.0'
+        file_pathway = "simulations/" + folder_name + "/output/" + "".join(std_name) + ".csv"
+        
+        return file_pathway
 
 
+def getPlotVals(usr_input):
+        densities = []
+        err_list = []
+        mon_list = []
+        param_pos = {"Temperature": 0, "pH": 2, "Genetic Diversity": 4, "Frequency of random insertions": 6, "Number of Roads": 8}
+
+        folder_name = usr_input[0]
+        param = usr_input[1]
+        idx = param_pos[param]
+        param_val = usr_input[2]
+        inc = usr_input[3]
+        final = usr_input[4]
+        reps= usr_input[5]
+
+        param_list = []
+
+        while param_val <= final:
+                param_list += [param_val]
+                sim_name = getFileName(folder_name, idx, param_val)
+                print sim_name
+                yval,err,xlabels = extractFromFile(sim_name,reps)
+                densities.append(yval)
+                err_list.append(err)
+                param_val += inc
+
+        return densities,err_list,xlabels, param_list
 
 
-repetitions = 3
+def askUser(param_ids):
+        save_name = raw_input("Enter the name of the simulation as seen in NetLogo: ")
+        print ("1. Temperature\n2. pH\n3. Genetic Diversity\n4. Frequency of random insertions\n5. Number of Roads")
+        idx = int(raw_input("Select the parameter that was varied: "))
+        param = param_ids[idx]
+        start = float(raw_input("Value of starting parameter: "))
+        inc = float(raw_input("Increment: "))
+        final = float(raw_input("Value of stopping parameter: "))
+        rep = int(raw_input("Repetitions per simulation: "))
+        return [save_name,param,start,inc,final,rep]
+
+# def getSimVals:
 densities = []
 err_list = []
-mon_list = [0,1,2,3,4]
-param = -0.1
-inc = 0.1
-num_param = 3
-num_rep = 3
-i = 0
-folder_name = "phSim"
-file_pathway = "simulations/" + folder_name + "/output/"
+mon_list = []
+param_ids = {1: "Temperature", 2: "pH", 3: "Genetic Diversity", 4: "Frequency of random insertions", 5: "Number of Roads"}
 
-#askUser()
-
-# for i in range(num_param):
-#         sim_name =  file_pathway + str(param)
-#         if param == 0 : sim_name = file_pathway + str(0) #since Netlogo appends '0' to files instead of '0.0'
-#         print sim_name
-#         val,err = getPlotVals(sim_name,num_rep)
-#         param += inc
-#         densities.append(val)
-#         err_list.append(err)
+# usr_input = askUser(param_ids)
+# print usr_input
+usr_input = ['monTest', 'Temperature', -0.5, 0.5, 0.5, 3]
+usr_input = ['monTest', 'pH', -0.1, 0.1, 0.1, 3]
 
 
-# draw_hist(mon_list,densities)
-# draw_hist_err(mon_list,densities,err_list)
-# plt.title("pH Tolerance")
-# # plt.grid(True)
-# plt.show()
+densities,err_list,mon_list,legend = getPlotVals(usr_input)
+print legend
+draw_hist_err(mon_list,densities,err_list, legend)
+plt.title("pH Tolerance")
+legend = plt.legend(loc='best', shadow=True, fontsize='medium', title = usr_input[1] + " Levels")
 
-test("0_0_0_0.csv",3)
-
-
+plt.show()
