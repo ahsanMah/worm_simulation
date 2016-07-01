@@ -1496,40 +1496,6 @@ NetLogo 5.3.1
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
-<experiments>
-  <experiment name="experiment" repetitions="3" runMetricsEveryStep="false">
-    <setup>setup
-setup_sim</setup>
-load_agents save_name
-setup_export</setup>
-    <go>go</go>
-    <metric>maxPop</metric>
-  </experiment>
-  <experiment name="experiment" repetitions="1" runMetricsEveryStep="false">
-    <setup>setup
-setup_sim
-load_agents save_name</setup>
-    <go>go</go>
-    <metric>maxPop</metric>
-    <enumeratedValueSet variable="save_number">
-      <value value="1"/>
-      <value value="2"/>
-      <value value="3"/>
-    </enumeratedValueSet>
-  </experiment>
-  <experiment name="temperature" repetitions="1" runMetricsEveryStep="false">
-    <setup>setup
-setup_sim
-load_agents save_name</setup>
-    <go>go</go>
-    <metric>maxPop</metric>
-    <enumeratedValueSet variable="save_number">
-      <value value="1"/>
-      <value value="2"/>
-      <value value="3"/>
-    </enumeratedValueSet>
-  </experiment>
-</experiments>
 @#$#@#$#@
 @#$#@#$#@
 default
