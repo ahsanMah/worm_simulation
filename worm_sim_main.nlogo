@@ -429,8 +429,8 @@ GRAPHICS-WINDOW
 300
 0
 300
-0
-0
+1
+1
 1
 ticks
 1000.0
@@ -1496,6 +1496,20 @@ NetLogo 5.3.1
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
+<experiments>
+  <experiment name="experiment" repetitions="3" runMetricsEveryStep="true">
+    <setup>setup
+setup_sim
+load_agents save_name
+setup_export</setup>
+    <go>go</go>
+    <enumeratedValueSet variable="ph_tolerance">
+      <value value="0.1"/>
+      <value value="0"/>
+      <value value="-0.1"/>
+    </enumeratedValueSet>
+  </experiment>
+</experiments>
 @#$#@#$#@
 @#$#@#$#@
 default
