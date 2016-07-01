@@ -212,20 +212,23 @@ def getFileName(folder_name,param, val):
         return file_pathway
 
 
-def getPlotVals(folder_name, param, reps):
+def getPlotVals(usr_input):
         densities = []
         err_list = []
         mon_list = []
-        param_idx = {"temp": 0, "ph": 2, "gd": 4, "freq": 6, "rds": 8}
-        idx = param_idx[param]
-        param_val = -0.1
-        inc = 0.1
-        num_param = 3
-        num_rep = 3
-        i = 0
+        param_pos = {"Temperature": 0, "pH": 2, "Genetic Diversity": 4, "Frequency of random insertions": 6, "Number of Roads": 8}
+
+        folder_name = usr_input[0]
+        param = usr_input[1]
+        idx = param_pos[param]
+        param_val = usr_input[2]
+        inc = usr_input[3]
+        final = usr_input[4]
+        reps= usr_input[5]
+
         param_list = []
 
-        for i in range(num_param):
+        while param_val <= final:
                 param_list += [param_val]
                 sim_name = getFileName(folder_name, idx, param_val)
                 print sim_name
@@ -237,26 +240,33 @@ def getPlotVals(folder_name, param, reps):
         return densities,err_list,xlabels, param_list
 
 
-
-def askUser():
+def askUser(param_ids):
         save_name = raw_input("Enter the name of the simulation as seen in NetLogo: ")
-        param = raw_input("Value of starting parameter: ")
-        inc = raw_input("Increment: ")
-        final = raw_input("Value of stopping parameter: ")
-        rep = raw_input("Repetitions per simulation: ")
-
+        print ("1. Temperature\n2. pH\n3. Genetic Diversity\n4. Frequency of random insertions\n5. Number of Roads")
+        idx = int(raw_input("Select the parameter that was varied: "))
+        param = param_ids[idx]
+        start = float(raw_input("Value of starting parameter: "))
+        inc = float(raw_input("Increment: "))
+        final = float(raw_input("Value of stopping parameter: "))
+        rep = int(raw_input("Repetitions per simulation: "))
+        return [save_name,param,start,inc,final,rep]
 
 # def getSimVals:
 densities = []
 err_list = []
 mon_list = []
+param_ids = {1: "Temperature", 2: "pH", 3: "Genetic Diversity", 4: "Frequency of random insertions", 5: "Number of Roads"}
 
-#askUser()
+# usr_input = askUser(param_ids)
+# print usr_input
+usr_input = ['monTest', 'Temperature', -0.5, 0.5, 0.5, 3]
+usr_input = ['monTest', 'pH', -0.1, 0.1, 0.1, 3]
 
-# draw_hist(mon_list,densities)
-densities,err_list,mon_list,legend = getPlotVals("monTest","ph",3)
+
+densities,err_list,mon_list,legend = getPlotVals(usr_input)
 print legend
 draw_hist_err(mon_list,densities,err_list, legend)
 plt.title("pH Tolerance")
-legend = plt.legend(loc='best', shadow=True, fontsize='medium', title = "pH Levels")
+legend = plt.legend(loc='best', shadow=True, fontsize='medium', title = usr_input[1] + " Levels")
+
 plt.show()

@@ -105,9 +105,7 @@ to setup_sim
   print "Loading from simulation files..."
   load_patches save_name
   ;load_agents save_name
-
-  show ph_table
-  print "Done Loading"
+  ;print "Finished loading environments"
 end
 
 to draw_river
@@ -250,7 +248,7 @@ to collect_monthly_data
         set monthly_data lput (array:to-list ?) monthly_data
       ]
     ]
-    set report_month report_month + 1
+
 
   ]
 
@@ -324,18 +322,18 @@ to-report check_stopping_conditions
   if (year = 10) [
     if (ticks mod 365 = 1)[
       set pop_data lput max_pop pop_data
-      export_data
+      ;export_data
       set max_pop 0
-      report true
+      ;report true
     ]
   ]
 
   if (year = 20) [
     if (ticks mod 365 = 1)[
       set pop_data lput max_pop pop_data
-      export_data
+      ;export_data
       set max_pop 0
-      ;report true
+      report true
     ]
   ]
 
@@ -403,7 +401,10 @@ to go
 
   collect_data
 
-  if check_stopping_conditions =  true [stop]
+  if check_stopping_conditions =  true [
+    export_data
+    stop
+    ]
 
   tick
 end
@@ -614,7 +615,7 @@ speed
 speed
 0
 1
-0.71
+0.7
 0.01
 1
 NIL
