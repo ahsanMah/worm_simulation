@@ -1,4 +1,5 @@
 Month Number,Monitor Number,Species Number,Population,Density,Genetic Diversity,pH Tolerance,Temperature Tolerance
+<<<<<<< HEAD
 1,0,1,0,0,0,0,5
 1,1,1,0,0,0,0,5
 1,2,1,0,0,0,0,5
@@ -54,3 +55,5 @@ Month Number,Monitor Number,Species Number,Population,Density,Genetic Diversity,
 11,2,1,0,0,0,0,5
 11,3,1,0,0,0,0,5
 11,4,1,17,4.318374259102455,0,0,5
+=======
+>>>>>>> 70451ede4dbfa37f610a99456382532ed4e8971f
