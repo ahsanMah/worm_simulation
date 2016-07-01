@@ -1,0 +1,115 @@
+## WHAT IS IT?
+
+(a general understanding of what the model is trying to show or explain)
+
+## HOW IT WORKS
+
+(what rules the agents use to create the overall behavior of the model)
+
+# HOW TO USE IT
+
+##Setting Up a Simulation:
+If parameters and GIS data are located in the proper folders, then pressing the "Setup Simulation" button will load them into the NetLogo world.  Then, to add worms, adjust the sliders to the desired parameters, select the number of worms to add to the simulation, and press the Add button.  If you want to add worms to random locations within a selected region, press "Select" and select an area, then press add. <b>Note</b>: after adding worms, click somewhere within the environment again while "Select" is still pressed in order to deselect the region. Once agents have been added, a simulation can be started by pressing "Go" and the simulation will run until "Go" is pressed again, it has simulated 30 years of invasion, or all of the worms have died. The "starting_day" box controls what day of the starting year the simulation starts on.
+
+
+
+##Species Controls:
+###Add:
+
+The "Add" button allows users to place worms in the NetLogo world.  The "worm_population" slider at the top of the species controls how many worms are placed when the user presses "Add". If only "Add" is selected, when the user clicks, the worms will be inserted at that location.  If a region is selected with "Select", the worms will be randomly distributed within that region.  The Interface will prevent users from placing worms where there is water or a rock outcropping within a selected box; it will not do this when the user adds with a mouse click.
+
+
+##Environment Controls:
+The user has the ability to manipulate an existing environment or create an entire environemnt of their own.
+###Draw:
+If "Draw" is selected, and "change:" is set to water or highway, then the user can drag their mouse around the netlogo world to draw either of these features.  If the mouse seems unresponsive, make sure the "view updates" chooser on the top bar of the Interface panel is set to continuous. If "change:" is set to anything other than water or highway, the "Draw" button will not draw anything.
+
+
+<b>Note</b>: Make sure to not have "Draw" selected at the same time as "Add" or "Select"
+<b>Tip</b>: Drawing slowly will be much more accurate.
+
+###Select:
+When "Select" is on, clicking and dragging on the NetLogo world will create a box around a selected region. Once drawn, users can modify the parameters of this box in a variety of ways.
+
+####pH and/or Temperature:
+If the user wants to change the pH and/or temperature within the box, they should adjust the patch_ph and temperature_difference sliders to the desired parameters. Then, select the desired shape from the "obstacle_shape" box. Choosing "rectangle" will fill the entire selected box with the chosen parameters. "Circle" will fill in a circle with diameter of the shorter side of the box and a center at the center of the box with the parameters in the box. "Mountain" will draw a circle, but instead of uniform parameters, it will create a gradient from the current parameters, on the edges, to slider parameters, in the center.
+
+####Monitors:
+Choosing "Monitor" in the "obstacle_shape" box will draw a new monitor in the selected box; it will not modify any of the parameters in the box, regardless of what is selected in the "change:" box. After choosing the desired settings, press "Modify" to implement them. Note: After use, deselect the area by clicking on any point in the NetLogo world.
+
+####Insertion Regions:
+If "change:" is set to "insertion_points", the patches contained by the obstacle will be encoded as locations where worms can spawn when "Random_Insertions?" is turned on. When a random insertion occurs, every individual patch will have an equal chace of having worms spawn. E.g. a big square will have higher chance of having worms spawn at random insertion invervals than a smaller square.
+
+
+
+##How to Upload Data:
+GIS data on soil should be retrieved from the USDA Web Soil Survey (http://websoilsurvey.sc.egov.usda.gov/App/WebSoilSurvey.aspx).
+GIS highway data: provide link
+Historical temperature data was retrieved from PRISM (http://www.prism.oregonstate.edu/historical/)
+Data from these files should be stored in the "simulations" folder in another folder with the *save_name* that will be used with the data. The folder structure should mirror the folder structure of the provided GIS data.
+For more information on how to download and set up GIS data in the NetLogo world, see the provided "How to download GIS data.docx" document.
+
+##How to Modify Paramters:
+In a folder there exists parameters.  If you want to modify the parameters, modify the .csv with the corresponding parameters that need to be modified. Parameters for a particular save_name are found in the filepath simulations/*save_name*/input/parameters/
+The .csv files have values for pH/temperature and the corresponding survivability/hatchability rates of worms and cocoons.
+
+##Save/Load Features:
+The buttons "Save" and "Load" will save or load the locations and parameters of worms in the simulation with "save_name"
+The buttons "Save Environment" and "Load Environment" will save or load the current characteristics of every individual patch. This has the effect of saving the pH, depth and moisture on each patch and locations with water, rock outcroppings, highways, insertion points and monitors.
+It is reccomended that the user saves the environment every time before they make a change so they can easily revert to the previous state if they make a mistake--there is no undo button.
+
+##Using BehaviorSpace for Multiple Simulations:
+BehaviorSpace is a useful tool in NetLogo to run multiple simulations simultaneously. To run a BehaviorSpace experiment, click on "Tools -> BehaviorSpace". You can either edit the existing experiment, or create your own.  The first box will allow you to choose which variable to change in your simulations, follow the instructions below the box to choose which values are used in the simulations.  If you want to run a simulation multiple times with the same parameters, include the line ["save_number" [1 1 *number_of_runs*]] with the variables.  The following commands must be in the corresponding boxes for a simulation to work properly.
+####Reporters:
+maxPop
+####Setup commands:
+setup
+setup_sim
+load_agents save_name
+####Go commands:
+go
+
+##Other Buttons/Information:
+###What is a Turtle?
+A turtle is an agent that moves around the world.  In this model, worms and cocoons are both turtles.
+###Inspect Turtles/Patches
+By right clicking on a turtle/patch, users can observe the agent's attributes and location.
+###Show/Hide Worms
+Hide turtles makes the turtles invisible to the user.  This feature is useful if the user wants to observe what the traits of patches with very high densities of turtles. Turtles will still continue their usual processes, but not be visible to the user.
+Show turtles will make all hidden turtles visible again.
+
+##Useful Functions:
+Using the following commands in the "observer>" line of the command center will enable the user to have more precise control over the environment they are manipulating. To use one of these functions, first type the one-word command in the observer line, followed by the desired parameters, substituted for the words in italics.
+###initialize_monitors
+This command automatically generates population density monitors in the four corners and center of the NetLogo world.
+###draw_monitor *x_low x_high y_low y_high*
+Draws a rectangular population density monitor with corners at (x_low, y_low) (x_low, y_high) (x_high, y_low) and (x_high, y_high). All coordinates need to be integers because they refer to patch coordinates.
+###insertion_region *x_low x_high y_low y_high*
+Draws a rectangular insertion region with corners at *(x_low, y_low), (x_low, y_high), (x_high, y_low) and (x_high, y_high)*. All coordinates need to be integers because they refer to patch coordinates.
+###insert_worms *x y number species_number*
+Inserts *number* worms at location *(x, y)* with the attributes of the species with *species_number*.
+
+
+# THINGS TO NOTICE
+
+(suggested things for the user to notice while running the model)
+
+## THINGS TO TRY
+
+(suggested things for the user to try to do (move sliders, switches, etc.) with the model)
+
+## EXTENDING THE MODEL
+
+(suggested things to add or change in the Code tab to make the model more complicated, detailed, accurate, etc.)
+
+## NETLOGO FEATURES
+
+(interesting or unusual features of NetLogo that the model uses, particularly in the Code tab; or where workarounds were needed for missing features)
+
+## RELATED MODELS
+
+(models in the NetLogo Models Library and elsewhere which are of related interest)
+
+## CREDITS AND REFERENCES
+
+(a reference to the model's URL on the web if it has one, as well as any other necessary credits, citations, and links)

@@ -144,26 +144,26 @@ def extractFromFile (filename, reps):
         multi_run = []
         data_reader.next() #skips the header line
         for i in range(reps):
-			yvals = []
-			row = data_reader.next()
-			data_table = {}
-		
-			while row[0] != "END SIM":
+                yvals = []
+                row = data_reader.next()
+                data_table = {}
 
-				monitor_num = row[1]
-				monitor_pop = convert_to_float(row[3])
-				if data_table.has_key(monitor_num):
-					if data_table[monitor_num][2] < monitor_pop:
-						data_table[monitor_num] = map(convert_to_float,row[2:]) #data from
-				else:                                                                   #species number onward
-					data_table[monitor_num] = map(convert_to_float,row[2:])         #is stored
+                while row[0] != "END SIM":
 
-				row = data_reader.next()
+                        monitor_num = row[1]
+                        monitor_pop = convert_to_float(row[3])
+                        if data_table.has_key(monitor_num):
+                                if data_table[monitor_num][2] < monitor_pop:
+                                        data_table[monitor_num] = map(convert_to_float,row[2:]) #data from
+                        else:                                                                   #species number onward
+                                data_table[monitor_num] = map(convert_to_float,row[2:])         #is stored
 
-			for key in sorted(data_table.keys()):
-				yvals.append (data_table[key][2])        
-			
-			multi_run.append(yvals)
+                        row = data_reader.next()
+
+                for key in sorted(data_table.keys()):
+                        yvals.append (data_table[key][2])        
+                
+                multi_run.append(yvals)
 
         if reps > 1:
                 avg_pop = np.mean(multi_run, axis = 0)
