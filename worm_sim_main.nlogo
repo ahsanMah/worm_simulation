@@ -378,6 +378,21 @@ to-report collected_data
   report monthly_data
 end
 
+to insertion-region [px pxhigh py pyhigh]
+  ask patches
+  [
+    if (pxcor >= px and pxcor <= pxhigh and pycor >= py and pycor <= pyhigh and pcolor != grey)
+      [
+        set can-insert? true
+        recolor-patch
+      ]
+  ]
+end
+
+to insert-worms [x y worm_pop spec_num]
+  add_species x y worm_pop spec_num
+end
+
 
 to go
 
@@ -423,16 +438,16 @@ GRAPHICS-WINDOW
 300
 0
 300
-1
-1
+0
+0
 1
 ticks
 1000.0
 
 BUTTON
-551
+875
 28
-623
+947
 61
 Setup
 setup\n;setup_sim
@@ -447,9 +462,9 @@ NIL
 1
 
 BUTTON
-776
+693
 28
-835
+752
 62
 Go
 go
@@ -506,7 +521,7 @@ ph_tolerance
 ph_tolerance
 -0.5
 0.5
--0.1
+0
 0.1
 1
 NIL
@@ -521,7 +536,7 @@ temperature_tolerance
 temperature_tolerance
 -2
 2
--0.5
+0
 0.1
 1
 NIL
@@ -597,7 +612,7 @@ CHOOSER
 obstacle_shape
 obstacle_shape
 "circle" "rectangle" "mountain" "monitor"
-1
+0
 
 SLIDER
 281
@@ -608,7 +623,7 @@ speed
 speed
 0
 1
-0.7
+0.71
 0.01
 1
 NIL
@@ -703,9 +718,9 @@ NIL
 1
 
 BUTTON
-840
+757
 28
-950
+867
 61
 Recolor Patches
 recolor_patches
@@ -870,13 +885,13 @@ CHOOSER
 706
 change:
 change:
-"pH" "temperature difference" "pH and temperature difference" "monitor" "highway" "water" "insertion point"
-6
+"pH" "temperature difference" "pH and temperature difference" "highway" "water" "insertion point"
+5
 
 BUTTON
-954
+953
 28
-1044
+1043
 61
 Load GIS
 setup\nsetup_gis\n;initialize_monitors
@@ -910,7 +925,7 @@ worm_population
 worm_population
 0
 500
-100
+500
 5
 1
 NIL
@@ -992,11 +1007,11 @@ number_inserted
 Number
 
 BUTTON
-1049
+1048
 28
-1155
+1154
 61
-Hide Turtles
+Hide Worms
 ask turtles [hide-turtle]
 NIL
 1
@@ -1009,11 +1024,11 @@ NIL
 1
 
 BUTTON
-1162
+1161
 28
-1273
+1272
 61
-Show Turtles
+Show Worms
 ask turtles[show-turtle]
 NIL
 1
@@ -1026,12 +1041,12 @@ NIL
 1
 
 BUTTON
-633
+555
 28
-767
+689
 61
 Setup Simulation
-setup_sim
+setup\nsetup_sim\nload_agents save_name
 NIL
 1
 T
@@ -1051,12 +1066,12 @@ NIL
 
 (what rules the agents use to create the overall behavior of the model)
 
-## HOW TO USE IT
+# HOW TO USE IT
 
-###Setting Up a Simulation:
-If parameters and GIS data are located in the proper folders, then pressing the Setup button will load them into the NetLogo environment.  Then, to add worms, adjust the sliders to the desired parameters, select the number of worms to add to the simulation, and press the Add button.  If you want to add worms to random locations within a selected region, press "Select" and select an area, then press add. Note: after adding worms, click somewhere within the environment again while "Select" is still pressed in order to deselect the region. Once agents have been added, a simulation can be started by pressing "Go" and the simulation will run until "Go" is pressed again, it has simulated 30 years of invasion, or all of the worms have died.
+##Setting Up a Simulation:
+If parameters and GIS data are located in the proper folders, then pressing the "Setup Simulation" button will load them into the NetLogo world.  Then, to add worms, adjust the sliders to the desired parameters, select the number of worms to add to the simulation, and press the Add button.  If you want to add worms to random locations within a selected region, press "Select" and select an area, then press add. Note: after adding worms, click somewhere within the environment again while "Select" is still pressed in order to deselect the region. Once agents have been added, a simulation can be started by pressing "Go" and the simulation will run until "Go" is pressed again, it has simulated 30 years of invasion, or all of the worms have died. The "starting_day" box controls what day of the starting year the simulation starts on.
 
-###Using BehaviorSpace for Multiple Simulations:
+##Using BehaviorSpace for Multiple Simulations:
 BehaviorSpace is a useful tool in NetLogo to run multiple simulations simultaneously. To run a BehaviorSpace experiment, click on "Tools -> BehaviorSpace". You can either edit the existing experiment, or create your own.  The first box will allow you to choose which variable to change in your simulations, follow the instructions below the box to choose which values are used in the simulations.  If you want to run a simulation multiple times with the same parameters, include the line ["save_number" [1 1 *number_of_runs*]] with the variables.  The following commands must be in the corresponding boxes for a simulation to work properly.
 ####Reporters:
 maxPop
@@ -1067,36 +1082,53 @@ load_agents save_name
 ####Go commands:
 go
 
-###Manipulating the Environment:
+##Species Controls:
+###Add:
+
+The "Add" button allows users to place worms in the NetLogo world.  The "worm_popoulation" slider at the top of the species controls how many worms are placed when the user presses "Add". If only "Add" is selected, when the user clicks, the worms will be inserted at that location.  If a region is selected with "Select", the worms will be randomly distributed within that region.  The Interface will prevent users from placing worms where there is water or a rock outcropping within a selected box; it will not do this when the user adds with a mouse click.
+
+
+##Environment Controls:
 The user has the ability to manipulate an existing environment or create an entire environemnt of their own.
-####Draw:
+###Draw:
+If "Draw" is selected, and "change:" is set to water or highway, then the user can drag their mouse around the netlogo world to draw either of these features.  If the mouse seems unresponsive, make sure the "view updates" chooser on the top bar of the Interface panel is set to continuous. Tip: drawing slowly will be much more accurate. If "change:" is set to anything other than water or highway, the "Draw" button will not draw anything.
 
 
 Note: Make sure to not have "Draw" selected at the same time as "Add" or "Select"
 
-####Select:
+###Select:
+When "Select" is on, clicking and dragging on the NetLogo world will create a box around a selected region. Once drawn, users can modify the parameters of this box in a variety of ways.
 
-####Add:
+####pH and/or Temperature:
+If the user wants to change the pH and/or temperature within the box, they should adjust the patch_ph and temperature_difference sliders to the desired parameters. Then, select the desired shape from the "obstacle_shape" box. Choosing "rectangle" will fill the entire selected box with the chosen parameters. "Circle" will fill in a circle with diameter of the shorter side of the box and a center at the center of the box with the parameters in the box. "Mountain" will draw a circle, but instead of uniform parameters, it will create a gradient from the current parameters, on the edges, to slider parameters, in the center.
+
+####Monitors:
+Choosing "Monitor" in the "obstacle_shape" box will draw a new monitor in the selected box; it will not modify any of the parameters in the box, regardless of what is selected in the "change:" box. After choosing the desired settings, press "Modify" to implement them. Note: After use, deselect the area by clicking on any point in the NetLogo world.
+
+####Insertion Regions:
+If "change:" is set to "insertion_points", the patches contained by the obstacle will be encoded as locations where worms can spawn when "Random_Insertions?" is turned on. When a random insertion occurs, every individual patch will have an equal chace of having worms spawn. E.g. a big square will have higher chance of having worms spawn at random insertion invervals than a smaller square.
 
 
 
- There are two methods for manipulating the environment: selecting and drawing. If users currently have "Select" chosen, they can select a rectangle, within which they can modify the temperature and/or pH. The patches can be modified in the entire rectangle, for a circle within the rectangle, or a mountain (modifies characteristics on a gradient in a circle). In addition to changing pH and Temperature, users can use the "Draw" buton to draw in highways and water features.
-Users can also draw monitors, which will keep track of the population and density within the monitor during a simulation.
-
-
-###How to Upload Data:
+##How to Upload Data:
 GIS data on soil should be retrieved from the USDA Web Soil Survey (http://websoilsurvey.sc.egov.usda.gov/App/WebSoilSurvey.aspx).
 GIS highway data: provide link
-Temperature data was retrieved from PRISM (http://www.prism.oregonstate.edu/historical/)
+Historical temperature data was retrieved from PRISM (http://www.prism.oregonstate.edu/historical/)
 
-###How to Modify Paramters:
+##How to Modify Paramters:
 In a folder there exists parameters.  If you want to modify the parameters, modify the .csv with the corresponding parameters that need to be modified.
 
-###Save/Load Features:
+##Save/Load Features:
 The buttons "Save" and "Load" will save or load the locations of worms in the simulation with "save_name"
 
+##Useful Functions:
+###initialize_monitors
+###draw_monitor
+###insertion_region
+###insert_worms
 
-## THINGS TO NOTICE
+
+# THINGS TO NOTICE
 
 (suggested things for the user to notice while running the model)
 
@@ -1487,8 +1519,7 @@ NetLogo 5.3.1
 <experiments>
   <experiment name="experiment" repetitions="1" runMetricsEveryStep="false">
     <setup>setup
-setup_sim
-load_agents save_name</setup>
+setup_sim</setup>
     <go>go</go>
     <metric>maxPop</metric>
     <steppedValueSet variable="ph_tolerance" first="-0.1" step="0.1" last="0.1"/>
