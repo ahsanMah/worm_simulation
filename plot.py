@@ -97,30 +97,6 @@ Draws a histogram with the given data
 parameters -> (x-axis labels, heights of the bars)
 
 '''
-def draw_hist (xlabels, yvals):
-        
-        xvals = np.arange(len(xlabels))
-        width = 0.9/len(yvals)
-        # err_list = (3, 5, 12, 13, 30, 50)
-        x_width = 0
-        plt.yscale('symlog')
-        sub.set_xticks(xvals + 0.5)
-        sub.set_xticklabels(xlabels)
-        plt.xlabel("Region Number")
-        plt.ylabel("Density in Region")
-        # sub.bar(xvals, yvals5yr, width, color = 'g', yerr = e)
-        # sub.bar(xvals+width, yvals10yr, width, color = 'b')
-        colors = ['g','y','r','m','c']
-
-        for idx in range(len(yvals)): #for every ph value
-                for mon_idx,y in enumerate(yvals[idx]):
-                        print (idx,mon_idx,y)
-                        # plt.bar(x + x_width, y, width, color = colors[mon_idx])
-                        sub.bar(mon_idx + x_width,y,width, color = colors[mon_idx])
-                x_width += width
-
-        return
-
 def draw_hist_err (xlabels, yvals, err_list, legend):
         
         xvals = np.arange(len(xlabels))
