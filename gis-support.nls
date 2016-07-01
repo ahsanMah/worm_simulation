@@ -73,10 +73,11 @@ end
 
 to load_ph
   set ph_map table:make
-  let filename (word "simulations/" save_name "/input/soil/pH_key.csv")
+  let filename (word "simulations/" save_name "/input/soil/map_key.csv")
   let ph_list csv:from-file filename
   foreach ph_list [
-    table:put ph_map (item 0 ?) (list (item 2 ?) (item 5 ?) (item 6 ?)) 
+    ;table:put ph_map (item 0 ?) (list (item 2 ?) (item 5 ?) (item 6 ?)) 
+    table:put ph_map (item 0 ?)(list (item 2 ?)(item 3 ?)(item 4 ?))
     ]
 end
 
