@@ -155,29 +155,48 @@ def draw_hist_err (xlabels, yvals, err_list):
 '''
 Parses the file and returns a list of the max densities of the data file given
 
-(filename) --> list of y-values to be plotted
+(filename) --> average population, standard errors, x-axis labels
 '''
-def extractFromFile (filename):
+def extractFromFile (filename, reps):
         data = open(filename, "rb")
         data_reader = csv.reader(data)
         data_table = {} #temporary table that stores info from files
         xvals = []              #values to be plotted on the x-axis
         yvals = []              #values to be plotted on the y-axis
         run_data = []   #data for individual runs
+        row = []
+        multi_run = []
         data_reader.next() #skips the header line
-        for row in data_reader:
-                monitor_num = convert_to_float(row[1])
-                monitor_pop = convert_to_float(row[3])
-                if data_table.has_key(monitor_num):
-                        if data_table[monitor_num][2] < monitor_pop:
-                                data_table[monitor_num] = map(convert_to_float,row[1:]) #data from
-                else:                                                                                                                   #species number onward
-                        data_table[monitor_num] = map(convert_to_float,row[1:])         #is stored
+        for i in range(reps):
+			yvals = []
+			row = data_reader.next()
+			data_table = {}
+		
+			while row[0] != "END SIM":
 
-        for val in data_table:
-                yvals.append (data_table[val][3])
+				monitor_num = row[1]
+				monitor_pop = convert_to_float(row[3])
+				if data_table.has_key(monitor_num):
+					if data_table[monitor_num][2] < monitor_pop:
+						data_table[monitor_num] = map(convert_to_float,row[2:]) #data from
+				else:                                                                   #species number onward
+					data_table[monitor_num] = map(convert_to_float,row[2:])         #is stored
 
-        return yvals
+				row = data_reader.next()
+
+			for key in sorted(data_table.keys()):
+				yvals.append (data_table[key][2])        
+			
+			multi_run.append(yvals)
+
+        avg_pop = np.mean(multi_run, axis = 0)
+        std_err = np.std(multi_run, axis = 0) / np.sqrt(repetitions)
+        xlabels = sorted(data_table.keys())
+
+        for idx,val in enumerate(avg_pop):
+                print xlabels[idx],val,std_err[idx]
+
+        return avg_pop, std_err, xlabels
 
 def getPlotVals(sim_name, repetitions):
         multi_run = []
@@ -206,46 +225,9 @@ def askUser():
         final = raw_input("Value of stopping parameter: ")
         rep = raw_input("Repetitions per simulation: ")
 
-def test (filename, reps):
-        data = open(filename, "rb")
-        data_reader = csv.reader(data)
-        data_table = {} #temporary table that stores info from files
-        xvals = []              #values to be plotted on the x-axis
-        yvals = []              #values to be plotted on the y-axis
-        run_data = []   #data for individual runs
-        row = []
-        multi_run = []
-        data_reader.next() #skips the header line
-        for i in range(reps):
-                yvals = []
-                row = data_reader.next()
 
-                while row[0] != "END SIM":
-                        
-                        monitor_num = row[1]
-                        monitor_pop = convert_to_float(row[3])
-                        if data_table.has_key(monitor_num):
-                                if data_table[monitor_num][2] < monitor_pop:
-                                        data_table[monitor_num] = map(convert_to_float,row[2:]) #data from
-                        else:                                                                   #species number onward
-                                data_table[monitor_num] = map(convert_to_float,row[2:])         #is stored
 
-                        for val in data_table:
-                                yvals.append (data_table[val][2])
-
-                        row = data_reader.next()
-
-                multi_run.append(yvals)
-
-        print multi_run
-        avg_pop = np.mean(multi_run, axis = 0)
-        std_err = np.std(multi_run, axis = 0) / np.sqrt(repetitions)
-
-        for idx,val in enumerate(avg_pop):
-                print val,std_err[idx]
-
-        return avg_pop, std_err
-
+# def getSimVals:
 
 
 
@@ -274,11 +256,9 @@ file_pathway = "simulations/" + folder_name + "/output/"
 
 
 # draw_hist(mon_list,densities)
-# draw_hist_err(mon_list,densities,err_list)
-# plt.title("pH Tolerance")
-# # plt.grid(True)
-# plt.show()
-
-test("0_0_0_0.csv",3)
-
-
+density,err,mon_list = extractFromFile("0_0_0_0.csv",3)
+densities.append(density)
+err_list.append(err)
+draw_hist_err(mon_list,densities,err_list)
+plt.title("pH Tolerance")
+plt.show()
