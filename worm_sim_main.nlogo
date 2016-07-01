@@ -369,7 +369,7 @@ to-report collected_data
   report monthly_data
 end
 
-to insertion-region [px pxhigh py pyhigh]
+to insertion_region [px pxhigh py pyhigh]
   ask patches
   [
     if (pxcor >= px and pxcor <= pxhigh and pycor >= py and pycor <= pyhigh and pcolor != grey)
@@ -380,7 +380,7 @@ to insertion-region [px pxhigh py pyhigh]
   ]
 end
 
-to insert-worms [x y worm_pop spec_num]
+to insert_worms [x y worm_pop spec_num]
   add_species x y worm_pop spec_num
 end
 
@@ -689,7 +689,7 @@ CHOOSER
 species_number
 species_number
 1 2 3 4 5
-1
+2
 
 BUTTON
 283
@@ -1051,16 +1051,7 @@ NIL
 ##Setting Up a Simulation:
 If parameters and GIS data are located in the proper folders, then pressing the "Setup Simulation" button will load them into the NetLogo world.  Then, to add worms, adjust the sliders to the desired parameters, select the number of worms to add to the simulation, and press the Add button.  If you want to add worms to random locations within a selected region, press "Select" and select an area, then press add. Note: after adding worms, click somewhere within the environment again while "Select" is still pressed in order to deselect the region. Once agents have been added, a simulation can be started by pressing "Go" and the simulation will run until "Go" is pressed again, it has simulated 30 years of invasion, or all of the worms have died. The "starting_day" box controls what day of the starting year the simulation starts on.
 
-##Using BehaviorSpace for Multiple Simulations:
-BehaviorSpace is a useful tool in NetLogo to run multiple simulations simultaneously. To run a BehaviorSpace experiment, click on "Tools -> BehaviorSpace". You can either edit the existing experiment, or create your own.  The first box will allow you to choose which variable to change in your simulations, follow the instructions below the box to choose which values are used in the simulations.  If you want to run a simulation multiple times with the same parameters, include the line ["save_number" [1 1 *number_of_runs*]] with the variables.  The following commands must be in the corresponding boxes for a simulation to work properly.
-####Reporters:
-maxPop
-####Setup commands:
-setup
-setup_sim
-load_agents save_name
-####Go commands:
-go
+
 
 ##Species Controls:
 ###Add:
@@ -1094,18 +1085,48 @@ If "change:" is set to "insertion_points", the patches contained by the obstacle
 GIS data on soil should be retrieved from the USDA Web Soil Survey (http://websoilsurvey.sc.egov.usda.gov/App/WebSoilSurvey.aspx).
 GIS highway data: provide link
 Historical temperature data was retrieved from PRISM (http://www.prism.oregonstate.edu/historical/)
+Data from these files should be stored in the "simulations" folder in another folder with the *save_name* that will be used with the data. The folder structure should mirror the folder structure of the provided GIS data.
+For more information on how to download and set up GIS data in the NetLogo world, see the provided "How to download GIS data.docx" document.
 
 ##How to Modify Paramters:
-In a folder there exists parameters.  If you want to modify the parameters, modify the .csv with the corresponding parameters that need to be modified.
+In a folder there exists parameters.  If you want to modify the parameters, modify the .csv with the corresponding parameters that need to be modified. Parameters for a particular save_name are found in the filepath simulations/*save_name*/input/parameters/
+The .csv files have values for pH/temperature and the corresponding survivability/hatchability rates of worms and cocoons.
 
 ##Save/Load Features:
-The buttons "Save" and "Load" will save or load the locations of worms in the simulation with "save_name"
+The buttons "Save" and "Load" will save or load the locations and parameters of worms in the simulation with "save_name"
+The buttons "Save Environment" and "Load Environment" will save or load the current characteristics of every individual patch. This has the effect of saving the pH, depth and moisture on each patch and locations with water, rock outcroppings, highways, insertion points and monitors.
+It is reccomended that the user saves the environment every time before they make a change so they can easily revert to the previous state if they make a mistake--there is no undo button.
+
+##Using BehaviorSpace for Multiple Simulations:
+BehaviorSpace is a useful tool in NetLogo to run multiple simulations simultaneously. To run a BehaviorSpace experiment, click on "Tools -> BehaviorSpace". You can either edit the existing experiment, or create your own.  The first box will allow you to choose which variable to change in your simulations, follow the instructions below the box to choose which values are used in the simulations.  If you want to run a simulation multiple times with the same parameters, include the line ["save_number" [1 1 *number_of_runs*]] with the variables.  The following commands must be in the corresponding boxes for a simulation to work properly.
+####Reporters:
+maxPop
+####Setup commands:
+setup
+setup_sim
+load_agents save_name
+####Go commands:
+go
+
+##Other Buttons/Information:
+###What is a Turtle?
+A turtle is an agent that moves around the world.  In this model, worms and cocoons are both turtles.
+###Inspect Turtles/Patches
+By right clicking on a turtle/patch, users can observe the agent's attributes and location.
+###Show/Hide Worms
+Hide turtles makes the turtles invisible to the user.  This feature is useful if the user wants to observe what the traits of patches with very high densities of turtles. Turtles will still continue their usual processes, but not be visible to the user.
+Show turtles will make all hidden turtles visible again.
 
 ##Useful Functions:
+Using the following commands in the "observer>" line of the command center will enable the user to have more precise control over the environment they are manipulating. To use one of these functions, first type the one-word command in the observer line, followed by the desired parameters, substituted for the words in italics.
 ###initialize_monitors
-###draw_monitor
-###insertion_region
-###insert_worms
+This command automatically generates population density monitors in the four corners and center of the NetLogo world.
+###draw_monitor *x_low x_high y_low y_high*
+Draws a rectangular population density monitor with corners at (x_low, y_low) (x_low, y_high) (x_high, y_low) and (x_high, y_high). All coordinates need to be integers because they refer to patch coordinates.
+###insertion_region *x_low x_high y_low y_high*
+Draws a rectangular insertion region with corners at *(x_low, y_low), (x_low, y_high), (x_high, y_low) and (x_high, y_high)*. All coordinates need to be integers because they refer to patch coordinates.
+###insert_worms *x y number species_number*
+Inserts *number* worms at location *(x, y)* with the attributes of the species with *species_number*.
 
 
 # THINGS TO NOTICE
