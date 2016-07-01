@@ -905,7 +905,11 @@ worm_population
 worm_population
 0
 500
+<<<<<<< HEAD
+500
+=======
 50
+>>>>>>> 6ee0ba2c232006c6dcf3a8d6e52509b171d114c0
 5
 1
 NIL
@@ -1026,7 +1030,11 @@ BUTTON
 689
 61
 Setup Simulation
-setup\nsetup_sim\nload_agents save_name\nsetup_export
+<<<<<<< HEAD
+setup\nsetup_sim\nload_agents save_name
+=======
+setup_sim\nsetup_export
+>>>>>>> 6ee0ba2c232006c6dcf3a8d6e52509b171d114c0
 NIL
 1
 T
@@ -1496,6 +1504,44 @@ NetLogo 5.3.1
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
+<experiments>
+  <experiment name="experiment" repetitions="3" runMetricsEveryStep="false">
+    <setup>setup
+<<<<<<< HEAD
+setup_sim</setup>
+=======
+setup_sim
+load_agents save_name
+setup_export</setup>
+>>>>>>> 6ee0ba2c232006c6dcf3a8d6e52509b171d114c0
+    <go>go</go>
+    <metric>maxPop</metric>
+  </experiment>
+  <experiment name="experiment" repetitions="1" runMetricsEveryStep="false">
+    <setup>setup
+setup_sim
+load_agents save_name</setup>
+    <go>go</go>
+    <metric>maxPop</metric>
+    <enumeratedValueSet variable="save_number">
+      <value value="1"/>
+      <value value="2"/>
+      <value value="3"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="temperature" repetitions="1" runMetricsEveryStep="false">
+    <setup>setup
+setup_sim
+load_agents save_name</setup>
+    <go>go</go>
+    <metric>maxPop</metric>
+    <enumeratedValueSet variable="save_number">
+      <value value="1"/>
+      <value value="2"/>
+      <value value="3"/>
+    </enumeratedValueSet>
+  </experiment>
+</experiments>
 @#$#@#$#@
 @#$#@#$#@
 default
