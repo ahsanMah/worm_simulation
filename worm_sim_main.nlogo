@@ -303,11 +303,11 @@ end
 
 to collect_data
 
-  if (year = 9) [
-    collect_monthly_data
-  ]
+;  if (year = 9) [
+;    collect_monthly_data
+;  ]
 
-  if (year = 19) [
+  if (year = (number_of_years - 1)) [
     collect_monthly_data
   ]
 end
@@ -333,11 +333,11 @@ to-report check_stopping_conditions
       set pop_data lput max_pop pop_data
       ;export_data
       set max_pop 0
-      report true
+      ;report true
     ]
   ]
 
-  if (year = 30) [
+  if (year = number_of_years) [
     if (ticks mod 365 = 1)[
       set pop_data lput max_pop pop_data
       export_data
@@ -442,7 +442,7 @@ BUTTON
 947
 61
 Setup
-setup\n;setup_sim
+setup\nsetup_export
 NIL
 1
 T
@@ -655,7 +655,7 @@ CHOOSER
 Show:
 Show:
 "pH" "depth" "temperature" "monitor" "turtle density" "insertion points"
-0
+3
 
 TEXTBOX
 287
@@ -1038,6 +1038,17 @@ NIL
 NIL
 1
 
+INPUTBOX
+411
+30
+533
+90
+number_of_years
+0
+1
+0
+Number
+
 @#$#@#$#@
 ## WHAT IS IT?
 
@@ -1067,7 +1078,7 @@ If "Draw" is selected, and "change:" is set to water or highway, then the user c
 
 
 <b>Note</b>: Make sure to not have "Draw" selected at the same time as "Add" or "Select"
-Tip: Drawing slowly will be much more accurate.
+<b>Tip</b>: Drawing slowly will be much more accurate.
 
 ###Select:
 When "Select" is on, clicking and dragging on the NetLogo world will create a box around a selected region. Once drawn, users can modify the parameters of this box in a variety of ways.
