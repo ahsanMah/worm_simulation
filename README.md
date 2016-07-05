@@ -8,7 +8,7 @@ worm_sim_main.nlogo can be opened int NetLogo, which can be downloaded from http
 
 Information on how to use the worm simulator is on the “Info” tab of the NetLogo interface.
 
-Information on how to download and use GIS data is available in the document “How to download GIS data.docx” (work in progress)
+Information on how to download and use GIS data is available in the document “How to download GIS data.docx”
 
 How to use Python Plotter:
 (work in progress)
