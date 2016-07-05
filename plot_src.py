@@ -104,7 +104,9 @@ def draw_hist_err (xlabels, yvals, err_list, legend):
         width = 0.9/len(yvals)
         x_width = 0
         plt.yscale('symlog')
-        plt.xticks(xvals + 0.5, xlabels)
+        plt.xticks(xvals+0.5, xlabels)
+        # Pad margins so that markers don't get clipped by the axes
+        # plt.margins(x=0.075)
         plt.xlabel("Region")
         plt.ylabel("Density in Region")
         colors = ['g','c','m','r','y','b','k']
@@ -204,17 +206,17 @@ def plotBar(params,pos):
         densities = []
         err_list = []
         mon_list = []
-        param_table = {"temperature_tolerance": [0, "Temp","Temperature Tolerance"], "ph_tolerance": [2, "pH", "pH Tolerance"], "Genetic Diversity": 4, "Frequency of random insertions": 6, "Number of Roads": 8}
+        param_table = {"temperature_tolerance": [0, "Temp Levels","Temperature Tolerance"], "ph_tolerance": [2, "pH Levels", "pH Tolerance"], "species_genetic_diversity": [4, "GD", "Genetic Diversity"], "frequency": [6, "Frequency", "Frequency of random insertions"], "num_roads": [8, "Roads", "Number of Roads"]}
         
         plt.subplot(1,2,pos)
         title = param_table[params[2]][2]
-        param_name = param_table[params[2]][1]
+        legend_name = param_table[params[2]][1]
         params[2] = param_table[params[2]][0] #gets the file name index position of the prameter from the param table
        
         densities,err_list,mon_list,legend = getPlotVals(params)
         draw_hist_err(mon_list,densities,err_list, legend)
         plt.title(title)
-        legend = plt.legend(loc='best', shadow=True, fontsize='medium', title =  param_name + " Levels")
+        legend = plt.legend(loc='best', shadow=True, fontsize='medium', title =  legend_name)
 
 def normalize(word): #removes quotation marks  
         return word[1:-1]
