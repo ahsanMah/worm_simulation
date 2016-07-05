@@ -104,9 +104,8 @@ def draw_hist_err (xlabels, yvals, err_list, legend):
         width = 0.9/len(yvals)
         x_width = 0
         plt.yscale('symlog')
-        sub.set_xticks(xvals + 0.5)
-        sub.set_xticklabels(xlabels)
-        plt.xlabel("Region Number")
+        plt.xticks(xvals + 0.5, xlabels)
+        plt.xlabel("Region")
         plt.ylabel("Density in Region")
         colors = ['g','c','m','r','y','b','k']
 
