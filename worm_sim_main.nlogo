@@ -1044,7 +1044,7 @@ INPUTBOX
 533
 90
 number_of_years
-0
+18
 1
 0
 Number
@@ -1063,6 +1063,7 @@ Number
 ##Setting Up a Simulation:
 If parameters and GIS data are located in the proper folders, then pressing the "Setup Simulation" button will load them into the NetLogo world.  Then, to add worms, adjust the sliders to the desired parameters, select the number of worms to add to the simulation, and press the Add button.  If you want to add worms to random locations within a selected region, press "Select" and select an area, then press add. <b>Note</b>: after adding worms, click somewhere within the environment again while "Select" is still pressed in order to deselect the region. Once agents have been added, a simulation can be started by pressing "Go" and the simulation will run until "Go" is pressed again, it has simulated 30 years of invasion, or all of the worms have died. The "starting_day" box controls what day of the starting year the simulation starts on.
 
+<b>Note</b>: Any data collected from the simulation will be appended to the end of the exisiting output files. You will have to manually remove existing files from the 'simulations/{save_name}/output' folder if you want new files.
 
 
 ##Species Controls:
@@ -1112,6 +1113,7 @@ It is reccomended that the user saves the environment every time before they mak
 
 ##Using BehaviorSpace for Multiple Simulations:
 BehaviorSpace is a useful tool in NetLogo to run multiple simulations simultaneously. To run a BehaviorSpace experiment, click on "Tools -> BehaviorSpace". You can either edit the existing experiment, or create your own.  The first box will allow you to choose which variable to change in your simulations, follow the instructions below the box to choose which values are used in the simulations.  If you want to run a simulation multiple times with the same parameters, include the line ["save_number" [1 1 *number_of_runs*]] with the variables.  The following commands must be in the corresponding boxes for a simulation to work properly.
+
 ####Reporters:
 maxPop
 ####Setup commands:

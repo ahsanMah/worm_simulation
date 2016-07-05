@@ -1,0 +1,2 @@
+monTest 3 "ph_tolerance" [-0.1 0.1 0.1]
+monTest 3 "temperature_tolerance" [-0.5 0.0 0.5]

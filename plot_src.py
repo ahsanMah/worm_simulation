@@ -186,67 +186,75 @@ def getPlotVals(usr_input):
         densities = []
         err_list = []
         mon_list = []
-        param_pos = {"Temperature": 0, "pH": 2, "Genetic Diversity": 4, "Frequency of random insertions": 6, "Number of Roads": 8}
 
         folder_name = usr_input[0]
-        param = usr_input[1]
-        idx = param_pos[param]
-        param_val = usr_input[2]
-        inc = usr_input[3]
-        final = usr_input[4]
-        reps= usr_input[5]
+        reps = int(usr_input[1])
+        idx = usr_input[2]
+        val_list = map(convert_to_float,usr_input[3:])
 
-        param_list = []
-
-        while param_val <= final:
-                param_list += [param_val]
+        for param_val in val_list:
                 sim_name = getFileName(folder_name, idx, param_val)
                 yval,err,xlabels = extractFromFile(sim_name,reps)
                 densities.append(yval)
                 err_list.append(err)
-                param_val += inc
 
-        return densities,err_list,xlabels, param_list
-
-
-def askUser(param_ids):
-        save_name = raw_input("Enter the name of the simulation as seen in NetLogo: ")
-        print ("1. Temperature\n2. pH\n3. Genetic Diversity\n4. Frequency of random insertions\n5. Number of Roads")
-        idx = int(raw_input("Select the parameter that was varied: "))
-        param = param_ids[idx]
-        start = float(raw_input("Value of starting parameter: "))
-        inc = float(raw_input("Increment: "))
-        final = float(raw_input("Value of stopping parameter: "))
-        rep = int(raw_input("Repetitions per simulation: "))
-        return [save_name,param,start,inc,final,rep]
+        return densities,err_list,xlabels, val_list
 
 
 def plotBar(params,pos):
         densities = []
         err_list = []
         mon_list = []
-        param_ids = {1: "Temperature", 2: "pH", 3: "Genetic Diversity", 4: "Frequency of random insertions", 5: "Number of Roads"}
+        param_table = {"temperature_tolerance": [0, "Temp","Temperature Tolerance"], "ph_tolerance": [2, "pH", "pH Tolerance"], "Genetic Diversity": 4, "Frequency of random insertions": 6, "Number of Roads": 8}
         
         plt.subplot(1,2,pos)
-        usr_input = params[:2] + map(convert_to_float,params[2:5]) + [int(params[-1])]
-        print usr_input
-        densities,err_list,mon_list,legend = getPlotVals(usr_input)
+        title = param_table[params[2]][2]
+        param_name = param_table[params[2]][1]
+        params[2] = param_table[params[2]][0] #gets the file name index position of the prameter from the param table
+       
+        densities,err_list,mon_list,legend = getPlotVals(params)
         draw_hist_err(mon_list,densities,err_list, legend)
-        plt.title(usr_input[1] + " Tolerance")
-        legend = plt.legend(loc='best', shadow=True, fontsize='medium', title = usr_input[1] + " Levels")
+        plt.title(title)
+        legend = plt.legend(loc='best', shadow=True, fontsize='medium', title =  param_name + " Levels")
 
+def normalize(word): #removes quotation marks  
+        return word[1:-1]
 
+def extractInput(usr_input):
+        param_list = []
+        usr_input = usr_input.replace("[", "",1)
+        usr_input = usr_input.replace("]", "",1)
+        print usr_input
+        if "[" not in usr_input:
+                param_list = usr_input.split()
+                param_list[2] = normalize(param_list[2])
+                print param_list
+        else:
+                usr_input = usr_input.replace("[", "")
+                usr_input = usr_input.replace("]", "")
+                usr_input = usr_input.split()
+                val_list = []
+                start = float(usr_input[3])
+                inc = float(usr_input[4])
+                final = float(usr_input[5])
 
-# usr_input = askUser(param_ids)
-# print usr_input
+                while start <= final:
+                        val_list.append(start)
+                        start += inc
+
+                param_list =  usr_input[:3] + val_list
+                param_list[2] = normalize(param_list[2])
+
+        return param_list
+
 
 pos = 0
-sim_params = csv.reader(open("simParams.csv","rU"))
-sim_params.next()
+sim_params = open("test.txt","r")
 
-for param in sim_params:
+for line in sim_params:
         pos += 1
-        plotBar(param,pos)
-
+        usr_input = line.strip()
+        usr_input = extractInput(usr_input)
+        plotBar(usr_input,pos)
 
 plt.show()
