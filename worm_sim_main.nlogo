@@ -615,7 +615,7 @@ speed
 speed
 0
 1
-0.7
+0.21
 0.01
 1
 NIL
@@ -641,7 +641,7 @@ patch_pH
 patch_pH
 0
 14
-5.1
+7.8
 0.1
 1
 NIL
@@ -690,7 +690,7 @@ CHOOSER
 species_number
 species_number
 1 2 3 4 5
-2
+1
 
 BUTTON
 283
@@ -803,7 +803,7 @@ temperature_difference
 temperature_difference
 -10
 10
--10
+2.5
 0.5
 1
 NIL
@@ -906,7 +906,7 @@ worm_population
 worm_population
 0
 500
-50
+60
 5
 1
 NIL
