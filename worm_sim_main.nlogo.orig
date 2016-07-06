@@ -615,7 +615,7 @@ speed
 speed
 0
 1
-0.21
+0.7
 0.01
 1
 NIL
@@ -641,7 +641,7 @@ patch_pH
 patch_pH
 0
 14
-7.8
+5.1
 0.1
 1
 NIL
@@ -690,7 +690,7 @@ CHOOSER
 species_number
 species_number
 1 2 3 4 5
-1
+2
 
 BUTTON
 283
@@ -803,7 +803,7 @@ temperature_difference
 temperature_difference
 -10
 10
-2.5
+-10
 0.5
 1
 NIL
@@ -906,7 +906,7 @@ worm_population
 worm_population
 0
 500
-60
+50
 5
 1
 NIL
@@ -1038,6 +1038,8 @@ NIL
 NIL
 1
 
+<<<<<<< HEAD
+=======
 INPUTBOX
 411
 30
@@ -1049,6 +1051,7 @@ number_of_years
 0
 Number
 
+>>>>>>> cc31fa92d4d9326e16c2ec28b32fe8b277e5a295
 @#$#@#$#@
 ## WHAT IS IT?
 

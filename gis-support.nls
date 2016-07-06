@@ -21,7 +21,7 @@ to setup_gis
 
   print "Setting up world..."
   gis:set-world-envelope-ds (gis:envelope-of soil_dataset)
-  set road_dataset gis:load-dataset (word "simulations/" save_name "/input/roads/roadmap.shp")
+  set road_dataset gis:load-dataset (word "simulations/" save_name "/input/roads/roadtrl010g.shp")
   gis:apply-coverage soil_dataset "MUSYM" symbol
   ;gis:apply-coverage road_dataset "STATE_CODE" road
   set road_features gis:feature-list-of road_dataset
@@ -106,7 +106,7 @@ to draw_map
 end
 
 to map_patches
- set last_point []
+  set last_point []
   ask patches[
     
     if (table:has-key? ph_map symbol)[
@@ -114,29 +114,29 @@ to map_patches
       let gis_depth (item 1 table:get ph_map symbol)
       let gis_moisture (item 2 table:get ph_map symbol)
       ifelse (gis_ph != "")[
-       ;set pcolor scale-color green gis_ph 14 0
-       set ph gis_ph
-       set soil_depth gis_depth
-       set moisture gis_moisture
-       ]
-       [ set pcolor grey
-         set permeability 0
-         ]
+        ;set pcolor scale-color green gis_ph 14 0
+        set ph gis_ph
+        set soil_depth gis_depth
+        set moisture gis_moisture
+      ]
+      [ set pcolor grey
+        set permeability 0
+      ]
     ]
-       
-   if (symbol = "W")
+    
+    if (symbol = "W")
     [
       set pcolor blue
       set permeability speed_in_water
       set food-here 0
     ]
-;   if (road = 36)
-;   [
-;      set permeability road_speed
-;      set pcolor magenta
-;      set food-here default_food_value
-;   ]
-
+    ;   if (road = 36)
+    ;   [
+    ;      set permeability road_speed
+    ;      set pcolor magenta
+    ;      set food-here default_food_value
+    ;   ]
+    
   ]
   ;show road_vertexlist
   foreach road_vertexlist
@@ -172,7 +172,7 @@ to map_patches
               ;show (not empty? last_point) and (not empty? road_point)
               ;show x-at < x2 and y-at < y2
               
-              while [x-at > x2]
+              while [precision x-at 0 != precision x2 0]
               [
                 ask patch x-at y-at
                 [
@@ -189,7 +189,7 @@ to map_patches
             
           ]
           ;show (not empty? last_point) and (not empty? road_point)
-           set last_point road_point
+          set last_point road_point
         ]
       ]
     ]
