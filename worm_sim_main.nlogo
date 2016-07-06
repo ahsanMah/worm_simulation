@@ -303,11 +303,11 @@ end
 
 to collect_data
 
-  if (year = 9) [
-    collect_monthly_data
-  ]
+;  if (year = 9) [
+;    collect_monthly_data
+;  ]
 
-  if (year = 19) [
+  if (year = number_of_years - 1) [
     collect_monthly_data
   ]
 end
@@ -337,7 +337,7 @@ to-report check_stopping_conditions
     ]
   ]
 
-  if (year = 30) [
+  if (year = number_of_years) [
     if (ticks mod 365 = 1)[
       set pop_data lput max_pop pop_data
       export_data
@@ -1044,7 +1044,7 @@ INPUTBOX
 533
 90
 number_of_years
-18
+3
 1
 0
 Number
