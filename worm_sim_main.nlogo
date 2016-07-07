@@ -1,4 +1,4 @@
-extensions [array csv table gis]
+extensions [array csv table gis profiler]
 __includes["environment.nls" "agents.nls" "gis-support.nls" "save-load-features.nls"]
 
 globals[
@@ -104,8 +104,14 @@ end
 to setup_sim
   print "Loading from simulation files..."
   load_patches save_name
-  ;load_agents save_name
+  load_agents save_name
   ;print "Finished loading environments"
+end
+
+to setup_bs
+  setup
+  setup_sim
+  setup_export
 end
 
 to draw_river
@@ -272,16 +278,18 @@ to simulate_agents
     check_if_hatch
   ]
 
-  ask adults [
-    check_burrow
+  check_burrow
 
-    if not burrow [
+  ask adults [
+
+    if (not burrow and pcolor != blue)[
       update_maturity
       check_reproduction
       move
     ]
     update_thresholds
     check_death
+
   ]
 
 end
@@ -298,14 +306,30 @@ to simulate_environment
       global_temperature)
   ]
 
+  set survival_prob 1
+;  let day_prob 1
+;  let mapped_temp 0
+
+  ;gets cumulative probabilities of the past 3 days
+  foreach prev_days_temp [
+
+;    set mapped_temp precision (? + temp_shift) 1
+;    ifelse table:has-key? temp_table mapped_temp [
+;      set day_prob (item 0 table:get temp_table mapped_temp)
+;    ][ set day_prob (item 0 table:get temp_table ?) ]
+;    set survival_prob survival_prob * day_prob
+
+    set survival_prob survival_prob * (item 0 table:get temp_table ?)
+  ]
+
 end
 
 
 to collect_data
 
-;  if (year = 9) [
-;    collect_monthly_data
-;  ]
+  ;  if (year = 9) [
+  ;    collect_monthly_data
+  ;  ]
 
   if (year = number_of_years - 1) [
     collect_monthly_data
@@ -331,16 +355,14 @@ to-report check_stopping_conditions
   if (year = 20) [
     if (ticks mod 365 = 1)[
       set pop_data lput max_pop pop_data
-      ;export_data
       set max_pop 0
-      report true
+      ;report true
     ]
   ]
 
   if (year = number_of_years) [
     if (ticks mod 365 = 1)[
       set pop_data lput max_pop pop_data
-      export_data
       set max_pop 0
       report true
     ]
@@ -403,8 +425,11 @@ to go
 
   if check_stopping_conditions =  true [
     export_data
+;    profiler:stop          ;; stop profiling
+;    print profiler:report  ;; view the results
+;    profiler:reset         ;; clear the data
     stop
-    ]
+  ]
 
   tick
 end
@@ -439,9 +464,9 @@ ticks
 BUTTON
 875
 28
-947
+957
 61
-Setup
+Initialize
 setup\nsetup_export
 NIL
 1
@@ -604,7 +629,7 @@ CHOOSER
 obstacle_shape
 obstacle_shape
 "circle" "rectangle" "mountain" "monitor"
-0
+1
 
 SLIDER
 281
@@ -641,7 +666,7 @@ patch_pH
 patch_pH
 0
 14
-7.8
+6.9
 0.1
 1
 NIL
@@ -655,7 +680,7 @@ CHOOSER
 Show:
 Show:
 "pH" "depth" "temperature" "monitor" "turtle density" "insertion points"
-0
+4
 
 TEXTBOX
 287
@@ -881,9 +906,9 @@ change:
 5
 
 BUTTON
-953
+968
 28
-1043
+1058
 61
 Load GIS
 setup\nsetup_gis\n
@@ -906,7 +931,7 @@ worm_population
 worm_population
 0
 500
-500
+20
 5
 1
 NIL
@@ -988,9 +1013,9 @@ number_inserted
 Number
 
 BUTTON
-1048
+1068
 28
-1154
+1167
 61
 Hide Worms
 ask turtles [hide-turtle]
@@ -1005,7 +1030,7 @@ NIL
 1
 
 BUTTON
-1161
+1178
 28
 1272
 61
@@ -1027,7 +1052,7 @@ BUTTON
 689
 61
 Setup Simulation
-setup\nsetup_sim\nload_agents save_name\nsetup_export
+setup\nsetup_sim\n;load_agents save_name\nsetup_export\n;profiler:start
 NIL
 1
 T
@@ -1044,7 +1069,7 @@ INPUTBOX
 533
 90
 number_of_years
-5
+15
 1
 0
 Number
@@ -1542,6 +1567,14 @@ setup_export</setup>
       <value value="0.1"/>
       <value value="0"/>
       <value value="-0.1"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="test" repetitions="3" runMetricsEveryStep="true">
+    <setup>setup_bs</setup>
+    <go>go</go>
+    <metric>count turtles</metric>
+    <enumeratedValueSet variable="ph_tolerance">
+      <value value="0"/>
     </enumeratedValueSet>
   </experiment>
 </experiments>

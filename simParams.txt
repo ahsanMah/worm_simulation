@@ -1,2 +1,1 @@
-monTest 15 ["ph_tolerance" 0]
-monTest 3 "temperature_tolerance" [-0.5 0.5 0.5]
+monTest 8 ["ph_tolerance" 0]

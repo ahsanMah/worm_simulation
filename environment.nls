@@ -147,6 +147,7 @@ to calculate_time
     set current_day current_day + 1
     set day_num day_num + 1
     set day_of_month day_of_month + 1
+    set current_day current_day mod 10800
   ]
     if day_of_month > item current_month num_days
     [

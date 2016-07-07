@@ -12,8 +12,8 @@ to load_obstacles [name]
 end
 
 to save_patches [name]
-  save_monitors name
-  save_obstacles name
+  ;save_monitors name
+  ;save_obstacles name
   let filename (word "simulations/" name "/input/environment/mypatches.csv")
   let i min-pxcor
   let j min-pycor
@@ -24,7 +24,7 @@ to save_patches [name]
     [
       ask patch i j
       [
-        let info (list i j ph food-here permeability local_death_threshold temp_diff_here pcolor soil_depth moisture can-insert?)
+        let info (list i j ph food-here permeability local_death_threshold temp_diff_here pcolor soil_depth moisture can-insert? being_monitored monitor_index monitor_size monitor_number)
         file-open filename
         file-print csv:to-row info
         file-close

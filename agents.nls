@@ -15,6 +15,7 @@ globals [
   min_stamina
   agent_size
   burrow
+  survival_prob
   
   species_list
 
@@ -229,13 +230,13 @@ to egest
 end
 
 to check_death  
-  random-seed new-seed
+  ;random-seed new-seed
   set survival_p random-float 1
-    if (survival_p < death_threshold) [
-      ;show death_threshold
-      die
-    ]
-    
+  if (survival_p < death_threshold) [
+    ;show death_threshold
+    die
+  ]
+  
 end
 
 to check_reproduction
@@ -267,24 +268,8 @@ end
 
 to check_burrow
   
-  let survival_prob 1
-  let day_prob 1
-  let mapped_temp 0
-  ;gets cumulative probabilities of the past 3 days
-  foreach prev_days_temp [
-    set mapped_temp precision (? + temp_shift) 1
-    
-    ifelse table:has-key? temp_table mapped_temp [
-      set day_prob (item 0 table:get temp_table mapped_temp)
-    ][ set day_prob (item 0 table:get temp_table ?) ]
-    
-    ;set survival_prob survival_prob * day_prob
-    ;print ?
-    set survival_prob survival_prob * (item 0 table:get temp_table ?)
-  ]
-  
   ;worm starts burrowing if it senses high death chance in the past few days
-  ifelse (survival_prob < 0.7 and pcolor != blue) 
+  ifelse (survival_prob < 0.7) 
   [set burrow true]
   [ set burrow false]
   
