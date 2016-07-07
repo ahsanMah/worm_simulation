@@ -12,7 +12,6 @@ to load_obstacles [name]
 end
 
 to save_patches [name]
-  ;save_monitors name
   ;save_obstacles name
   let filename (word "simulations/" name "/input/environment/mypatches.csv")
   let i min-pxcor
@@ -44,32 +43,40 @@ end
 to load_patches [name]
   ;load_obstacles name
   let filename (word "simulations/" name "/input/environment/mypatches.csv")
-  let data csv:from-file filename
-  set monitor_names but-last (item 0 data)
-  set monitor_number last (item 0 data)
-  set data but-first data
+ 
+  file-open filename
+  let info csv:from-row file-read-line
+  
+  set monitor_names but-last info
+  set monitor_number last info
 
-  foreach (data)
+  while [not file-at-end?]
   [
-    ask patch (item 0 ?) (item 1 ?)
+    set info csv:from-row file-read-line
+    
+    ask patch (item 0 info) (item 1 info)
     [
-      set ph item 2 ?
-      set food-here item 3 ?
-      set permeability item 4 ?
-      set local_death_threshold item 5 ?
-      set temp_diff_here item 6 ?
-      set being_monitored false
-      set pcolor item 7 ?
-      set soil_depth item 8 ?
-      set moisture item 9 ?
-      set can-insert? item 10 ?
-      set being_monitored item 11 ?
-      set monitor_index item 12 ?
-      set monitor_size item 13 ?
+      set ph item 2 info
+      set food-here item 3 info
+      set permeability item 4 info
+      set local_death_threshold item 5 info
+      set temp_diff_here item 6 info
+      set pcolor item 7 info
+      set soil_depth item 8 info
+      set moisture item 9 info
+      set can-insert? item 10 info
+      set being_monitored item 11 info
+      set monitor_index item 12 info
+      set monitor_size item 13 info
     ]
   ]
+  file-close
   print "Loaded patches"
-  ;load_monitors name
+
+  let monitor_list n-values monitor_number [?]
+  foreach monitor_list [update_monitor_area ?]
+  print "Loaded monitors"
+
   calculate_temp
 end
 
@@ -154,53 +161,6 @@ to load_temperature
 
   file-close
 
-end
-
-to save_monitors [name]
-  let filename (word "simulations/" name "/input/environment/mymonitors.csv")
-  let i min-pxcor
-  let j min-pycor
-  carefully [file-delete filename][] ;deletes the file if it exists otherwise does nothing
-  file-open filename
-  file-print csv:to-row monitor_names
-  file-close
-  while [(i <= max-pxcor)]
-  [
-    while [(j <= max-pycor)]
-    [
-      ask patch i j
-      [
-        let info (list i j being_monitored monitor_index monitor_size monitor_number)
-        file-open filename
-        file-print csv:to-row info
-        file-close
-        set j j + 1
-      ]
-    ]
-    
-    set j min-pycor
-    set i i + 1
-  ]
-end
-
-to load_monitors [name]
-  let filename (word "simulations/" name "/input/environment/mymonitors.csv")
-  let data csv:from-file filename
-  set monitor_names item 0 data
-  set data remove-item 0 data
-  foreach (data)
-  [
-    ask patch (item 0 ?) (item 1 ?)
-    [
-      set being_monitored item 2 ?
-      set monitor_index item 3 ?
-      set monitor_size item 4 ?
-    ]
-    set monitor_number item 5 ?
-  ]
-  let monitor_list n-values monitor_number [?]
-  foreach monitor_list [update_monitor_area ?]
-  print "Loaded monitors"
 end
 
 to load_param [filename table]
