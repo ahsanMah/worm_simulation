@@ -279,6 +279,7 @@ to check_burrow
     ][ set day_prob (item 0 table:get temp_table ?) ]
     
     ;set survival_prob survival_prob * day_prob
+    ;print ?
     set survival_prob survival_prob * (item 0 table:get temp_table ?)
   ]
   

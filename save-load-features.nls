@@ -126,11 +126,17 @@ to load_temperature
     set i i + 1
   ]
   let days_since_start 0
+  let row_entry 0
   while [ not file-at-end? ]
   [
     let row (csv:from-row file-read-line)
-    let row_entry (item 1 row)
-    ;show row_entry
+    carefully [set row_entry read-from-string (item 1 row)] ; if input is string, convert to number
+    [set row_entry (item 1 row)]
+    
+    if (row_entry = 0) [ ;since NetLogo probably approximates zero
+      set row_entry row_entry + 0
+      ]
+    
     table:put temperature_table days_since_start row_entry
     set days_since_start days_since_start + 1
   ]

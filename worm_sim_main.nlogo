@@ -434,7 +434,7 @@ GRAPHICS-WINDOW
 1
 1
 ticks
-1000.0
+240.0
 
 BUTTON
 875
@@ -442,7 +442,7 @@ BUTTON
 947
 61
 Setup
-setup\n;setup_sim
+setup\nsetup_export
 NIL
 1
 T
@@ -906,7 +906,7 @@ worm_population
 worm_population
 0
 500
-60
+500
 5
 1
 NIL
@@ -1044,7 +1044,7 @@ INPUTBOX
 533
 90
 number_of_years
-3
+5
 1
 0
 Number
