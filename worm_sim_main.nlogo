@@ -1069,7 +1069,7 @@ INPUTBOX
 533
 90
 number_of_years
-15
+50
 1
 0
 Number
@@ -1569,10 +1569,9 @@ setup_export</setup>
       <value value="-0.1"/>
     </enumeratedValueSet>
   </experiment>
-  <experiment name="test" repetitions="3" runMetricsEveryStep="true">
+  <experiment name="50yr" repetitions="8" runMetricsEveryStep="true">
     <setup>setup_bs</setup>
     <go>go</go>
-    <metric>count turtles</metric>
     <enumeratedValueSet variable="ph_tolerance">
       <value value="0"/>
     </enumeratedValueSet>
