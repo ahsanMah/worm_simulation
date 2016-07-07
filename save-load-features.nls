@@ -18,29 +18,37 @@ to save_patches [name]
   let i min-pxcor
   let j min-pycor
   carefully [file-delete filename] []
+  file-open filename
+  
+  file-print csv:to-row (lput monitor_number monitor_names)
+  
   while [(i <= max-pxcor)]
   [
     while [(j <= max-pycor)]
     [
       ask patch i j
       [
-        let info (list i j ph food-here permeability local_death_threshold temp_diff_here pcolor soil_depth moisture can-insert? being_monitored monitor_index monitor_size monitor_number)
-        file-open filename
+        let info (list i j ph food-here permeability local_death_threshold temp_diff_here pcolor soil_depth moisture can-insert? being_monitored monitor_index monitor_size)
         file-print csv:to-row info
-        file-close
         set j j + 1
       ]
     ]
     set j min-pycor
     set i i + 1
   ]
+  
+  file-close
 
 end
 
 to load_patches [name]
-  load_obstacles name
+  ;load_obstacles name
   let filename (word "simulations/" name "/input/environment/mypatches.csv")
   let data csv:from-file filename
+  set monitor_names but-last (item 0 data)
+  set monitor_number last (item 0 data)
+  set data but-first data
+
   foreach (data)
   [
     ask patch (item 0 ?) (item 1 ?)
@@ -55,10 +63,13 @@ to load_patches [name]
       set soil_depth item 8 ?
       set moisture item 9 ?
       set can-insert? item 10 ?
+      set being_monitored item 11 ?
+      set monitor_index item 12 ?
+      set monitor_size item 13 ?
     ]
   ]
   print "Loaded patches"
-  load_monitors name
+  ;load_monitors name
   calculate_temp
 end
 
