@@ -680,7 +680,7 @@ CHOOSER
 Show:
 Show:
 "pH" "depth" "temperature" "monitor" "turtle density" "insertion points"
-0
+5
 
 TEXTBOX
 287
@@ -1069,7 +1069,7 @@ INPUTBOX
 533
 90
 number_of_years
-50
+20
 1
 0
 Number

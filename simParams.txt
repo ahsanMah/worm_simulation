@@ -1,1 +1,1 @@
-monTest 7 ["ph_tolerance" 0]
+monTest 3 ["ph_tolerance" 0 0.1]
