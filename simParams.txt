@@ -1,1 +1,1 @@
-randomInsertions 1 ["frequency" 5]
+monTest 3 ["ph_tolerance" 0 0.1]

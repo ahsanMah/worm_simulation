@@ -191,7 +191,7 @@ def getPlotVals(usr_input):
 
         folder_name = usr_input[0]
         reps = int(usr_input[1])
-        param = usr_input[2]
+        param = normalize(usr_input[2])
         idx = param_table[param][0] #gets the file name index position of the prameter from the param table
         legend_name = param_table[param][1]
         title = param_table[param][2]
@@ -218,18 +218,15 @@ def getPlotVals(usr_input):
                         densities.append(yval)
                         err_list.append(err)
 
-        
-        
-
         return densities,err_list,xlabels,val_list,legend_name,title
 
 
-def plotBar(params,pos):
+def plotBar(params,plot_count,pos):
         densities = []
         err_list = []
         mon_list = []
         
-        plt.subplot(1,2,pos)
+        plt.subplot((plot_count+1)/2, (plot_count+1)/2,pos)
         densities,err_list,mon_list,legend,legend_name,title = getPlotVals(params)
         draw_hist_err(mon_list,densities,err_list, legend)
         plt.title(title)
@@ -245,10 +242,7 @@ def extractInput(usr_input):
         
         if "[" not in usr_input:
                 param_list = usr_input.split()
-                param_list[2] = normalize(param_list[2])
-                print param_list[2]
-                #add exception for roads
-                
+                                
         else:
                 usr_input = usr_input.replace("[", "")
                 usr_input = usr_input.replace("]", "")
@@ -263,18 +257,23 @@ def extractInput(usr_input):
                         start += inc
 
                 param_list =  usr_input[:3] + val_list
-                param_list[2] = normalize(param_list[2])
 
         return param_list
 
 
+plot_count = 0
 pos = 0
+sim_params = open("simParams.txt","r")
+
+for line in sim_params:
+        plot_count+= 1
+
 sim_params = open("simParams.txt","r")
 
 for line in sim_params:
         pos += 1
         usr_input = line.strip()
         usr_input = extractInput(usr_input)
-        plotBar(usr_input,pos)
+        plotBar(usr_input,plot_count,pos)
 
 plt.show()

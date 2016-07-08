@@ -640,7 +640,7 @@ speed
 speed
 0
 1
-0.7
+0.5
 0.01
 1
 NIL
@@ -652,7 +652,7 @@ INPUTBOX
 403
 90
 save_name
-roadTest
+monTest
 1
 0
 String (reporter)
@@ -715,7 +715,7 @@ CHOOSER
 species_number
 species_number
 1 2 3 4 5
-1
+0
 
 BUTTON
 283
@@ -911,7 +911,7 @@ BUTTON
 1058
 61
 Load GIS
-setup\nsetup_gis\n
+setup_gis\n
 NIL
 1
 T
@@ -931,7 +931,7 @@ worm_population
 worm_population
 0
 500
-20
+50
 5
 1
 NIL
@@ -1007,7 +1007,7 @@ INPUTBOX
 536
 440
 number_inserted
-12
+10
 1
 0
 Number
@@ -1069,7 +1069,7 @@ INPUTBOX
 533
 90
 number_of_years
-20
+10
 1
 0
 Number
@@ -1558,15 +1558,11 @@ NetLogo 5.3.1
 @#$#@#$#@
 <experiments>
   <experiment name="experiment" repetitions="3" runMetricsEveryStep="true">
-    <setup>setup
-setup_sim
-load_agents save_name
-setup_export</setup>
+    <setup>setup_bs</setup>
     <go>go</go>
     <enumeratedValueSet variable="ph_tolerance">
       <value value="0.1"/>
       <value value="0"/>
-      <value value="-0.1"/>
     </enumeratedValueSet>
   </experiment>
   <experiment name="50yr" repetitions="8" runMetricsEveryStep="true">
@@ -1574,6 +1570,79 @@ setup_export</setup>
     <go>go</go>
     <enumeratedValueSet variable="ph_tolerance">
       <value value="0"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="roads" repetitions="8" runMetricsEveryStep="false">
+    <setup>setup_bs</setup>
+    <go>go</go>
+    <enumeratedValueSet variable="save_name">
+      <value value="&quot;roadTest&quot;"/>
+      <value value="&quot;defaultRun&quot;"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="experiment" repetitions="1" runMetricsEveryStep="true">
+    <setup>setup</setup>
+    <go>go</go>
+    <metric>count turtles</metric>
+    <enumeratedValueSet variable="species_number">
+      <value value="2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="change:">
+      <value value="&quot;insertion point&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="ph_tolerance">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="number_inserted">
+      <value value="10"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="starting_day">
+      <value value="150"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Show:">
+      <value value="&quot;insertion points&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="save_name">
+      <value value="&quot;randomInsertions&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="species_genetic_diversity">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="number_of_years">
+      <value value="20"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="obstacle_shape">
+      <value value="&quot;rectangle&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="temperature_tolerance">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="frequency">
+      <value value="5"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="speed">
+      <value value="0.5"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="patch_pH">
+      <value value="6.9"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="temperature_difference">
+      <value value="2.5"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="worm_population">
+      <value value="20"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Random_Insertions?">
+      <value value="true"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="test" repetitions="3" runMetricsEveryStep="true">
+    <setup>setup_bs</setup>
+    <go>go</go>
+    <metric>count turtles</metric>
+    <enumeratedValueSet variable="ph_tolerance">
+      <value value="0"/>
+      <value value="0.1"/>
     </enumeratedValueSet>
   </experiment>
 </experiments>
