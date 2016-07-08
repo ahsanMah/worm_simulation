@@ -640,7 +640,7 @@ speed
 speed
 0
 1
-0.21
+0.7
 0.01
 1
 NIL
@@ -652,7 +652,7 @@ INPUTBOX
 403
 90
 save_name
-monTest
+roadTest
 1
 0
 String (reporter)
@@ -680,7 +680,7 @@ CHOOSER
 Show:
 Show:
 "pH" "depth" "temperature" "monitor" "turtle density" "insertion points"
-5
+0
 
 TEXTBOX
 287

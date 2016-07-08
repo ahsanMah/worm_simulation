@@ -186,34 +186,51 @@ def getFileName(folder_name,param, val):
 def getPlotVals(usr_input):
         densities = []
         err_list = []
-        mon_list = []
+        param_table = {"temperature_tolerance": [0, "Temp Levels","Temperature Tolerance"], "ph_tolerance": [2, "pH Levels", "pH Tolerance"], "species_genetic_diversity": [4, "GD", "Genetic Diversity"], "frequency": [6, "Frequency", "Frequency of random insertions"], "save_name": [-1,"Sim Name","Simulation Comparison"]}
+
 
         folder_name = usr_input[0]
         reps = int(usr_input[1])
-        idx = usr_input[2]
-        val_list = map(convert_to_float,usr_input[3:])
+        param = usr_input[2]
+        idx = param_table[param][0] #gets the file name index position of the prameter from the param table
+        legend_name = param_table[param][1]
+        title = param_table[param][2]
+        
 
-        for param_val in val_list:
-                sim_name = getFileName(folder_name, idx, param_val)
-                yval,err,xlabels = extractFromFile(sim_name,reps)
-                densities.append(yval)
-                err_list.append(err)
+        if idx == -1: #if iterating through save_names 
+                val_list = map(normalize,usr_input[3:])
 
-        return densities,err_list,xlabels, val_list
+                for name in val_list:
+                        sim_name = getFileName(name, 0, 0)
+                        yval,err,xlabels = extractFromFile(sim_name,reps)
+                        densities.append(yval)
+                        err_list.append(err)
+
+        else:
+                if idx == 6:
+                        val_list = map(lambda x: int(x), usr_input[3:])
+                else:
+                        val_list = map(convert_to_float,usr_input[3:])
+
+                for param_val in val_list:
+                        sim_name = getFileName(folder_name, idx, param_val)
+                        yval,err,xlabels = extractFromFile(sim_name,reps)
+                        densities.append(yval)
+                        err_list.append(err)
+
+        
+        
+
+        return densities,err_list,xlabels,val_list,legend_name,title
 
 
 def plotBar(params,pos):
         densities = []
         err_list = []
         mon_list = []
-        param_table = {"temperature_tolerance": [0, "Temp Levels","Temperature Tolerance"], "ph_tolerance": [2, "pH Levels", "pH Tolerance"], "species_genetic_diversity": [4, "GD", "Genetic Diversity"], "frequency": [6, "Frequency", "Frequency of random insertions"], "num_roads": [8, "Roads", "Number of Roads"]}
         
         plt.subplot(1,2,pos)
-        title = param_table[params[2]][2]
-        legend_name = param_table[params[2]][1]
-        params[2] = param_table[params[2]][0] #gets the file name index position of the prameter from the param table
-       
-        densities,err_list,mon_list,legend = getPlotVals(params)
+        densities,err_list,mon_list,legend,legend_name,title = getPlotVals(params)
         draw_hist_err(mon_list,densities,err_list, legend)
         plt.title(title)
         legend = plt.legend(loc='best', shadow=True, fontsize='medium', title =  legend_name)
@@ -229,6 +246,8 @@ def extractInput(usr_input):
         if "[" not in usr_input:
                 param_list = usr_input.split()
                 param_list[2] = normalize(param_list[2])
+                print param_list[2]
+                #add exception for roads
                 
         else:
                 usr_input = usr_input.replace("[", "")
