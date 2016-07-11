@@ -324,7 +324,7 @@ to update_thresholds
     set survival item 0 (table:get ph_table ph)
     ]
 
-  set ph_hazard_rate (0 - ln (survival)) / 3
+  set ph_hazard_rate (0 - ln (survival)) / experiment_days
   
   set ph_factor mortality_fn ph_hazard_rate patch_days
   set age_factor age_mortality_rate * age

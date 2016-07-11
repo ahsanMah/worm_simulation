@@ -274,10 +274,6 @@ end
 
 to simulate_agents
 
-  ask cocoons [
-    check_if_hatch
-  ]
-
   check_burrow
 
   ask adults [
@@ -291,6 +287,11 @@ to simulate_agents
     check_death
 
   ]
+
+  ask cocoons [
+    check_if_hatch
+  ]
+
 
 end
 
