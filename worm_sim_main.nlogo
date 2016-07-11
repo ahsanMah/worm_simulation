@@ -426,9 +426,9 @@ to go
 
   if check_stopping_conditions =  true [
     export_data
-    ;    profiler:stop          ;; stop profiling
-    ;    print profiler:report  ;; view the results
-    ;    profiler:reset         ;; clear the data
+        profiler:stop          ;; stop profiling
+        print profiler:report  ;; view the results
+        profiler:reset         ;; clear the data
     stop
   ]
 
@@ -554,7 +554,7 @@ temperature_tolerance
 temperature_tolerance
 -2
 2
-0.1
+-0.5
 0.1
 1
 NIL
@@ -1031,7 +1031,7 @@ BUTTON
 425
 53
 Setup Simulation
-setup\nsetup_sim\n;load_agents save_name\nsetup_export\n;profiler:start
+profiler:start\nsetup\nsetup_sim\n;load_agents save_name\nsetup_export
 NIL
 1
 T
@@ -1048,7 +1048,7 @@ INPUTBOX
 269
 82
 number_of_years
-10
+20
 1
 0
 Number
@@ -1579,7 +1579,7 @@ NetLogo 5.3.1
   <experiment name="temp" repetitions="3" runMetricsEveryStep="false">
     <setup>setup_bs</setup>
     <go>go</go>
-    <steppedValueSet variable="temperature_tolerance" first="-0.5" step="0.2" last="0.5"/>
+    <steppedValueSet variable="temperature_tolerance" first="-0.5" step="0.5" last="0.5"/>
   </experiment>
 </experiments>
 @#$#@#$#@
