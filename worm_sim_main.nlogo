@@ -2,6 +2,7 @@ extensions [array csv table gis profiler]
 __includes["environment.nls" "agents.nls" "gis-support.nls" "save-load-features.nls"]
 
 globals[
+  bs_run
   species_data
   monthly_data
   output_data
@@ -33,6 +34,7 @@ globals[
 to setup
 
   clear-all
+  set bs_run false
   set year 0
   set ph_table table:make
   set temp_table table:make
@@ -267,7 +269,7 @@ to random_insertions
       let species one-of table:keys species_list
       let spot one-of patches with [can-insert?];fishing_spots
       let number number_inserted
-      add_species [pxcor] of spot [pycor] of spot number species ;(item 0 spot) (item 1 spot) number species
+      add_species [pxcor] of spot [pycor] of spot number species species_genetic_diversity ph_tolerance temperature_tolerance;(item 0 spot) (item 1 spot) population species gd ph_tol temp_tol
     ]
   ]
 end
@@ -401,9 +403,9 @@ to insertion_region [px pxhigh py pyhigh]
   ]
 end
 
-to insert_worms [x y worm_pop spec_num]
-  add_species x y worm_pop spec_num
-end
+;to insert_worms [x y worm_pop spec_num]
+;  add_species x y worm_pop spec_num
+;end
 
 
 to go
@@ -539,7 +541,7 @@ ph_tolerance
 ph_tolerance
 -0.5
 0.5
-0
+-0.5
 0.1
 1
 NIL
@@ -554,7 +556,7 @@ temperature_tolerance
 temperature_tolerance
 -2
 2
--0.5
+-2
 0.1
 1
 NIL
@@ -716,7 +718,7 @@ CHOOSER
 species_number
 species_number
 1 2 3 4 5
-0
+1
 
 BUTTON
 19

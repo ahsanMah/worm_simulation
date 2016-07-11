@@ -92,7 +92,7 @@ to save_agents [name]
   carefully [file-delete filename] []
   ask turtles
   [
-    let info (list xcor ycor parent_breed shape wait_period genetic_diversity reprod_min_temp)
+    let info (list xcor ycor (parent_breed + 1) shape genetic_diversity ph_shift temp_shift)
     file-open filename
     file-print csv:to-row info
     file-close
@@ -110,24 +110,25 @@ to load_agents [name]
   set data csv:from-file filename
   foreach (data)
   [
-    create-adults 1 [
-      setxy item 0 ? item 1 ?
-      set parent_breed item 2 ?
-      set size agent_size
-      set shape item 3 ?
-      set maturation_wait 0
-      set wait_period item 4 ?
-      set stamina 5
-      set genetic_diversity species_genetic_diversity
-      set color (item parent_breed color_list)
-      set death_threshold normal_death_threshold
-      set reprod_min_temp item 6 ?
-      set reprod_max_temp reprod_min_temp + 10
-      set cocoon_rate 0.093
-      set prev_patch ph
-      set patch_days 0
-      set age 0
-    ]
+    add_species (item 0 ?) (item 1 ?) 1 (item 2 ?) (item 3 ?) (item 4 ?) (item 5 ?)
+;    create-adults 1 [
+;      setxy item 0 ? item 1 ?
+;      set parent_breed item 2 ?
+;      set size agent_size
+;      set shape item 3 ?
+;      set maturation_wait 0
+;      ifelse bs_run [set genetic_diversity species_genetic_diversity]
+;      [set genetic_diversity item 4 ?]
+;      set stamina 5
+;      set color (item parent_breed color_list)
+;      set death_threshold normal_death_threshold
+;      set reprod_min_temp one-of [13 14 15 16]
+;      set reprod_max_temp reprod_min_temp + 10
+;      set cocoon_rate 0.093
+;      set prev_patch ph
+;      set patch_days 0
+;      set age 0
+;    ]
   ]
   print "Loaded agents"
 end
