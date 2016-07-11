@@ -1,9 +1,10 @@
 globals [
+  
   age_mortality_rate
-  ;annual globals
   normal_death_threshold max_death_threshold  ;;probability of death
   normal_reproduction_rate  ;;probablity of reproducing
-
+  experiment_days
+  
   ;daily globals
   amount_egested
   consumption-in-period

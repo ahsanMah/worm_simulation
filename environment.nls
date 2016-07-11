@@ -5,7 +5,6 @@ globals [
   year
   global_temperature
   prev_days_temp     ;stores temps for the previous 3 days
-  
 
   current_month
   current_day

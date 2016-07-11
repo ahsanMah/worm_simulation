@@ -50,9 +50,9 @@ to setup
   setup_agents
   print "Done"
   print "Loading parameters..."
-  ;let filename "data/input/pH-Table.csv"
-  load_param (word "simulations/" save_name "/input/parameters/pH-Table.csv") ph_table
-  load_param (word "simulations/" save_name "/input/parameters/temp-Table.csv") temp_table
+
+  load_ph_dependancy (word "simulations/" save_name "/input/parameters/pH-Table.csv") ph_table
+  load_temp_dependancy (word "simulations/" save_name "/input/parameters/temp-Table.csv") temp_table
 
   set-default-shape sides "line"
   recolor_patches

@@ -162,10 +162,23 @@ to load_temperature
 
 end
 
-to load_param [filename table]
+to load_temp_dependancy [filename table]
 
   let data csv:from-file filename
 
+  foreach data[
+    let param item 0 ?
+    let values (but-first ?)
+    table:put table param values
+  ]
+end
+
+to load_ph_dependancy [filename table]
+
+  let data csv:from-file filename
+  set experiment_days first first data ;gets the number of days from the first row
+  set data but-first data
+  
   foreach data[
     let param item 0 ?
     let values (but-first ?)
