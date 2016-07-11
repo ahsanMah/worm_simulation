@@ -136,9 +136,6 @@ to draw_obstacles
       foreach obstacle_list [setup-obstacles ? ]
       recolor-patch
     ]
-    ;update_monitor_area
-    ;recolor_patches
-
 end
 
 to calculate_time

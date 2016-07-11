@@ -41,7 +41,6 @@ to setup
   set report_month 0
   set final_population 0
   set max_pop 0
-  set fishing_spots [ [67.03 242.13] [118.73 214.20] [125.4 162.5] [112.48 289.6] [135.83 175.43] ]
 
   print "Loading temperature data..."
   load_temperature
@@ -630,7 +629,7 @@ CHOOSER
 obstacle_shape
 obstacle_shape
 "circle" "rectangle" "mountain" "monitor"
-1
+0
 
 SLIDER
 17
@@ -667,7 +666,7 @@ patch_pH
 patch_pH
 0
 14
-6.9
+7
 0.1
 1
 NIL
@@ -829,7 +828,7 @@ temperature_difference
 temperature_difference
 -10
 10
-2.5
+3
 0.5
 1
 NIL
@@ -904,7 +903,7 @@ CHOOSER
 change:
 change:
 "pH" "temperature difference" "pH and temperature difference" "highway" "water" "insertion point"
-5
+3
 
 BUTTON
 704
@@ -1048,7 +1047,7 @@ INPUTBOX
 269
 82
 number_of_years
-20
+2
 1
 0
 Number

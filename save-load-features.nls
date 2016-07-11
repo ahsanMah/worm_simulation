@@ -61,6 +61,7 @@ to load_patches [name]
       set permeability item 4 info
       set local_death_threshold item 5 info
       set temp_diff_here item 6 info
+      set temperature global_temperature + temp_diff_here
       set pcolor item 7 info
       set soil_depth item 8 info
       set moisture item 9 info
@@ -76,8 +77,6 @@ to load_patches [name]
   let monitor_list n-values monitor_number [?]
   foreach monitor_list [update_monitor_area ?]
   print "Loaded monitors"
-
-  calculate_temp
 end
 
 to save_agents [name]
