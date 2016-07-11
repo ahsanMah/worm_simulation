@@ -186,7 +186,7 @@ def getFileName(folder_name,param, val):
 def getPlotVals(usr_input):
         densities = []
         err_list = []
-        param_table = {"temperature_tolerance": [0, "Temp Levels","Temperature Tolerance"], "ph_tolerance": [2, "pH Levels", "pH Tolerance"], "species_genetic_diversity": [4, "GD", "Genetic Diversity"], "frequency": [6, "Frequency", "Frequency of random insertions"], "save_name": [-1,"Sim Name","Simulation Comparison"]}
+        param_table = {"temperature_tolerance": [0, "Temp Levels","Temperature Tolerance"], "ph_tolerance": [2, "pH Levels", "pH Tolerance"], "species_genetic_diversity": [4, "GD", "Genetic Diversity"], "insertion_frequency": [6, "Frequency", "Frequency of random insertions"], "save_name": [-1,"Sim Name","Simulation Comparison"]}
 
 
         folder_name = usr_input[0]

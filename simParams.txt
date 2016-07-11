@@ -1,1 +1,4 @@
-monTest 3 ["ph_tolerance" 0 0.1]
+randomInsertions 3 ["insertion_frequency" [0 3 10]]
+ph+Test 3 ["ph_tolerance" [-0.1 0.1 0.1]]
+ph+Test 3 ["temperature_tolerance" [-0.5 0.2 0.5]]
+roadTest 8 ["save_name" "roadTest" "defaultRun"]
