@@ -465,9 +465,9 @@ ticks
 240.0
 
 BUTTON
-611
+537
 20
-693
+619
 53
 Initialize
 setup\nsetup_export
@@ -482,10 +482,10 @@ NIL
 1
 
 BUTTON
-429
+469
 20
-488
-54
+528
+53
 Go
 go
 T
@@ -533,7 +533,7 @@ PENS
 "pen-5" 1.0 0 -5825686 true "" "plotxy day_num count adults with [parent_breed = 4]\nif (day_num = 365) [clear-plot]"
 
 SLIDER
-17
+19
 203
 270
 236
@@ -548,9 +548,9 @@ NIL
 HORIZONTAL
 
 SLIDER
-16
+19
 245
-271
+270
 278
 temperature_tolerance
 temperature_tolerance
@@ -603,10 +603,10 @@ count cocoons
 11
 
 INPUTBOX
-171
-553
-270
-647
+170
+588
+269
+648
 starting_day
 150
 1
@@ -615,9 +615,9 @@ Number
 
 MONITOR
 1169
-23
-1264
-68
+24
+1267
+69
 Daily Temp *C
 global_temperature
 2
@@ -625,7 +625,7 @@ global_temperature
 11
 
 CHOOSER
-18
+20
 603
 166
 648
@@ -635,9 +635,9 @@ obstacle_shape
 0
 
 SLIDER
-17
+19
 322
-271
+270
 355
 speed
 speed
@@ -650,9 +650,9 @@ NIL
 HORIZONTAL
 
 INPUTBOX
-17
+19
 22
-139
+140
 82
 save_name
 pH+Temp
@@ -661,7 +661,7 @@ pH+Temp
 String (reporter)
 
 SLIDER
-19
+20
 703
 270
 736
@@ -676,10 +676,10 @@ NIL
 HORIZONTAL
 
 CHOOSER
-19
-553
+20
+551
 166
-598
+596
 Show:
 Show:
 "pH" "depth" "temperature" "monitor" "turtle density" "insertion points"
@@ -696,7 +696,7 @@ Species Controls
 1
 
 SLIDER
-16
+19
 284
 270
 317
@@ -711,7 +711,7 @@ NIL
 HORIZONTAL
 
 CHOOSER
-18
+19
 115
 270
 160
@@ -723,7 +723,7 @@ species_number
 BUTTON
 19
 443
-96
+102
 476
 Add
 mouse_add_species
@@ -738,10 +738,10 @@ NIL
 1
 
 BUTTON
-493
-20
-603
-53
+170
+551
+269
+584
 Recolor Patches
 recolor_patches
 NIL
@@ -755,10 +755,10 @@ NIL
 1
 
 BUTTON
-19
-788
-142
-822
+20
+783
+143
+817
 Save Environment
 save_patches save_name
 NIL
@@ -772,10 +772,10 @@ NIL
 1
 
 BUTTON
-147
-788
-267
-823
+150
+783
+270
+817
 Load Environment
 load_patches save_name
 NIL
@@ -789,10 +789,10 @@ NIL
 1
 
 BUTTON
-110
-442
-180
-475
+108
+443
+182
+476
 Save
 save_agents save_name
 NIL
@@ -806,10 +806,10 @@ NIL
 1
 
 BUTTON
-195
-442
-271
-475
+187
+443
+270
+476
 Load
 load_agents save_name
 NIL
@@ -823,9 +823,9 @@ NIL
 1
 
 SLIDER
-18
+20
 743
-271
+270
 776
 temperature_difference
 temperature_difference
@@ -838,7 +838,7 @@ NIL
 HORIZONTAL
 
 BUTTON
-21
+20
 509
 102
 542
@@ -858,7 +858,7 @@ BUTTON
 108
 509
 182
-542
+543
 Select
 edit_environment
 T
@@ -875,7 +875,7 @@ BUTTON
 187
 509
 270
-542
+544
 Modify
 recolor-selected
 NIL
@@ -909,9 +909,9 @@ change:
 3
 
 BUTTON
-704
+624
 20
-794
+714
 53
 Load GIS
 setup_gis\n
@@ -926,10 +926,10 @@ NIL
 1
 
 SLIDER
-17
-164
+19
+165
 270
-197
+198
 worm_population
 worm_population
 0
@@ -979,9 +979,9 @@ PENS
 "high" 1.0 0 -7500403 true "" "plot y-high"
 
 SLIDER
-16
+19
 361
-273
+270
 394
 insertion_frequency
 insertion_frequency
@@ -994,9 +994,9 @@ insertion_frequency
 HORIZONTAL
 
 BUTTON
-804
+719
 20
-903
+818
 53
 Hide Worms
 ask turtles [hide-turtle]
@@ -1011,9 +1011,9 @@ NIL
 1
 
 BUTTON
-914
+823
 20
-1008
+917
 53
 Show Worms
 ask turtles[show-turtle]
@@ -1028,11 +1028,11 @@ NIL
 1
 
 BUTTON
-291
+382
 20
-425
+462
 53
-Setup Simulation
+Setup
 profiler:start\nsetup\nsetup_sim\n;load_agents save_name\nsetup_export
 NIL
 1
@@ -1045,9 +1045,9 @@ NIL
 1
 
 INPUTBOX
-147
+148
 22
-269
+270
 82
 number_of_years
 2
@@ -1056,9 +1056,9 @@ number_of_years
 Number
 
 SLIDER
-17
+19
 399
-273
+270
 432
 number_inserted
 number_inserted
