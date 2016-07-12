@@ -541,7 +541,7 @@ ph_tolerance
 ph_tolerance
 -0.5
 0.5
-0.5
+0
 0.1
 1
 NIL
@@ -556,7 +556,7 @@ temperature_tolerance
 temperature_tolerance
 -2
 2
-2
+0
 0.1
 1
 NIL
@@ -718,7 +718,7 @@ CHOOSER
 species_number
 species_number
 1 2 3 4 5
-4
+0
 
 BUTTON
 19
@@ -934,7 +934,7 @@ worm_population
 worm_population
 0
 500
-50
+25
 5
 1
 NIL
@@ -1050,7 +1050,7 @@ INPUTBOX
 270
 82
 number_of_years
-2
+10
 1
 0
 Number
