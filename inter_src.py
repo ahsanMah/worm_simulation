@@ -12,11 +12,15 @@ def getNext (row_index, col_index, table):
 			return (row_index,table[row_index][col_index])
 		row_index += 1
 
-def update_file (filename):
-	data = open(filename, "rU")
+def update_file (file_pathway):
+	data = open(file_pathway, "rU")
 	data_reader = csv.reader(data, dialect = "excel")
 	data_table = []
-	index = 0
+	index = 1
+	name = file_pathway[-12:]
+
+	if name == "ph-Table.csv":
+		data_table.append(data_reader.next()) #gets the number of experiment days from the top row
 
 	for row in data_reader:
 		entry = map(convert_to_float,row) #converts all items to floats
@@ -36,7 +40,7 @@ def update_file (filename):
 				data_table[index][col_index] = prev_val + inc
 		index += 1
 				
-	output = open(filename, "wb")
+	output = open(file_pathway, "wb")
 	data_writer = csv.writer(output)
 
 	for row in data_table:

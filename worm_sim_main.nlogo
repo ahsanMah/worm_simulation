@@ -2,6 +2,7 @@ extensions [array csv table gis profiler]
 __includes["environment.nls" "agents.nls" "gis-support.nls" "save-load-features.nls"]
 
 globals[
+  bs_run
   species_data
   monthly_data
   output_data
@@ -33,6 +34,7 @@ globals[
 to setup
 
   clear-all
+  set bs_run false
   set year 0
   set ph_table table:make
   set temp_table table:make
@@ -41,7 +43,6 @@ to setup
   set report_month 0
   set final_population 0
   set max_pop 0
-  set fishing_spots [ [67.03 242.13] [118.73 214.20] [125.4 162.5] [112.48 289.6] [135.83 175.43] ]
 
   print "Loading temperature data..."
   load_temperature
@@ -51,9 +52,9 @@ to setup
   setup_agents
   print "Done"
   print "Loading parameters..."
-  ;let filename "data/input/pH-Table.csv"
-  load_param (word "simulations/" save_name "/input/parameters/pH-Table.csv") ph_table
-  load_param (word "simulations/" save_name "/input/parameters/temp-Table.csv") temp_table
+
+  load_ph_dependancy (word "simulations/" save_name "/input/parameters/pH-Table.csv") ph_table
+  load_temp_dependancy (word "simulations/" save_name "/input/parameters/temp-Table.csv") temp_table
 
   set-default-shape sides "line"
   recolor_patches
@@ -268,16 +269,12 @@ to random_insertions
       let species one-of table:keys species_list
       let spot one-of patches with [can-insert?];fishing_spots
       let number number_inserted
-      add_species [pxcor] of spot [pycor] of spot number species ;(item 0 spot) (item 1 spot) number species
+      add_species [pxcor] of spot [pycor] of spot number species species_genetic_diversity ph_tolerance temperature_tolerance;(item 0 spot) (item 1 spot) population species gd ph_tol temp_tol
     ]
   ]
 end
 
 to simulate_agents
-
-  ask cocoons [
-    check_if_hatch
-  ]
 
   check_burrow
 
@@ -292,6 +289,11 @@ to simulate_agents
     check_death
 
   ]
+
+  ask cocoons [
+    check_if_hatch
+  ]
+
 
 end
 
@@ -401,9 +403,9 @@ to insertion_region [px pxhigh py pyhigh]
   ]
 end
 
-to insert_worms [x y worm_pop spec_num]
-  add_species x y worm_pop spec_num
-end
+;to insert_worms [x y worm_pop spec_num]
+;  add_species x y worm_pop spec_num
+;end
 
 
 to go
@@ -426,9 +428,9 @@ to go
 
   if check_stopping_conditions =  true [
     export_data
-    ;    profiler:stop          ;; stop profiling
-    ;    print profiler:report  ;; view the results
-    ;    profiler:reset         ;; clear the data
+        profiler:stop          ;; stop profiling
+        print profiler:report  ;; view the results
+        profiler:reset         ;; clear the data
     stop
   ]
 
@@ -539,7 +541,7 @@ ph_tolerance
 ph_tolerance
 -0.5
 0.5
-0
+-0.5
 0.1
 1
 NIL
@@ -554,7 +556,7 @@ temperature_tolerance
 temperature_tolerance
 -2
 2
-0.1
+-2
 0.1
 1
 NIL
@@ -630,7 +632,7 @@ CHOOSER
 obstacle_shape
 obstacle_shape
 "circle" "rectangle" "mountain" "monitor"
-1
+0
 
 SLIDER
 17
@@ -667,7 +669,7 @@ patch_pH
 patch_pH
 0
 14
-6.9
+7
 0.1
 1
 NIL
@@ -716,7 +718,7 @@ CHOOSER
 species_number
 species_number
 1 2 3 4 5
-0
+1
 
 BUTTON
 19
@@ -829,7 +831,7 @@ temperature_difference
 temperature_difference
 -10
 10
-2.5
+3
 0.5
 1
 NIL
@@ -904,7 +906,7 @@ CHOOSER
 change:
 change:
 "pH" "temperature difference" "pH and temperature difference" "highway" "water" "insertion point"
-5
+3
 
 BUTTON
 704
@@ -1031,7 +1033,7 @@ BUTTON
 425
 53
 Setup Simulation
-setup\nsetup_sim\n;load_agents save_name\nsetup_export\n;profiler:start
+profiler:start\nsetup\nsetup_sim\n;load_agents save_name\nsetup_export
 NIL
 1
 T
@@ -1048,7 +1050,7 @@ INPUTBOX
 269
 82
 number_of_years
-10
+2
 1
 0
 Number
@@ -1579,7 +1581,7 @@ NetLogo 5.3.1
   <experiment name="temp" repetitions="3" runMetricsEveryStep="false">
     <setup>setup_bs</setup>
     <go>go</go>
-    <steppedValueSet variable="temperature_tolerance" first="-0.5" step="0.2" last="0.5"/>
+    <steppedValueSet variable="temperature_tolerance" first="-0.5" step="0.5" last="0.5"/>
   </experiment>
 </experiments>
 @#$#@#$#@

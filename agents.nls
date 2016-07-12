@@ -1,9 +1,10 @@
 globals [
+  
   age_mortality_rate
-  ;annual globals
   normal_death_threshold max_death_threshold  ;;probability of death
   normal_reproduction_rate  ;;probablity of reproducing
-
+  experiment_days
+  
   ;daily globals
   amount_egested
   consumption-in-period
@@ -33,8 +34,6 @@ globals [
   subspecies_count
   
   degree_accumulation_needed
-  ph_shift  ;shift in optimum ph due to tolerance
-  temp_shift
   ]
 
 breed [cocoons]
@@ -46,8 +45,6 @@ turtles-own [
   reprod_p    ;probability of reproduction
   
   maturation_wait
-  wait_period ;days taken by cocoon to hatch given optimal temperature considitions
-  wait_days
   hatch_temp  ;minimum temperature required for cocoons to hatch
 
   subspecies_number
@@ -68,6 +65,8 @@ turtles-own [
   cocoon
   prev_patch
   patch_days
+  ph_shift  ;shift in optimum ph due to tolerance
+  temp_shift
   ]
 cocoons-own[
  degree_days 
@@ -87,19 +86,16 @@ to setup_agents
   set counter 0
   set amount_egested 1
   set consumption-in-period 1
-  set ph_shift ph_tolerance
-  set temp_shift temperature_tolerance
   set species_list table:make
   set shape_list (list "red_worm" "cyan_worm" "pink_worm" "orange_worm" "magenta_worm" "violet_worm")
   set color_list (list red cyan pink orange magenta violet)
-  ;foreach species_list [create_species ?]
 end
 
 to mouse_add_species
   ifelse (mouse-down?)
     
     [
-    add_species mouse-xcor mouse-ycor worm_population species_number
+    add_species mouse-xcor mouse-ycor worm_population species_number species_genetic_diversity ph_tolerance temperature_tolerance
     stop
     ]
     [
@@ -112,7 +108,7 @@ to mouse_add_species
        let rand_y (random-float (y-max - y-min)) + y-min
        if ([pcolor] of patch rand_x rand_y != blue and [pcolor] of patch rand_x rand_y != grey)
        [
-       add_species rand_x rand_y 1 species_number
+       add_species rand_x rand_y 1 species_number species_genetic_diversity ph_tolerance temperature_tolerance
        set i i + 1
        ]
       ]
@@ -123,11 +119,21 @@ to mouse_add_species
 end
 
 
-
-to add_species [x y population species_num]
-  let new_species (list species_num species_genetic_diversity ph_tolerance temperature_tolerance population x y)
+to add_species [x y population species_num usr_gd usr_ph_tol usr_temp_tol]
   
-   
+  let gd usr_gd
+  let ph_tol usr_ph_tol
+  let temp_tol usr_temp_tol
+  
+  if bs_run [
+    set gd species_genetic_diversity
+    set ph_tol ph_tolerance
+    set temp_tol temperature_tolerance
+  ]
+  
+  let new_species (list species_num gd ph_tol temp_tol population x y)
+  
+  
   ifelse (table:has-key? species_list species_num) [
     ;create new population with existing settings
     set new_species table:get species_list species_num
@@ -135,8 +141,8 @@ to add_species [x y population species_num]
     set new_species sentence new_species (list population x y)
     
   ] 
-  [ table:put species_list species_num (list species_genetic_diversity ph_tolerance temperature_tolerance)]
-
+  [ table:put species_list species_num (list gd ph_tol temp_tol)]
+  
   ;foreach table:to-list species_list [show ?]
   
   create_species new_species
@@ -167,7 +173,6 @@ to create_species [species]
     set subspecies_number subspecies_count
     set subspecies_count subspecies_count + 1
     set maturation_wait 0;random-normal 91 22
-    set wait_period 15 + random-normal 20 3;simulates a wait period of 15 to 65 days 
     set stamina 5
     set genetic_diversity temp_genetic_diversity ; 0-1 measure of genetic diversity of the species
                                                  ;NOTE --> use genetic diversity to change ph/temp death factors
@@ -177,6 +182,10 @@ to create_species [species]
     set cocoon_rate 0.093
     set prev_patch ph
     set patch_days 0
+    
+    set ph_shift temp_ph_tolerance
+    set temp_shift temp_temperature_tolerance
+    
    ]
 end
 
@@ -212,9 +221,7 @@ to move
   ]
   
   forward speed * permeability / periods-in-day
-
-  ;eat
-  ;check_death
+  
 end
 
 
@@ -254,7 +261,6 @@ to check_reproduction
             set degree_accumulation item (16 - reprod_min_temp) [1300 1200 1100 1000]
             set maturation_wait random-normal 91 22
             set age 0
-            set wait_days 0
             set color (item parent_breed color_list)
             set shape "dot"
           ]
@@ -323,7 +329,7 @@ to update_thresholds
     set survival item 0 (table:get ph_table ph)
     ]
 
-  set ph_hazard_rate (0 - ln (survival)) / 3
+  set ph_hazard_rate (0 - ln (survival)) / experiment_days
   
   set ph_factor mortality_fn ph_hazard_rate patch_days
   set age_factor age_mortality_rate * age
