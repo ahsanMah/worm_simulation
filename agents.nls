@@ -28,6 +28,7 @@ globals [
   temp_start_y
   temp_ph_tolerance
   temp_temperature_tolerance
+  temp_reprod_min
   
   shape_list
   color_list
@@ -95,7 +96,7 @@ to mouse_add_species
   ifelse (mouse-down?)
     
     [
-    add_species mouse-xcor mouse-ycor worm_population species_number species_genetic_diversity ph_tolerance temperature_tolerance
+    add_species mouse-xcor mouse-ycor worm_population species_number species_genetic_diversity ph_tolerance temperature_tolerance 0
     stop
     ]
     [
@@ -108,7 +109,7 @@ to mouse_add_species
        let rand_y (random-float (y-max - y-min)) + y-min
        if ([pcolor] of patch rand_x rand_y != blue and [pcolor] of patch rand_x rand_y != grey)
        [
-       add_species rand_x rand_y 1 species_number species_genetic_diversity ph_tolerance temperature_tolerance
+       add_species rand_x rand_y 1 species_number species_genetic_diversity ph_tolerance temperature_tolerance 0
        set i i + 1
        ]
       ]
@@ -119,26 +120,28 @@ to mouse_add_species
 end
 
 
-to add_species [x y population species_num usr_gd usr_ph_tol usr_temp_tol]
+to add_species [x y population species_num usr_gd usr_ph_tol usr_temp_tol usr_reprod_min]
   
   let gd usr_gd
   let ph_tol usr_ph_tol
   let temp_tol usr_temp_tol
+  let reprod_min usr_reprod_min
   
   if bs_run [
     set gd species_genetic_diversity
     set ph_tol ph_tolerance
     set temp_tol temperature_tolerance
+    set reprod_min 0
   ]
   
-  let new_species (list species_num gd ph_tol temp_tol population x y)
+  let new_species (list species_num gd ph_tol temp_tol reprod_min population x y)
   
   
   ifelse (table:has-key? species_list species_num) [
     ;create new population with existing settings
     set new_species table:get species_list species_num
     set new_species fput species_num new_species
-    set new_species sentence new_species (list population x y)
+    set new_species sentence new_species (list reprod_min population x y)
     
   ] 
   [ table:put species_list species_num (list gd ph_tol temp_tol)]
@@ -157,9 +160,10 @@ to create_species [species]
   set temp_genetic_diversity item 1 species
   set temp_ph_tolerance item 2 species
   set temp_temperature_tolerance item 3 species
-  set temp_population item 4 species
-  set temp_start_x item 5 species
-  set temp_start_y item 6 species
+  set temp_reprod_min item 4 species
+  set temp_population item 5 species
+  set temp_start_x item 6 species
+  set temp_start_y item 7 species
   
   
   
@@ -177,7 +181,9 @@ to create_species [species]
     set genetic_diversity temp_genetic_diversity ; 0-1 measure of genetic diversity of the species
                                                  ;NOTE --> use genetic diversity to change ph/temp death factors
     set death_threshold normal_death_threshold
-    set reprod_min_temp one-of [13 14 15 16]
+    ifelse (temp_reprod_min = 0) [
+      set reprod_min_temp one-of [13 14 15 16]
+    ][set reprod_min_temp temp_reprod_min]
     set reprod_max_temp reprod_min_temp + 10
     set cocoon_rate 0.093
     set prev_patch ph

@@ -269,7 +269,7 @@ to random_insertions
       let species one-of table:keys species_list
       let spot one-of patches with [can-insert?];fishing_spots
       let number number_inserted
-      add_species [pxcor] of spot [pycor] of spot number species species_genetic_diversity ph_tolerance temperature_tolerance;(item 0 spot) (item 1 spot) population species gd ph_tol temp_tol
+      add_species [pxcor] of spot [pycor] of spot number species species_genetic_diversity ph_tolerance temperature_tolerance 0;(item 0 spot) (item 1 spot) population species gd ph_tol temp_tol
     ]
   ]
 end
