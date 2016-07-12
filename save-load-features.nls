@@ -85,7 +85,7 @@ to save_agents [name]
   carefully [file-delete filename] []
   ask turtles
   [
-    let info (list xcor ycor (parent_breed + 1) genetic_diversity ph_shift temp_shift)
+    let info (list xcor ycor (parent_breed + 1) genetic_diversity ph_shift temp_shift reprod_min_temp)
     file-open filename
     file-print csv:to-row info
     file-close
@@ -100,7 +100,7 @@ to load_agents [name]
   set data csv:from-file filename
   foreach (data)
   [
-    add_species (item 0 ?) (item 1 ?) 1 (item 2 ?) (item 3 ?) (item 4 ?) (item 5 ?)
+    add_species (item 0 ?) (item 1 ?) 1 (item 2 ?) (item 3 ?) (item 4 ?) (item 5 ?) (item 6 ?)
   ]
   print "Loaded agents"
 end
