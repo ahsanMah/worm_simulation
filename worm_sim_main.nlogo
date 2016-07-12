@@ -690,16 +690,16 @@ TEXTBOX
 90
 133
 108
-Species Control
+Species Controls
 13
 0.0
 1
 
 SLIDER
-17
-283
-271
-316
+16
+284
+270
+317
 species_genetic_diversity
 species_genetic_diversity
 0
@@ -775,7 +775,7 @@ BUTTON
 147
 788
 267
-821
+823
 Load Environment
 load_patches save_name
 NIL

@@ -391,7 +391,7 @@ to-report anyselected?
   [
     if selected? pxcor pycor
     [
-     set bool true 
+      set bool true 
     ]
   ]
   report bool
