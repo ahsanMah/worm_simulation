@@ -541,7 +541,7 @@ ph_tolerance
 ph_tolerance
 -0.5
 0.5
--0.5
+0.5
 0.1
 1
 NIL
@@ -556,7 +556,7 @@ temperature_tolerance
 temperature_tolerance
 -2
 2
--2
+2
 0.1
 1
 NIL
@@ -718,7 +718,7 @@ CHOOSER
 species_number
 species_number
 1 2 3 4 5
-1
+4
 
 BUTTON
 19

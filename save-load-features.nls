@@ -80,19 +80,12 @@ to load_patches [name]
 end
 
 to save_agents [name]
-  let filename1 (word "simulations/" name "/input/environment/specieslist.csv")
-  let data []
-  foreach table:to-list species_list [ ;converts table into listto store as csv
-    set data lput (sentence item 0 ? item 1 ?) data
-  ]
-  csv:to-file filename1 data
-
   let filename (word "simulations/" name "/input/environment/myagents.csv")
 
   carefully [file-delete filename] []
   ask turtles
   [
-    let info (list xcor ycor (parent_breed + 1) shape genetic_diversity ph_shift temp_shift)
+    let info (list xcor ycor (parent_breed + 1) genetic_diversity ph_shift temp_shift)
     file-open filename
     file-print csv:to-row info
     file-close
@@ -101,34 +94,13 @@ to save_agents [name]
 end
 
 to load_agents [name]
-  let filename1 (word "simulations/" name "/input/environment/specieslist.csv")
   let filename (word "simulations/" name "/input/environment/myagents.csv")
   let data []
-  set data csv:from-file filename1
-  foreach data [table:put species_list item 0 ? (list item 1 ? item 2 ? item 3 ?)]
-  
+
   set data csv:from-file filename
   foreach (data)
   [
     add_species (item 0 ?) (item 1 ?) 1 (item 2 ?) (item 3 ?) (item 4 ?) (item 5 ?)
-;    create-adults 1 [
-;      setxy item 0 ? item 1 ?
-;      set parent_breed item 2 ?
-;      set size agent_size
-;      set shape item 3 ?
-;      set maturation_wait 0
-;      ifelse bs_run [set genetic_diversity species_genetic_diversity]
-;      [set genetic_diversity item 4 ?]
-;      set stamina 5
-;      set color (item parent_breed color_list)
-;      set death_threshold normal_death_threshold
-;      set reprod_min_temp one-of [13 14 15 16]
-;      set reprod_max_temp reprod_min_temp + 10
-;      set cocoon_rate 0.093
-;      set prev_patch ph
-;      set patch_days 0
-;      set age 0
-;    ]
   ]
   print "Loaded agents"
 end
