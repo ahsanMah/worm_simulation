@@ -197,34 +197,35 @@ end
 
 
 to move
-  let bool false
-  if (pcolor != blue) [
+  let water-ahead? false
+  let rock-ahead? false
+  if (pcolor != blue) [ ;if not on water
     right (random 121) - 60
     
-    ;  if ((count (patch-set (patch-ahead (speed * permeability / periods-in-day))) with [pcolor = blue]) > 
-    ;     (count (patch-set (patch-here)) with [pcolor != blue]))
-    ;  [
-    if (patch-ahead (speed * permeability / periods-in-day) != nobody)[ 
+    if (patch-ahead (speed * permeability / periods-in-day) != nobody)[ ;if not on near boundary of the grid
       ask patch-ahead (speed * permeability / periods-in-day) [
         
         if pcolor = blue [
-          set bool true
+          set water-ahead? true
+        ]
+
+        if pcolor = grey [
+          set rock-ahead? true
         ]
       ]
     ]
   ]
   
-  if (bool = true)[
+  if (water-ahead? = true)[
     if (random 100000 <= 99999)
       [
         right 180
       ]
   ]
   
-  if ( count (patch-set (patch-ahead  (speed * permeability / periods-in-day))) with [pcolor = grey]) > 0
-  [
+  if (rock-ahead? = true) [ 
     right 180
-  ]
+    ]
   
   forward speed * permeability / periods-in-day
   
