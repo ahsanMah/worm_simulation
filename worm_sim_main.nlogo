@@ -19,12 +19,8 @@ globals[
   fishing_spots
   xlow
   xhigh
-  x-low
-  x-high
   ylow
   yhigh
-  y-low
-  y-high
   header
   export_file
 
@@ -71,36 +67,25 @@ to initialize_monitors
   print "Done"
 end
 
-to xbounds
-  if count turtles > 0 [
-    ask one-of turtles[
-      set xlow xcor
-      set xhigh xcor
+to calculate_bounds
+
+  if ticks mod 7 = 0 [
+    if count turtles > 0 [
+      ask one-of turtles[
+        set xlow xcor
+        set xhigh xcor
+        set ylow ycor
+        set yhigh ycor
+      ]
+      ask turtles[
+        if xcor < xlow [set xlow xcor]
+        if xcor > xhigh [set xhigh xcor]
+        if ycor < ylow [set ylow ycor]
+        if ycor > yhigh [set yhigh ycor]
+      ]
     ]
-    ask turtles[
-      if xcor < xlow [set xlow xcor]
-      if xcor > xhigh [set xhigh xcor]
-    ]
-    set x-low xlow
-    set x-high xhigh
   ]
 end
-
-to ybounds
-  if count turtles > 0 [
-    ask one-of turtles[
-      set ylow ycor
-      set yhigh ycor
-    ]
-    ask turtles[
-      if ycor < ylow [set ylow ycor]
-      if ycor > yhigh [set yhigh ycor]
-    ]
-    set y-low ylow
-    set y-high yhigh
-  ]
-end
-
 
 to setup_sim
   print "Loading from simulation files..."
@@ -199,7 +184,7 @@ to setup_export
   set export_file (word "simulations/" save_name "/output/" temperature_tolerance "_" ph_tolerance "_" species_genetic_diversity "_" insertion_frequency ".csv")
 
   ;carefully [file-delete export_file][] ;deletes the file if it exists otherwise does nothing
-  if (not file-exists? export_file) [
+  if (not file-exists? export_file) [ ;initializes a file if it doesn't exist
     file-open export_file
     file-print csv:to-row header
     file-close
@@ -255,7 +240,6 @@ to collect_monthly_data
         set monthly_data lput (array:to-list ?) monthly_data
       ]
     ]
-
 
   ]
 
@@ -483,9 +467,9 @@ NIL
 
 BUTTON
 469
-20
+21
 528
-53
+54
 Go
 go
 T
@@ -643,7 +627,7 @@ speed
 speed
 0
 1
-0.5
+0.43
 0.01
 1
 NIL
@@ -954,10 +938,10 @@ NIL
 10.0
 true
 false
-"" "xbounds"
+"" "calculate_bounds"
 PENS
-"high" 1.0 0 -16777216 true "" "plotxy x-low ticks"
-"low" 1.0 0 -7500403 true "" "plotxy x-high ticks"
+"high" 1.0 0 -16777216 true "" "plotxy xlow ticks"
+"low" 1.0 0 -7500403 true "" "plotxy xhigh ticks"
 
 PLOT
 1039
@@ -973,10 +957,10 @@ NIL
 300.0
 true
 false
-"" "ybounds"
+"" ""
 PENS
-"low" 1.0 0 -16777216 true "" "plot y-low"
-"high" 1.0 0 -7500403 true "" "plot y-high"
+"low" 1.0 0 -16777216 true "" "plot ylow"
+"high" 1.0 0 -7500403 true "" "plot yhigh"
 
 SLIDER
 19
