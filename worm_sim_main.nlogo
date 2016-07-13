@@ -265,7 +265,6 @@ to simulate_agents
   ask adults [
 
     if (not burrow and pcolor != blue)[
-      update_maturity
       check_reproduction
       move
     ]

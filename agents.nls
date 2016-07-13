@@ -77,16 +77,9 @@ cocoons-own[
 to setup_agents
   set subspecies_count 0
   set age_mortality_rate 1.0 / 2190 ; Simulates a 6 year life span --> Type 2 survivorship curve
-  set normal_reproduction_rate 0.1
-  set max_death_threshold 40
   set agent_size 4
   set steps-per-ie 5
-  set max_stamina 5
-  set min_stamina 1
   set burrow false
-  set counter 0
-  set amount_egested 1
-  set consumption-in-period 1
   set species_list table:make
   set shape_list (list "red_worm" "cyan_worm" "pink_worm" "orange_worm" "magenta_worm" "violet_worm")
   set color_list (list red cyan pink orange magenta violet)
@@ -231,20 +224,7 @@ to move
   
 end
 
-
-to eat
-
-end
-
-
-to egest
-  set food-consumed-from food-consumed-from - ((1 - amount_egested) * food-consumed-last / steps-per-ie)
-  ;;set food-here food-here + ((1 - amount_egested) * food-consumed-last)
-  set food-consumed-last food-consumed-last / steps-per-ie
-end
-
 to check_death  
-  ;random-seed new-seed
   set survival_p random-float 1
   if (survival_p < death_threshold) [
     ;show death_threshold
@@ -259,7 +239,7 @@ to check_reproduction
     if (global_temperature > reprod_min_temp and pcolor != blue) [
       if (global_temperature < reprod_max_temp)[
         
-        if (maturation_wait < 1) [
+        if (age > maturation_wait) [
           set cocoon cocoon + cocoon_rate
         ]
         
@@ -352,12 +332,6 @@ to update_thresholds
     set death_threshold age_factor
   ]
    
-end
-
-to update_maturity
-    if (maturation_wait > 0) [
-      set maturation_wait maturation_wait - 1
-    ]
 end
 
 ;;hatches temperature is optimum for birth
