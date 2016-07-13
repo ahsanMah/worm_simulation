@@ -1,63 +1,32 @@
 globals [
   
   age_mortality_rate
-  normal_death_threshold max_death_threshold  ;;probability of death
-  normal_reproduction_rate  ;;probablity of reproducing
   experiment_days
   
   ;daily globals
-  amount_egested
-  consumption-in-period
   periods-in-day
-  counter
-  organic-regen
-  steps-per-ie
-  max_stamina
-  min_stamina
   agent_size
   burrow
   survival_prob
   
   species_list
-
-  temp_number
-  temp_genetic_diversity 
-  temp_hatch_temperature
-  temp_population
-  temp_start_x
-  temp_start_y
-  temp_ph_tolerance
-  temp_temperature_tolerance
-  temp_reprod_min
-  
   shape_list
   color_list
   subspecies_count
   
   degree_accumulation_needed
-  ]
+]
 
 breed [cocoons]
 breed [adults]
 
 turtles-own [
-  age
-  survival_p     ;probability of death
-  reprod_p    ;probability of reproduction
-  
+  age 
   maturation_wait
   hatch_temp  ;minimum temperature required for cocoons to hatch
 
   subspecies_number
-  stamina     ;helps simulate starvation
-  time-since-eaten
-  food-consumed-last
-  iseating?
-  cycle-counter
   genetic_diversity
-  max_temp_resist
-  low_temp_resist
-  max_ph_resist
   parent_breed
   death_threshold
   reprod_min_temp
@@ -78,7 +47,6 @@ to setup_agents
   set subspecies_count 0
   set age_mortality_rate 1.0 / 2190 ; Simulates a 6 year life span --> Type 2 survivorship curve
   set agent_size 4
-  set steps-per-ie 5
   set burrow false
   set species_list table:make
   set shape_list (list "red_worm" "cyan_worm" "pink_worm" "orange_worm" "magenta_worm" "violet_worm")
@@ -129,7 +97,6 @@ to add_species [x y population species_num usr_gd usr_ph_tol usr_temp_tol usr_re
   
   let new_species (list species_num gd ph_tol temp_tol reprod_min population x y)
   
-  
   ifelse (table:has-key? species_list species_num) [
     ;create new population with existing settings
     set new_species table:get species_list species_num
@@ -149,14 +116,14 @@ end
 
 to create_species [species]
   
-  set temp_number item 0 species
-  set temp_genetic_diversity item 1 species
-  set temp_ph_tolerance item 2 species
-  set temp_temperature_tolerance item 3 species
-  set temp_reprod_min item 4 species
-  set temp_population item 5 species
-  set temp_start_x item 6 species
-  set temp_start_y item 7 species
+  let temp_number item 0 species
+  let temp_genetic_diversity item 1 species
+  let temp_ph_tolerance item 2 species
+  let temp_temperature_tolerance item 3 species
+  let temp_reprod_min item 4 species
+  let temp_population item 5 species
+  let temp_start_x item 6 species
+  let temp_start_y item 7 species
   
   
   
@@ -170,15 +137,14 @@ to create_species [species]
     set subspecies_number subspecies_count
     set subspecies_count subspecies_count + 1
     set maturation_wait 0;random-normal 91 22
-    set stamina 5
     set genetic_diversity temp_genetic_diversity ; 0-1 measure of genetic diversity of the species
                                                  ;NOTE --> use genetic diversity to change ph/temp death factors
-    set death_threshold normal_death_threshold
+    set death_threshold 0
     ifelse (temp_reprod_min = 0) [
       set reprod_min_temp one-of [13 14 15 16]
     ][set reprod_min_temp temp_reprod_min]
     set reprod_max_temp reprod_min_temp + 10
-    set cocoon_rate 0.093
+    set cocoon_rate 0
     set prev_patch ph
     set patch_days 0
     
@@ -225,7 +191,7 @@ to move
 end
 
 to check_death  
-  set survival_p random-float 1
+  let survival_p random-float 1
   if (survival_p < death_threshold) [
     ;show death_threshold
     die
@@ -343,7 +309,6 @@ to check_if_hatch
   ifelse (degree_days >= degree_accumulation) [
     set breed adults
     set size agent_size
-    set stamina 5
     set shape (item parent_breed shape_list)
   ]
   [check_cocoon_death]

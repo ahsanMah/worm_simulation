@@ -263,20 +263,17 @@ to simulate_agents
   check_burrow
 
   ask adults [
-
     if (not burrow and pcolor != blue)[
       check_reproduction
       move
     ]
     update_thresholds
     check_death
-
   ]
 
   ask cocoons [
     check_if_hatch
   ]
-
 
 end
 
