@@ -24,9 +24,9 @@ turtles-own [
   age 
   maturation_wait
   hatch_temp  ;minimum temperature required for cocoons to hatch
-
   subspecies_number
   genetic_diversity
+  genetic_diversity_factor
   parent_breed
   death_threshold
   reprod_min_temp
@@ -104,7 +104,7 @@ to add_species [x y population species_num usr_gd usr_ph_tol usr_temp_tol usr_re
     set new_species sentence new_species (list reprod_min population x y)
     
   ] 
-  [ table:put species_list species_num (list gd ph_tol temp_tol)]
+  [ table:put species_list species_num (list gd ph_tol temp_tol)]  ;<-- Change this list if you want to record additional/different characteristics
   
   ;foreach table:to-list species_list [show ?]
   
@@ -136,9 +136,10 @@ to create_species [species]
     set shape (item parent_breed shape_list)
     set subspecies_number subspecies_count
     set subspecies_count subspecies_count + 1
-    set maturation_wait 0;random-normal 91 22
-    set genetic_diversity temp_genetic_diversity ; 0-1 measure of genetic diversity of the species
-                                                 ;NOTE --> use genetic diversity to change ph/temp death factors
+    set maturation_wait 0                                                      ;would normally be random-normal 91 22
+    set genetic_diversity temp_genetic_diversity
+    set genetic_diversity_factor random-normal 0 (temp_genetic_diversity / 3)  ; this will be used as a factor to change survival probablities
+                                                                               ;NOTE --> dividing by 3 allows the distribution range to stay within +-1
     set death_threshold 0
     ifelse (temp_reprod_min = 0) [
       set reprod_min_temp one-of [13 14 15 16]
@@ -148,7 +149,7 @@ to create_species [species]
     set prev_patch ph
     set patch_days 0
     
-    set ph_shift temp_ph_tolerance
+    set ph_shift temp_ph_tolerance 
     set temp_shift temp_temperature_tolerance
     
    ]
@@ -191,7 +192,7 @@ to move
 end
 
 to check_death  
-  let survival_p random-float 1
+  let survival_p random-float (1 + genetic_diversity_factor)
   if (survival_p < death_threshold) [
     ;show death_threshold
     die
@@ -259,8 +260,7 @@ to update_thresholds
   let ph_factor 0
   let temp_factor 0
   let age_factor 0
-
-  ;let ph_factor (3 / 42) * ((e ^ (max_ph_resist - ph) ) - 1) ; function ensures that a ph difference of 3 will have a higher death probability
+  
   ;reproduction rate affected by temperature + pH
   set temp_cocoon_rate 0.54 / 7
   

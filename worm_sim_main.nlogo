@@ -204,16 +204,17 @@ end
 to clear_arrays
 
   set species_data []
-  let monitor_idx_list n-values monitor_number [?] ;(?) allows to create a list from 0 to monitor number
-  foreach table:to-list species_list [  ; --> [species_num, [species info] ]
+  let monitor_idx_list n-values monitor_number [?]      ;(?) allows to create a list from 0 to monitor number
+  foreach table:to-list species_list [                  ; --> [species_num, [species info] ]
     let current_species_number item 0 ?
-    let species_info item 1 ?           ;data to be exported from species_list can be changed in add_species function
+    let species_info item 1 ?                           ;data to be exported from species_list can be changed in add_species function
 
-                                        ;n*m matrix of species data for every monitor
-    let species_matrix array:from-list monitor_idx_list  ;n = number of species charcteristics being collected, m = number of monitors
+    let species_matrix array:from-list monitor_idx_list ;m*n matrix of species data for every monitor
+                                                        ;m = number of monitors, n = number of species charcteristics being collected
+                                                        ;matrix-row --> MONTH MONITOR-NAME SPECIES-NUMBER POPULATION DENSITY SPECIES-INFO
     foreach monitor_idx_list [
-      let matrix_row sentence (list report_month (item ? monitor_names) current_species_number 0 0) species_info
-      array:set species_matrix ? array:from-list matrix_row ;resets population, density
+      let matrix_row sentence (list report_month (item ? monitor_names) current_species_number 0 0) species_info ;resets population, density
+      array:set species_matrix ? array:from-list matrix_row
     ]
     set species_data lput species_matrix species_data ;list of matrices
   ]
@@ -623,7 +624,7 @@ speed
 speed
 0
 1
-0.43
+0.5
 0.01
 1
 NIL
@@ -635,7 +636,7 @@ INPUTBOX
 140
 82
 save_name
-pH+Temp
+defaultRun
 1
 0
 String (reporter)
@@ -684,7 +685,7 @@ species_genetic_diversity
 species_genetic_diversity
 0
 1
-0
+0.7
 0.1
 1
 NIL
