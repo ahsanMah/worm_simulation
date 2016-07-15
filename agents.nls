@@ -45,7 +45,7 @@ cocoons-own[
 
 to setup_agents
   set subspecies_count 0
-  set age_mortality_rate 1.0 / 2190 ; Simulates a 6 year life span --> Type 2 survivorship curve
+  set age_mortality_rate 0.001 ;1.0 / 2190 ; Simulates a 6 year life span --> Type 2 survivorship curve
   set agent_size 4
   set burrow false
   set species_list table:make

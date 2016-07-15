@@ -409,9 +409,9 @@ to go
 
   if check_stopping_conditions =  true [
     export_data
-        profiler:stop          ;; stop profiling
-        print profiler:report  ;; view the results
-        profiler:reset         ;; clear the data
+;        profiler:stop          ;; stop profiling
+;        print profiler:report  ;; view the results
+;        profiler:reset         ;; clear the data
     stop
   ]
 
@@ -1014,7 +1014,7 @@ BUTTON
 462
 53
 Setup
-profiler:start\nsetup\nsetup_sim\n;load_agents save_name\nsetup_export
+;profiler:start\nsetup\nsetup_sim\n;load_agents save_name\nsetup_export
 NIL
 1
 T
@@ -1539,7 +1539,7 @@ NetLogo 5.3.1
     <go>go</go>
     <steppedValueSet variable="insertion_frequency" first="0" step="3" last="10"/>
   </experiment>
-  <experiment name="50yr" repetitions="8" runMetricsEveryStep="true">
+  <experiment name="test" repetitions="3" runMetricsEveryStep="true">
     <setup>setup_bs</setup>
     <go>go</go>
     <enumeratedValueSet variable="ph_tolerance">

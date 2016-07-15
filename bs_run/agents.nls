@@ -1,0 +1,326 @@
+globals [
+  
+  age_mortality_rate
+  experiment_days
+  
+  ;daily globals
+  periods-in-day
+  agent_size
+  burrow
+  survival_prob
+  
+  species_list
+  shape_list
+  color_list
+  subspecies_count
+  
+  degree_accumulation_needed
+]
+
+breed [cocoons]
+breed [adults]
+
+turtles-own [
+  age 
+  maturation_wait
+  hatch_temp  ;minimum temperature required for cocoons to hatch
+  subspecies_number
+  genetic_diversity
+  genetic_diversity_factor
+  parent_breed
+  death_threshold
+  reprod_min_temp
+  reprod_max_temp
+  cocoon_rate ;cocoon per day
+  cocoon
+  prev_patch
+  patch_days
+  ph_shift  ;shift in optimum ph due to tolerance
+  temp_shift
+  ]
+cocoons-own[
+ degree_days 
+ degree_accumulation
+]
+
+to setup_agents
+  set subspecies_count 0
+  set age_mortality_rate 0.001 ;1.0 / 2190 ; Simulates a 6 year life span --> Type 2 survivorship curve
+  set agent_size 4
+  set burrow false
+  set species_list table:make
+  set shape_list (list "red_worm" "cyan_worm" "pink_worm" "orange_worm" "magenta_worm" "violet_worm")
+  set color_list (list red cyan pink orange magenta violet)
+end
+
+to mouse_add_species
+  ifelse (mouse-down?)
+    
+    [
+    add_species mouse-xcor mouse-ycor worm_population species_number species_genetic_diversity ph_tolerance temperature_tolerance 0
+    stop
+    ]
+    [
+    if anyselected?
+    [
+      let i 0
+      while [i < worm_population]
+      [
+       let rand_x (random-float (x-max - x-min)) + x-min
+       let rand_y (random-float (y-max - y-min)) + y-min
+       if ([pcolor] of patch rand_x rand_y != blue and [pcolor] of patch rand_x rand_y != grey)
+       [
+       add_species rand_x rand_y 1 species_number species_genetic_diversity ph_tolerance temperature_tolerance 0
+       set i i + 1
+       ]
+      ]
+      stop
+    ]
+    
+    ]
+end
+
+
+to add_species [x y population species_num usr_gd usr_ph_tol usr_temp_tol usr_reprod_min]
+  
+  let gd usr_gd
+  let ph_tol usr_ph_tol
+  let temp_tol usr_temp_tol
+  let reprod_min usr_reprod_min
+  
+  if bs_run [
+    set gd species_genetic_diversity
+    set ph_tol ph_tolerance
+    set temp_tol temperature_tolerance
+    set reprod_min 0
+  ]
+  
+  let new_species (list species_num gd ph_tol temp_tol reprod_min population x y)
+  
+  ifelse (table:has-key? species_list species_num) [
+    ;create new population with existing settings
+    set new_species table:get species_list species_num
+    set new_species fput species_num new_species
+    set new_species sentence new_species (list reprod_min population x y)
+    
+  ] 
+  [ table:put species_list species_num (list gd ph_tol temp_tol)]  ;<-- Change this list if you want to record additional/different characteristics
+  
+  ;foreach table:to-list species_list [show ?]
+  
+  create_species new_species
+  
+  
+end
+
+
+to create_species [species]
+  
+  let temp_number item 0 species
+  let temp_genetic_diversity item 1 species
+  let temp_ph_tolerance item 2 species
+  let temp_temperature_tolerance item 3 species
+  let temp_reprod_min item 4 species
+  let temp_population item 5 species
+  let temp_start_x item 6 species
+  let temp_start_y item 7 species
+  
+  
+  
+ create-adults temp_population[
+    set parent_breed (temp_number - 1)
+    ;move-to one-of patches with [permeability > 0]
+    setxy temp_start_x temp_start_y
+    set size agent_size
+    set age 0
+    set shape (item parent_breed shape_list)
+    set subspecies_number subspecies_count
+    set subspecies_count subspecies_count + 1
+    set maturation_wait 0                                                      ;would normally be random-normal 91 22
+    set genetic_diversity temp_genetic_diversity
+    set genetic_diversity_factor random-normal 0 (temp_genetic_diversity / 3)  ; this will be used as a factor to change survival probablities
+                                                                               ;NOTE --> dividing by 3 allows the distribution range to stay within +-1
+    set death_threshold 0
+    ifelse (temp_reprod_min = 0) [
+      set reprod_min_temp one-of [13 14 15 16]
+    ][set reprod_min_temp temp_reprod_min]
+    set reprod_max_temp reprod_min_temp + 10
+    set cocoon_rate 0
+    set prev_patch ph
+    set patch_days 0
+    
+    set ph_shift temp_ph_tolerance 
+    set temp_shift temp_temperature_tolerance
+    
+   ]
+end
+
+
+to move
+  let water-ahead? false
+  let rock-ahead? false
+  if (pcolor != blue) [ ;if not on water
+    right (random 121) - 60
+    
+    if (patch-ahead (speed * permeability / periods-in-day) != nobody)[ ;if not on near boundary of the grid
+      ask patch-ahead (speed * permeability / periods-in-day) [
+        
+        if pcolor = blue [
+          set water-ahead? true
+        ]
+
+        if pcolor = grey [
+          set rock-ahead? true
+        ]
+      ]
+    ]
+  ]
+  
+  if (water-ahead? = true)[
+    if (random 100000 <= 99999)
+      [
+        right 180
+      ]
+  ]
+  
+  if (rock-ahead? = true) [ 
+    right 180
+    ]
+  
+  forward speed * permeability / periods-in-day
+  
+end
+
+to check_death  
+  let survival_p random-float (1 + genetic_diversity_factor)
+  if (survival_p < death_threshold) [
+    ;show death_threshold
+    die
+  ]
+  
+end
+
+to check_reproduction
+  
+  if not burrow [
+    if (global_temperature > reprod_min_temp and pcolor != blue) [
+      if (global_temperature < reprod_max_temp)[
+        
+        if (age > maturation_wait) [
+          set cocoon cocoon + cocoon_rate
+        ]
+        
+        if (cocoon >= 1)[
+          hatch-cocoons 1 [
+            set degree_accumulation item (16 - reprod_min_temp) [1300 1200 1100 1000]
+            set maturation_wait random-normal 91 22
+            set age 0
+            set color (item parent_breed color_list)
+            set shape "dot"
+          ]
+          set cocoon 0
+        ]
+      ]
+    ]
+  ]
+  
+end
+
+to check_burrow
+  
+  ;worm starts burrowing if it senses high death chance in the past few days
+  ifelse (survival_prob < 0.7) 
+  [set burrow true]
+  [ set burrow false]
+  
+end
+
+to-report mortality_fn [hazard_rate day_number]
+  let mortality_rate 1 - (e ^ ((0 - hazard_rate) * day_number))
+  report mortality_rate
+end
+
+
+;updates probablities of dying and reproducing
+to update_thresholds
+  
+  set age age + 1
+    
+  ifelse (ph = prev_patch) 
+  [set patch_days patch_days + 1]
+  [set patch_days 1]
+  
+  
+  ;resetting all values
+  let survival 0
+  let ph_hazard_rate 0
+  let mortality_rate 0
+  let ph_cocoon_rate 0
+  let temp_cocoon_rate 0
+  let ph_factor 0
+  let temp_factor 0
+  let age_factor 0
+  
+  ;reproduction rate affected by temperature + pH
+  set temp_cocoon_rate 0.54 / 7
+  
+  ;;pH of soil also affects survival + reproduction rate
+  let mapped_ph precision (ph + ph_shift) 1
+  let mapped_temp precision (global_temperature + temp_shift) 1
+  
+  
+  ifelse table:has-key? temp_table mapped_temp [
+    set temp_factor 1 - (item 0 table:get temp_table mapped_temp)
+  ][ set temp_factor 1 - (item 0 table:get temp_table global_temperature) ]
+  
+  ifelse table:has-key? ph_table mapped_ph [
+    set ph_cocoon_rate (item 1 table:get ph_table mapped_ph) / 7
+    set survival item 0 (table:get ph_table mapped_ph) ;gets survival chance from pH table
+  ]
+  [
+    set ph_cocoon_rate (item 1 table:get ph_table ph) / 7
+    set survival item 0 (table:get ph_table ph)
+    ]
+
+  set ph_hazard_rate (0 - ln (survival)) / experiment_days
+  
+  set ph_factor mortality_fn ph_hazard_rate patch_days
+  set age_factor age_mortality_rate * age
+  
+  set cocoon_rate min (list temp_cocoon_rate ph_cocoon_rate)
+  set death_threshold temp_factor + ph_factor
+  
+  if burrow [
+    set death_threshold ph_factor
+  ]
+  
+  if (age mod 365 = 0) [
+    set death_threshold age_factor
+  ]
+   
+end
+
+;;hatches temperature is optimum for birth
+to check_if_hatch
+  if (global_temperature > 0)[
+    set degree_days degree_days + global_temperature
+  ]
+  
+  ifelse (degree_days >= degree_accumulation) [
+    set breed adults
+    set size agent_size
+    set shape (item parent_breed shape_list)
+  ]
+  [check_cocoon_death]
+end
+
+to check_cocoon_death
+  let randNum random-float 1
+  let cocoon_death_thresh item 1 table:get temp_table global_temperature
+  
+  if (randNum > cocoon_death_thresh) [
+    die
+  ]
+end
+
+
