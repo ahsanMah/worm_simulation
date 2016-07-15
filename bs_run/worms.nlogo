@@ -1574,6 +1574,14 @@ NetLogo 5.3.1
     <go>go</go>
     <steppedValueSet variable="temperature_tolerance" first="-2" step="0.5" last="0.5"/>
   </experiment>
+  <experiment name="roadTest" repetitions="20" runMetricsEveryStep="false">
+    <setup>setup_bs</setup>
+    <go>go</go>
+    <enumeratedValueSet variable="save_name">
+      <value value="&quot;roadTest&quot;"/>
+      <value value="&quot;defaultRun&quot;"/>
+    </enumeratedValueSet>
+  </experiment>
 </experiments>
 @#$#@#$#@
 @#$#@#$#@
