@@ -636,7 +636,7 @@ INPUTBOX
 140
 82
 save_name
-roadTest
+defaultRun
 1
 0
 String (reporter)
@@ -1031,7 +1031,7 @@ INPUTBOX
 270
 82
 number_of_years
-20
+10
 1
 0
 Number
@@ -1539,7 +1539,7 @@ NetLogo 5.3.1
     <go>go</go>
     <steppedValueSet variable="insertion_frequency" first="0" step="3" last="10"/>
   </experiment>
-  <experiment name="test" repetitions="8" runMetricsEveryStep="true">
+  <experiment name="test" repetitions="4" runMetricsEveryStep="true">
     <setup>setup_bs</setup>
     <go>go</go>
     <enumeratedValueSet variable="ph_tolerance">
