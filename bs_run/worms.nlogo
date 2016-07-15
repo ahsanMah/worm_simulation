@@ -624,7 +624,7 @@ speed
 speed
 0
 1
-0.2
+0.5
 0.01
 1
 NIL
@@ -1031,7 +1031,7 @@ INPUTBOX
 270
 82
 number_of_years
-10
+25
 1
 0
 Number
@@ -1534,10 +1534,14 @@ NetLogo 5.3.1
 @#$#@#$#@
 @#$#@#$#@
 <experiments>
-  <experiment name="insertions" repetitions="3" runMetricsEveryStep="true">
+  <experiment name="insertions" repetitions="20" runMetricsEveryStep="true">
     <setup>setup_bs</setup>
     <go>go</go>
-    <steppedValueSet variable="insertion_frequency" first="0" step="3" last="10"/>
+    <enumeratedValueSet variable="insertion_frequency">
+      <value value="0"/>
+      <value value="5"/>
+      <value value="10"/>
+    </enumeratedValueSet>
   </experiment>
   <experiment name="test" repetitions="4" runMetricsEveryStep="true">
     <setup>setup_bs</setup>
@@ -1557,7 +1561,10 @@ NetLogo 5.3.1
   <experiment name="ph-1" repetitions="20" runMetricsEveryStep="false">
     <setup>setup_bs</setup>
     <go>go</go>
-    <steppedValueSet variable="ph_tolerance" first="-0.2" step="0.1" last="0"/>
+    <enumeratedValueSet variable="ph_tolerance">
+      <value value="-0.2"/>
+      <value value="0"/>
+    </enumeratedValueSet>
   </experiment>
   <experiment name="temp-2" repetitions="20" runMetricsEveryStep="false">
     <setup>setup_bs</setup>
@@ -1567,7 +1574,9 @@ NetLogo 5.3.1
   <experiment name="ph-2" repetitions="20" runMetricsEveryStep="false">
     <setup>setup_bs</setup>
     <go>go</go>
-    <steppedValueSet variable="ph_tolerance" first="0.1" step="0.1" last="0.2"/>
+    <enumeratedValueSet variable="ph_tolerance">
+      <value value="0.2"/>
+    </enumeratedValueSet>
   </experiment>
   <experiment name="temp-1" repetitions="20" runMetricsEveryStep="false">
     <setup>setup_bs</setup>
