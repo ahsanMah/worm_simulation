@@ -177,7 +177,7 @@ def extractFromFile (filename, reps):
 def getFileName(folder_name,param, val):
         std_name = list("0_0_0_0")
         std_name[param] = str(val)             #changes the parameter value at the correct position  
-        if val == 0 : std_name[param] = str(0) #since Netlogo appends '0' to files instead of '0.0'
+        if str(val)[-1] == "0" : std_name[param] = str(int(val)) #since Netlogo appends '0' to files instead of '0.0'
         file_pathway = "simulations/" + folder_name + "/output/" + "".join(std_name) + ".csv"
         
         return file_pathway
