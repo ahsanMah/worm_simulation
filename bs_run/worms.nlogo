@@ -624,7 +624,7 @@ speed
 speed
 0
 1
-0.5
+0.2
 0.01
 1
 NIL
@@ -636,7 +636,7 @@ INPUTBOX
 140
 82
 save_name
-defaultRun
+roadTest
 1
 0
 String (reporter)
@@ -685,7 +685,7 @@ species_genetic_diversity
 species_genetic_diversity
 0
 1
-0.7
+0
 0.1
 1
 NIL
@@ -1031,7 +1031,7 @@ INPUTBOX
 270
 82
 number_of_years
-10
+20
 1
 0
 Number
@@ -1554,15 +1554,25 @@ NetLogo 5.3.1
       <value value="&quot;defaultRun&quot;"/>
     </enumeratedValueSet>
   </experiment>
-  <experiment name="ph" repetitions="3" runMetricsEveryStep="false">
+  <experiment name="ph-1" repetitions="20" runMetricsEveryStep="false">
     <setup>setup_bs</setup>
     <go>go</go>
-    <steppedValueSet variable="ph_tolerance" first="-0.2" step="0.1" last="0.1"/>
+    <steppedValueSet variable="ph_tolerance" first="-0.2" step="0.1" last="0"/>
   </experiment>
-  <experiment name="temp" repetitions="3" runMetricsEveryStep="false">
+  <experiment name="temp-2" repetitions="20" runMetricsEveryStep="false">
     <setup>setup_bs</setup>
     <go>go</go>
-    <steppedValueSet variable="temperature_tolerance" first="-0.5" step="0.5" last="0.5"/>
+    <steppedValueSet variable="temperature_tolerance" first="1" step="0.5" last="2"/>
+  </experiment>
+  <experiment name="ph-2" repetitions="20" runMetricsEveryStep="false">
+    <setup>setup_bs</setup>
+    <go>go</go>
+    <steppedValueSet variable="ph_tolerance" first="0.1" step="0.1" last="0.2"/>
+  </experiment>
+  <experiment name="temp-1" repetitions="20" runMetricsEveryStep="false">
+    <setup>setup_bs</setup>
+    <go>go</go>
+    <steppedValueSet variable="temperature_tolerance" first="-2" step="0.5" last="0.5"/>
   </experiment>
 </experiments>
 @#$#@#$#@
