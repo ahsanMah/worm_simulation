@@ -129,7 +129,7 @@ Parses the file and returns a list of the max densities of the data file given
 (filename) --> average population, standard errors, x-axis labels
 '''
 def extractFromFile (filename, reps):
-        data = open(filename, "rU")
+        data = open(filename, "rb")
         data_reader = csv.reader(data)
         data_table = {} #temporary table that stores info from files
         xvals = []              #values to be plotted on the x-axis
@@ -177,7 +177,7 @@ def extractFromFile (filename, reps):
 def getFileName(folder_name,param, val):
         std_name = list("0_0_0_0")
         std_name[param] = str(val)             #changes the parameter value at the correct position  
-        if str(val)[-1] == '0' : std_name[param] = str(int(val)) #since Netlogo appends '0' to files instead of '0.0'
+        if val == 0 : std_name[param] = str(0) #since Netlogo appends '0' to files instead of '0.0'
         file_pathway = "simulations/" + folder_name + "/output/" + "".join(std_name) + ".csv"
         
         return file_pathway

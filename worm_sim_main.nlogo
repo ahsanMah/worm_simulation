@@ -685,7 +685,7 @@ species_genetic_diversity
 species_genetic_diversity
 0
 1
-0.7
+0
 0.1
 1
 NIL
@@ -1031,7 +1031,7 @@ INPUTBOX
 270
 82
 number_of_years
-10
+25
 1
 0
 Number
