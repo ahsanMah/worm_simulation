@@ -226,7 +226,7 @@ def plotBar(params,plot_count,pos):
         err_list = []
         mon_list = []
         
-        plt.subplot((plot_count+1)/2, (plot_count+1)/2,pos)
+        plt.subplot((plot_count+1)/2, plot_count,pos)
         densities,err_list,mon_list,legend,legend_name,title = getPlotVals(params)
         draw_hist_err(mon_list,densities,err_list, legend)
         plt.title(title)

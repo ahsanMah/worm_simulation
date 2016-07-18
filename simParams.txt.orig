@@ -1,5 +1,0 @@
-<<<<<<< HEAD
-defaultRun 20 ["temperature_tolerance" [-1 0.5 2]]
-=======
-defaultRun 20 ["ph_tolerance" [-0.2 0.1 0.2]]
->>>>>>> a473166b351a85dbb23f0f3a729526fd3db5f299
