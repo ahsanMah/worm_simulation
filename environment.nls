@@ -55,7 +55,7 @@ patches-own
   soil_depth
   moisture   
   can-insert?          
-  
+  density
 ]
 
 
@@ -221,24 +221,31 @@ to recolor-patch
       if (being_monitored) [set pcolor orange]
     ]
     
-    ifelse (Show: = "turtle density")
-    [
-      if (pcolor != blue and pcolor != grey and pcolor != magenta and count turtles-here > 0)
-        [
-          set pcolor scale-color orange (count turtles-here) 25 0
-        ]
-      ask turtles-here
-        [
-          hide-turtle
-        ]
-    ]
-    [
-      ask turtles-here
-      [
-        show-turtle
-      ]
-    ]
+    if (Show: = "turtle density")
     
+    [ 
+      set pcolor white
+      set density count turtles-here    ;population per square mile 
+                                        ;if density > 1 [show density]
+      if density > 0 [
+      if density >= 200 [
+        set pcolor scale-color red density 700 -150
+      ]
+      
+      if density < 200 [
+        set pcolor scale-color orange density 450 -100 
+      ]
+      
+      if density < 50 [
+        set pcolor scale-color yellow density 150 -55
+      ]
+      
+      if density < 5[
+        set pcolor scale-color green density 15 -3
+      ]
+      
+    ]
+    ]
     if (Show: = "insertion points")
     [
       if (pcolor != blue and pcolor != grey and pcolor != magenta)

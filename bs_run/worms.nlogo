@@ -308,12 +308,28 @@ to simulate_environment
 
 end
 
+to save_heatmap
+
+  ask turtles [hide-turtle]
+
+  let prev Show:
+  set Show: "turtle density"
+  recolor_patches
+  let filename (word "heatmap/" ticks ".png")
+  export-view filename
+  set Show: prev
+  recolor_patches
+
+  ask turtles [show-turtle]
+
+end
+
 
 to collect_data
 
-  ;  if (year = 9) [
-  ;    collect_monthly_data
-  ;  ]
+  if (ticks mod 365 = 0) [
+    save_heatmap
+  ]
 
   if (year = number_of_years - 1) [
     collect_monthly_data
@@ -384,11 +400,6 @@ to insertion_region [px pxhigh py pyhigh]
   ]
 end
 
-;to insert_worms [x y worm_pop spec_num]
-;  add_species x y worm_pop spec_num
-;end
-
-
 to go
 
   ;    let filename (word "movie/" ticks ".png")
@@ -409,9 +420,9 @@ to go
 
   if check_stopping_conditions =  true [
     export_data
-;        profiler:stop          ;; stop profiling
-;        print profiler:report  ;; view the results
-;        profiler:reset         ;; clear the data
+    ;        profiler:stop          ;; stop profiling
+    ;        print profiler:report  ;; view the results
+    ;        profiler:reset         ;; clear the data
     stop
   ]
 
@@ -915,7 +926,7 @@ worm_population
 worm_population
 0
 500
-25
+100
 5
 1
 NIL
@@ -1031,7 +1042,7 @@ INPUTBOX
 270
 82
 number_of_years
-25
+20
 1
 0
 Number
@@ -1534,16 +1545,12 @@ NetLogo 5.3.1
 @#$#@#$#@
 @#$#@#$#@
 <experiments>
-  <experiment name="insertions" repetitions="20" runMetricsEveryStep="true">
+  <experiment name="insertions" repetitions="3" runMetricsEveryStep="true">
     <setup>setup_bs</setup>
     <go>go</go>
-    <enumeratedValueSet variable="insertion_frequency">
-      <value value="0"/>
-      <value value="5"/>
-      <value value="10"/>
-    </enumeratedValueSet>
+    <steppedValueSet variable="insertion_frequency" first="0" step="3" last="10"/>
   </experiment>
-  <experiment name="test" repetitions="4" runMetricsEveryStep="true">
+  <experiment name="test" repetitions="3" runMetricsEveryStep="true">
     <setup>setup_bs</setup>
     <go>go</go>
     <enumeratedValueSet variable="ph_tolerance">
@@ -1558,38 +1565,15 @@ NetLogo 5.3.1
       <value value="&quot;defaultRun&quot;"/>
     </enumeratedValueSet>
   </experiment>
-  <experiment name="ph-1" repetitions="20" runMetricsEveryStep="false">
+  <experiment name="ph" repetitions="3" runMetricsEveryStep="false">
     <setup>setup_bs</setup>
     <go>go</go>
-    <enumeratedValueSet variable="ph_tolerance">
-      <value value="-0.2"/>
-      <value value="0"/>
-    </enumeratedValueSet>
+    <steppedValueSet variable="ph_tolerance" first="-0.2" step="0.1" last="0.1"/>
   </experiment>
-  <experiment name="temp-2" repetitions="20" runMetricsEveryStep="false">
+  <experiment name="temp" repetitions="3" runMetricsEveryStep="false">
     <setup>setup_bs</setup>
     <go>go</go>
-    <steppedValueSet variable="temperature_tolerance" first="1" step="0.5" last="2"/>
-  </experiment>
-  <experiment name="ph-2" repetitions="20" runMetricsEveryStep="false">
-    <setup>setup_bs</setup>
-    <go>go</go>
-    <enumeratedValueSet variable="ph_tolerance">
-      <value value="0.2"/>
-    </enumeratedValueSet>
-  </experiment>
-  <experiment name="temp-1" repetitions="20" runMetricsEveryStep="false">
-    <setup>setup_bs</setup>
-    <go>go</go>
-    <steppedValueSet variable="temperature_tolerance" first="-2" step="0.5" last="0.5"/>
-  </experiment>
-  <experiment name="roadTest" repetitions="20" runMetricsEveryStep="false">
-    <setup>setup_bs</setup>
-    <go>go</go>
-    <enumeratedValueSet variable="save_name">
-      <value value="&quot;roadTest&quot;"/>
-      <value value="&quot;defaultRun&quot;"/>
-    </enumeratedValueSet>
+    <steppedValueSet variable="temperature_tolerance" first="-0.5" step="0.5" last="0.5"/>
   </experiment>
 </experiments>
 @#$#@#$#@

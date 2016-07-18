@@ -308,12 +308,28 @@ to simulate_environment
 
 end
 
+to save_heatmap
+
+  ask turtles [hide-turtle]
+
+  let prev Show:
+  set Show: "turtle density"
+  recolor_patches
+  let filename (word "heatmap/" ticks ".png")
+  export-view filename
+  set Show: prev
+  recolor_patches
+
+  ask turtles [show-turtle]
+
+end
+
 
 to collect_data
 
-  ;  if (year = 9) [
-  ;    collect_monthly_data
-  ;  ]
+  if (ticks mod 365 = 0) [
+    save_heatmap
+  ]
 
   if (year = number_of_years - 1) [
     collect_monthly_data
@@ -384,11 +400,6 @@ to insertion_region [px pxhigh py pyhigh]
   ]
 end
 
-;to insert_worms [x y worm_pop spec_num]
-;  add_species x y worm_pop spec_num
-;end
-
-
 to go
 
   ;    let filename (word "movie/" ticks ".png")
@@ -409,9 +420,9 @@ to go
 
   if check_stopping_conditions =  true [
     export_data
-;        profiler:stop          ;; stop profiling
-;        print profiler:report  ;; view the results
-;        profiler:reset         ;; clear the data
+    ;        profiler:stop          ;; stop profiling
+    ;        print profiler:report  ;; view the results
+    ;        profiler:reset         ;; clear the data
     stop
   ]
 
@@ -664,7 +675,7 @@ CHOOSER
 Show:
 Show:
 "pH" "depth" "temperature" "monitor" "turtle density" "insertion points"
-0
+4
 
 TEXTBOX
 23
@@ -915,7 +926,7 @@ worm_population
 worm_population
 0
 500
-25
+100
 5
 1
 NIL
@@ -1031,7 +1042,7 @@ INPUTBOX
 270
 82
 number_of_years
-25
+20
 1
 0
 Number

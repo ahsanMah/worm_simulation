@@ -2,9 +2,10 @@
 
 rm -R simulations/defaultRun/output/*
 rm -R simulations/roadTest/output/*
+rm -R heatmap/*
 
 java -Xmx2048m -Dfile.encoding=UTF-8 -cp dep/NetLogo.jar \
   org.nlogo.headless.Main \
   --model worms.nlogo \
-  --experiment ph-2 \
+  --experiment ph-3 \
   --threads 3

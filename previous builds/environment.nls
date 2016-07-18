@@ -1,0 +1,557 @@
+
+globals [
+  ;;annual globals
+  day_num ;;day number
+  year
+  global_temperature
+  prev_days_temp     ;stores temps for the previous 3 days
+
+  current_month
+  current_day
+  next_month
+  num_days
+  temperatures
+  day_of_month
+  
+  monitor_names
+  monitor_number
+  obstacle
+  obstacle_list
+  temp_arr
+  speed_in_water
+  road_speed
+  patch_area
+  
+  temp_shape
+  temp_size
+  temp_x
+  temp_y
+  temp_pH
+  temp_movable
+  
+  selected
+  
+  x-min
+  x-max
+  y-min
+  y-max
+  
+  ]
+
+breed [sides side]
+
+patches-own
+[
+  ph                     ;pH values ranging from 0-14
+  food-here              ;amount of food on this patch
+  permeability           ;0 - 1, 0 being completely impermeable, 1 meaning complete freedom of movement
+  local_death_threshold
+  food-consumed-from
+  temp_diff_here
+  temperature
+  being_monitored
+  monitor_size
+  monitor_index
+  soil_depth
+  moisture   
+  can-insert?          
+  
+]
+
+
+
+
+to setup_environment
+  
+  set day_num starting_day
+  set year 0
+  set periods-in-day 1;;0
+  set speed_in_water 0.4
+  set road_speed 2
+  set default_food_value 5000
+  
+  ;set temperatures (list January February March April May June July August September October November December)
+  ;  ;set temperatures (list -5 -4 1 7 13 18 21 20 15 9 4 -2)
+  set num_days (list 31 28 31 30 31 30 31 31 30 31 30 31)
+  set current_month 0
+  let var starting_day
+  set monitor_number 0
+  set monitor_names []
+  set patch_area (max-pxcor * max-pycor) / 100
+  
+  while [var > item current_month num_days]
+  [
+    set var var - item current_month num_days
+    set current_month current_month + 1    
+  ]
+  
+  set day_of_month var ;(var + (item ((current_month - 1) mod 12) num_days))
+  set global_temperature table:get temperature_table starting_day
+  set prev_days_temp (list global_temperature global_temperature global_temperature)
+  set current_day starting_day
+  ;calculate_temp ;uncomment this if you want to have temperature vary between patches
+  
+  ;array used to temporarily store obstacle parameters
+  set obstacle n-values 6 [0]
+  
+  ;print obstacle
+  set obstacle_list []
+  
+  ask patches
+  [
+    set permeability 1
+    set ph 7
+    set temp_diff_here 0
+    set being_monitored false
+    set monitor_index -1
+    setup-initial-food
+    set soil_depth 200
+    set can-insert? false
+    recolor-patch
+    
+  ]
+  
+end
+
+to calculate_temp
+  ask patches
+  [
+    set temperature global_temperature + temp_diff_here
+  ]
+;    set temperature (4 * var * (180 - var)) / (40500 - var * (180 - var))
+;    set temperature temperature * max_temperature ;scales temperature to real world values
+
+end
+
+to recolor_patches
+  ask patches
+  [
+   recolor-patch 
+  ]
+end
+
+to draw_obstacles
+    ask patches [
+      foreach obstacle_list [setup-obstacles ? ]
+      recolor-patch
+    ]
+end
+
+to calculate_time
+  
+  if (ticks mod (periods-in-day) = 0) [
+    set current_day current_day + 1
+    set day_num day_num + 1
+    set day_of_month day_of_month + 1
+    set current_day current_day mod 10800
+  ]
+    if day_of_month > item current_month num_days
+    [
+      set current_month (current_month + 1) mod 12
+      set report_month report_month + 1
+      set day_of_month 1
+      ;show current_month
+  ]
+  
+  if (day_num = 366) [
+    set year year + 1
+    set day_num 1 ;;reset for every year
+  ]
+  
+
+  end
+
+to setup-initial-food
+;  let setup-patch one-of patches
+;  if (distancexy 0 60) < 30
+;  [
+;    set food-here 400
+;  ]
+;
+;  let setup-patch2 one-of patches
+;  if (distancexy 0 -60) < 30
+;  [
+;    set food-here 400
+;  ]
+
+;set food-here (random 251 + 250)
+  set food-here default_food_value
+end
+
+to recolor-patch
+  if (pcolor != blue and pcolor != grey and pcolor != magenta)
+  [
+    
+    if (Show: = "pH")
+    [
+      if (ph = 7)
+      [
+        set pcolor white 
+      ]
+      if (ph > 7)
+      [
+        set pcolor scale-color yellow ph 16 7 
+      ]
+      if (ph < 7)
+      [
+        set pcolor scale-color green ph 3 7
+      ]
+    ]
+    if (Show: = "depth")
+    [
+      set pcolor scale-color brown soil_depth 350 0
+    ]
+    if (Show: = "temperature")
+    [
+      if (temp_diff_here = 0)
+      [
+        set pcolor white
+      ]
+      if (temp_diff_here > 0)
+      [
+        set pcolor scale-color red temp_diff_here 10 0 
+      ]
+      if (temp_diff_here < 0)
+      [
+        set pcolor scale-color violet temp_diff_here -10 0
+      ]
+    ]
+    
+    if (Show: = "monitor") [
+      if (being_monitored) [set pcolor orange]
+    ]
+    
+    ifelse (Show: = "turtle density")
+    [
+      if (pcolor != blue and pcolor != grey and pcolor != magenta and count turtles-here > 0)
+        [
+          set pcolor scale-color orange (count turtles-here) 25 0
+        ]
+      ask turtles-here
+        [
+          hide-turtle
+        ]
+    ]
+    [
+      ask turtles-here
+      [
+        show-turtle
+      ]
+    ]
+    
+    if (Show: = "insertion points")
+    [
+      if (pcolor != blue and pcolor != grey and pcolor != magenta)
+      [
+        ifelse (can-insert?)
+        [
+          set pcolor orange
+        ]
+        [
+          set pcolor white
+        ]
+      ]
+    ]
+    
+  ]
+end
+
+
+to change_speed
+  ask patches
+  [
+   if (permeability = 0.05) 
+   [
+    set permeability speed_in_water 
+   ]
+  ]
+end
+
+to edit_environment
+  if mouse-down? [
+    ifelse selected? mouse-xcor mouse-ycor
+    [
+      deselect
+    ]
+    [
+      handle-select
+    ]
+    
+  ]
+  display
+end
+
+to recolor-selected
+
+  if (obstacle_shape = "rectangle")[
+  ask patches
+  [
+   if selected? pxcor pycor
+   [
+    if (change: = "pH" or change: = "pH and temperature difference")[set ph patch_ph]
+    if (change: = "temperature difference" or change: = "pH and temperature difference")[set temp_diff_here temperature_difference]
+    if (change: = "insertion point" and pcolor != blue) [set can-insert? true]
+    recolor-patch
+   ] 
+  ]
+  ]
+  
+  if (obstacle_shape = "circle")
+  [
+    adjust-sides
+    let mt_size min (list (x-max - x-min) (y-max - y-min)) / 2
+    set temp_x (x-max - x-min) / 2 + x-min
+    set temp_y (y-max - y-min) / 2 + y-min
+    ask patches
+    [
+      if selected? pxcor pycor and (distancexy temp_x temp_y) < mt_size
+      [ 
+        if (change: = "pH" or change: = "pH and temperature difference")[set ph patch_ph]
+        if (change: = "temperature difference" or change: = "pH and temperature difference")[set temp_diff_here temperature_difference]
+        if (change: = "insertion point" and pcolor != blue) [set can-insert? true]
+        recolor-patch
+      ]
+    ]
+      
+  ]
+  
+  if (obstacle_shape = "mountain")
+  [
+    adjust-sides
+    let mt_size min (list (x-max - x-min) (y-max - y-min)) / 2
+    set temp_x (x-max - x-min) / 2 + x-min
+    set temp_y (y-max - y-min) / 2 + y-min
+    ask patches
+    [
+      if selected? pxcor pycor and (distancexy temp_x temp_y) < mt_size
+      [
+        if (change: = "pH" or change: = "pH and temperature difference")[set ph (precision (ph - ((ph - patch_ph) / mt_size) * (mt_size - distancexy temp_x temp_y) ) 1)]
+        if (change: = "temperature difference" or change: = "pH and temperature difference")[set temp_diff_here precision (temp_diff_here + ((temperature_difference) / mt_size) * (mt_size - distancexy temp_x temp_y)) 1]
+        recolor-patch
+      ]
+    ]
+  ]
+    
+    if (obstacle_shape = "monitor")
+    [
+      ask patches
+      [
+        if selected? pxcor pycor
+        [
+          set being_monitored true
+          set monitor_index monitor_number
+          set monitor_size temp_size
+          recolor-patch
+        ]
+        
+      ]
+      update_monitor_area monitor_number
+      set monitor_number monitor_number + 1
+  ]
+end
+
+to draw_monitor [xmin xmax ymin ymax name]
+  name_monitor name
+   
+  ask patches
+  [
+    if (pxcor >= xmin and pxcor <= xmax and pycor >= ymin and pycor <= ymax)
+      [
+        set being_monitored true
+        set monitor_index monitor_number
+        set monitor_size temp_size
+        recolor-patch
+      ]
+  ]
+  update_monitor_area monitor_number
+  set monitor_number monitor_number + 1
+end
+
+to handle-select
+  let old-x mouse-xcor
+  let old-y mouse-ycor
+  while [mouse-down?]
+  [
+    select old-x old-y mouse-xcor mouse-ycor
+    display
+  ]
+  if not any? selected [ deselect ]
+end
+
+to adjust-sides 
+  set y-max max [ycor] of sides
+  set y-min min [ycor] of sides
+  set x-max max [xcor] of sides
+  set x-min min [xcor] of sides
+end
+
+to-report anyselected?
+  let bool false
+  ask patches
+  [
+    if selected? pxcor pycor
+    [
+      set bool true 
+    ]
+  ]
+  report bool
+end
+
+to-report selected? [x y]
+  if not any? sides [ report false ]
+  adjust-sides  
+  report x >= x-min and x <= x-max and y >= y-min and y <= y-max
+end
+
+to select [x1 y1 x2 y2]
+  deselect
+  make-side x1 y1 x2 y1
+  make-side x1 y1 x1 y2
+  make-side x1 y2 x2 y2
+  make-side x2 y1 x2 y2
+  set selected patches with [selected? pxcor pycor]
+  
+end
+
+to deselect
+  ask sides [die]
+  set selected no-patches
+end
+
+to make-side [x1 y1 x2 y2]
+  create-sides 1 [
+    set color gray
+    setxy (x1 + x2) / 2
+          (y1 + y2) / 2
+    facexy x1 y1
+    set size 2 * distancexy x1 y1
+  ]
+end
+
+to setup-obstacles [one_obstacle]
+  ;if obstacle parameters given
+
+  if (item 0 one_obstacle != 0) [
+    ;looks at items in the array to setup the obstacle
+
+    set temp_shape item 0 one_obstacle
+    set temp_size item 1 one_obstacle
+    set temp_x item 2 one_obstacle
+    set temp_y item 3 one_obstacle
+    set temp_pH item 4 one_obstacle
+    set temp_movable item 5 one_obstacle
+
+
+    if temp_shape = "mountain"
+    [
+      if (distancexy temp_x temp_y) < temp_size 
+      [
+        if (permeability != speed_in_water and permeability != road_speed)
+        [
+          set permeability 1
+        ]
+        set ph (ph - ((ph - patch_ph) / temp_size) * (temp_size - distancexy temp_x temp_y) )
+        set temp_diff_here (temp_diff_here + ((temperature_difference) / temp_size) * (temp_size - distancexy temp_x temp_y))
+      ]
+    ]
+    
+    if temp_shape = "lake"
+    [
+      if (distancexy temp_x temp_y) < temp_size 
+      [
+        set permeability speed_in_water
+        set food-here 0
+        set ph 7
+      ]
+    ]
+    
+    
+    if temp_shape = "square"
+    [
+      if pxcor >= temp_x - temp_size and pxcor <= temp_x + temp_size and pycor >= temp_y - temp_size and pycor <= temp_y + temp_size
+      [
+         set permeability speed_in_water
+         set food-here 0
+      ]
+    ]
+
+    if temp_shape = "horizontal-line"
+    [
+      if distancexy temp_x temp_y <= temp_size and temp_y = pycor
+      [
+        set permeability speed_in_water
+        set food-here 0
+      ]
+    ]
+    
+    if temp_shape = "vertical-line"
+    [
+      if distancexy temp_x temp_y <= temp_size and temp_x = pxcor
+      [
+          set permeability speed_in_water
+          set food-here 0
+      ]
+    ]
+    
+    if temp_shape = "monitor"
+    [
+      if (distancexy temp_x temp_y) < temp_size 
+        [
+
+        ]
+    ]
+
+  ]
+end
+
+to name_monitor [name]
+  set monitor_names lput name monitor_names 
+end
+
+to change_monitor_name [idx name]
+  set monitor_names replace-item idx monitor_names name
+end
+
+
+to update_monitor_area [index]
+  set area_list lput ((count patches with [monitor_index = index and pcolor != blue and pcolor != grey]) / patch_area) area_list
+end
+
+to collect_monitor_data
+    if (being_monitored) [
+      let patch_population 0
+      
+      foreach species_data [
+        set patch_population (count turtles-here with [parent_breed = ((array:item (array:item ? monitor_index) 2)  - 1)])
+        let area item monitor_index area_list
+        array:set (array:item ? monitor_index) 3 ((array:item (array:item ? monitor_index) 3) + patch_population) ;updates (increments) species populations
+        array:set (array:item ? monitor_index) 4 ((array:item (array:item ? monitor_index) 3) / area)     ;updates density 
+      ]
+    ]
+  
+end
+
+to default-insertions
+  ;; TAKE OUT THIS LINE OF CODE LATER
+  ask patch 67 242
+  [
+    set can-insert? true
+  ]
+  ask patch 118 214
+  [
+    set can-insert? true
+  ]
+    ask patch 125 162
+  [
+    set can-insert? true
+  ]
+    ask patch 112 289
+  [
+    set can-insert? true
+  ]
+    ask patch 134 175
+  [
+    set can-insert? true
+  ]
+end
+
