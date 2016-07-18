@@ -926,7 +926,7 @@ worm_population
 worm_population
 0
 500
-100
+25
 5
 1
 NIL
@@ -1042,7 +1042,7 @@ INPUTBOX
 270
 82
 number_of_years
-20
+30
 1
 0
 Number
@@ -1545,10 +1545,10 @@ NetLogo 5.3.1
 @#$#@#$#@
 @#$#@#$#@
 <experiments>
-  <experiment name="insertions" repetitions="3" runMetricsEveryStep="true">
+  <experiment name="insertions" repetitions="10" runMetricsEveryStep="true">
     <setup>setup_bs</setup>
     <go>go</go>
-    <steppedValueSet variable="insertion_frequency" first="0" step="3" last="10"/>
+    <steppedValueSet variable="insertion_frequency" first="0" step="5" last="10"/>
   </experiment>
   <experiment name="test" repetitions="3" runMetricsEveryStep="true">
     <setup>setup_bs</setup>
@@ -1557,7 +1557,7 @@ NetLogo 5.3.1
       <value value="0"/>
     </enumeratedValueSet>
   </experiment>
-  <experiment name="roads" repetitions="8" runMetricsEveryStep="false">
+  <experiment name="roads" repetitions="10" runMetricsEveryStep="false">
     <setup>setup_bs</setup>
     <go>go</go>
     <enumeratedValueSet variable="save_name">
@@ -1565,15 +1565,38 @@ NetLogo 5.3.1
       <value value="&quot;defaultRun&quot;"/>
     </enumeratedValueSet>
   </experiment>
-  <experiment name="ph" repetitions="3" runMetricsEveryStep="false">
+  <experiment name="ph-1" repetitions="10" runMetricsEveryStep="false">
     <setup>setup_bs</setup>
     <go>go</go>
-    <steppedValueSet variable="ph_tolerance" first="-0.2" step="0.1" last="0.1"/>
+    <enumeratedValueSet variable="ph_tolerance">
+      <value value="-0.2"/>
+    </enumeratedValueSet>
   </experiment>
   <experiment name="temp" repetitions="3" runMetricsEveryStep="false">
     <setup>setup_bs</setup>
     <go>go</go>
     <steppedValueSet variable="temperature_tolerance" first="-0.5" step="0.5" last="0.5"/>
+  </experiment>
+  <experiment name="ph-2" repetitions="10" runMetricsEveryStep="false">
+    <setup>setup_bs</setup>
+    <go>go</go>
+    <enumeratedValueSet variable="ph_tolerance">
+      <value value="0"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="ph-3" repetitions="10" runMetricsEveryStep="false">
+    <setup>setup_bs</setup>
+    <go>go</go>
+    <enumeratedValueSet variable="ph_tolerance">
+      <value value="0.2"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="roadsTest" repetitions="20" runMetricsEveryStep="false">
+    <setup>setup_bs</setup>
+    <go>go</go>
+    <enumeratedValueSet variable="save_name">
+      <value value="&quot;roadTest&quot;"/>
+    </enumeratedValueSet>
   </experiment>
 </experiments>
 @#$#@#$#@
