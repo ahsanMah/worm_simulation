@@ -354,7 +354,11 @@ to save_heatmap
   let prev Show:
   set Show: "turtle density"
   recolor_patches
+<<<<<<< HEAD
+  let filename (word "output/heatmap/" ticks ".png")
+=======
   let filename (word "simulations/" save_name "/output/heatmap/" temperature_tolerance "_" ph_tolerance "_" species_genetic_diversity "_" insertion_frequency "_" ticks ".png")
+>>>>>>> 8a3a00f0f1ab99b78274cf900932dd6bfffa6994
   export-view filename
   set Show: prev
   recolor_patches
@@ -686,7 +690,7 @@ INPUTBOX
 140
 82
 save_name
-defaultRun
+monTest
 1
 0
 String (reporter)
@@ -714,7 +718,7 @@ CHOOSER
 Show:
 Show:
 "pH" "depth" "temperature" "monitor" "turtle density" "insertion points"
-0
+4
 
 TEXTBOX
 23
@@ -1081,7 +1085,7 @@ INPUTBOX
 270
 82
 number_of_years
-15
+10
 1
 0
 Number
@@ -1596,7 +1600,7 @@ NetLogo 5.3.1
       <value value="0"/>
     </enumeratedValueSet>
   </experiment>
-  <experiment name="roads" repetitions="8" runMetricsEveryStep="false">
+  <experiment name="roads" repetitions="10" runMetricsEveryStep="false">
     <setup>setup_bs</setup>
     <go>go</go>
     <enumeratedValueSet variable="save_name">
