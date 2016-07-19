@@ -6,6 +6,7 @@ globals[
   species_data
   monthly_data
   output_data
+  grid_data            ;contains x,y coordinates of patches and population of turtles on that spot
   has_collected
   report_month
   area_list
@@ -16,13 +17,12 @@ globals[
   pop_data
   ph_table
   temp_table
-  fishing_spots
   xlow
   xhigh
   ylow
   yhigh
-  header
   export_file
+  grid_file
 
   ;index positions of data in arrays
   ;month monitor species_number population density genetic diversity
@@ -180,23 +180,43 @@ end
 to setup_export
   set species_data [] ;list of collected info of each species for each monitor
   set monthly_data [] ;list of data collected each month
-  set header ["Month Number" "Monitor Number" "Species Number" "Population" "Density" "Genetic Diversity" "pH Tolerance" "Temperature Tolerance"]
-  set export_file (word "simulations/" save_name "/output/" temperature_tolerance "_" ph_tolerance "_" species_genetic_diversity "_" insertion_frequency ".csv")
+  set grid_data []    ;list of patches with worm population
 
-  ;carefully [file-delete export_file][] ;deletes the file if it exists otherwise does nothing
+  let export_header ["Month Number" "Monitor Number" "Species Number" "Population" "Density" "Genetic Diversity" "pH Tolerance" "Temperature Tolerance"]
+  let grid_header (list"x-coordinate" "y-coordinate" "Population")
+
+  set export_file (word "simulations/" save_name "/output/" temperature_tolerance "_" ph_tolerance "_" species_genetic_diversity "_" insertion_frequency ".csv")
+  set grid_file (word "simulations/" save_name "/output/heatmap/grid.csv")
+
+
   if (not file-exists? export_file) [ ;initializes a file if it doesn't exist
     file-open export_file
-    file-print csv:to-row header
+    file-print csv:to-row export_header
+    file-close
+  ]
+
+  if (not file-exists? grid_file) [
+    file-open grid_file
+    file-print csv:to-row grid_header
     file-close
   ]
 end
 
 
 to export_data
+
+  ;exports grid data for heatmaps
+  file-open grid_file
+  foreach grid_data [ file-print csv:to-row ? ]
+  file-print csv:to-row ["END SIM"]
+  file-close
+
+  ;exports user collected data
   file-open export_file
   foreach monthly_data [ file-print csv:to-row ? ]
   file-print csv:to-row ["END SIM"]
   file-close
+
   print "Exported simulation data to file"
 end
 
@@ -309,13 +329,32 @@ to simulate_environment
 end
 
 to save_heatmap
+  let i min-pxcor
+  let j min-pycor
 
+  while [(i <= max-pxcor)]
+  [
+    while [(j <= max-pycor)]
+    [
+      ask patch i j
+      [
+        set density count turtles-here
+        let info (list i j density)
+        set grid_data lput info grid_data
+        set j j + 1
+      ]
+    ]
+    set j min-pycor
+    set i i + 1
+  ]
+
+  ;saves screen shot of turtle densities
   ask turtles [hide-turtle]
 
   let prev Show:
   set Show: "turtle density"
   recolor_patches
-  let filename (word "heatmap/" ticks ".png")
+  let filename (word "simulations/" save_name "/output/heatmap/" ticks ".png")
   export-view filename
   set Show: prev
   recolor_patches
@@ -327,7 +366,7 @@ end
 
 to collect_data
 
-  if (ticks mod 365 = 0) [
+  if (ticks mod 1825 = 0) [
     save_heatmap
   ]
 
@@ -675,7 +714,7 @@ CHOOSER
 Show:
 Show:
 "pH" "depth" "temperature" "monitor" "turtle density" "insertion points"
-4
+0
 
 TEXTBOX
 23
@@ -926,7 +965,7 @@ worm_population
 worm_population
 0
 500
-100
+25
 5
 1
 NIL
@@ -1042,7 +1081,7 @@ INPUTBOX
 270
 82
 number_of_years
-20
+15
 1
 0
 Number
