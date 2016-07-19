@@ -15,19 +15,19 @@ globals [
   
   monitor_names ;a list of the names given to each monitor
   monitor_number ;a number refering to a specific monitor
-  ;obstacle 
-  ;obstacle_list
+  obstacle 
+  obstacle_list
   temp_arr
   speed_in_water ;the speed that worms travel when in water, relative to their normal speed
   road_speed ;the speed that worms travel while on a road, relative to their normal speed
   patch_area ;the area of land that a single patch represents
   
-;  temp_shape
-  ;temp_size
+  temp_shape
+  temp_size
   temp_x
   temp_y
-;  temp_pH
-;  temp_movable
+  temp_pH
+  temp_movable
   
   selected ;the set of patches that are currently selected
   
@@ -46,11 +46,11 @@ patches-own
   food-here              ;amount of food on this patch
   permeability           ;0 - 1, 0 being completely impermeable, 1 meaning complete freedom of movement
   local_death_threshold  ;death threshold of a single patch
-  ;food-consumed-from
+  food-consumed-from
   temp_diff_here         ;a constant at each patch indicating how much warmer/colder it is than the global temperature
   temperature
   being_monitored        ;indicates if the population of a patch is being monitored
-  ;monitor_size           ;if a patch is part of a monitor, it has a monitor_size equal to the size of the monitor it is a part of
+  monitor_size           ;if a patch is part of a monitor, it has a monitor_size equal to the size of the monitor it is a part of
   monitor_index          ;keeps track of which monitor the patch is a part of (if it is in a monitor)
   soil_depth             ;the depth of soil within the patch
   moisture               ;the water content of the soil (15 bar)

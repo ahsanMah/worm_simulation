@@ -1,26 +1,26 @@
 
 globals [
   ;;annual globals
-  day_num ;;day number
-  year
-  global_temperature
+  day_num ;number of days since the first day of the starting year of the simulation
+  year ;number of years since the start of the simulation, starting from 0
+  global_temperature ;the temperature of the environment on the current day
   prev_days_temp     ;stores temps for the previous 3 days
 
-  current_month
-  current_day
-  next_month
-  num_days
-  temperatures
-  day_of_month
+  current_month ;an integer 0-11 representing the current month
+  current_day ;an integer 0-30 representing the day of the current month
+  next_month ;an integer representing the month following the current month
+  num_days ;a list of the number of days in each month ******
+  temperatures ;a list of the average temperature of each month *******
+  day_of_month ;the number of the day of the month
   
-  monitor_names
-  monitor_number
-  obstacle
+  monitor_names ;a list of the names given to each monitor
+  monitor_number ;a number refering to a specific monitor
+  obstacle 
   obstacle_list
   temp_arr
-  speed_in_water
-  road_speed
-  patch_area
+  speed_in_water ;the speed that worms travel when in water, relative to their normal speed
+  road_speed ;the speed that worms travel while on a road, relative to their normal speed
+  patch_area ;the area of land that a single patch represents
   
   temp_shape
   temp_size
@@ -29,12 +29,12 @@ globals [
   temp_pH
   temp_movable
   
-  selected
+  selected ;the set of patches that are currently selected
   
-  x-min
-  x-max
-  y-min
-  y-max
+  x-min ;used to designate a minimum x in several functions
+  x-max ;used to designate a maximum x in several functions
+  y-min ;used to designate a minimum y in several functions
+  y-max ;used to designate a maximum y in several functions
   
   ]
 
@@ -45,17 +45,17 @@ patches-own
   ph                     ;pH values ranging from 0-14
   food-here              ;amount of food on this patch
   permeability           ;0 - 1, 0 being completely impermeable, 1 meaning complete freedom of movement
-  local_death_threshold
+  local_death_threshold  ;death threshold of a single patch
   food-consumed-from
-  temp_diff_here
+  temp_diff_here         ;a constant at each patch indicating how much warmer/colder it is than the global temperature
   temperature
-  being_monitored
-  monitor_size
-  monitor_index
-  soil_depth
-  moisture   
-  can-insert?          
-  density
+  being_monitored        ;indicates if the population of a patch is being monitored
+  monitor_size           ;if a patch is part of a monitor, it has a monitor_size equal to the size of the monitor it is a part of
+  monitor_index          ;keeps track of which monitor the patch is a part of (if it is in a monitor)
+  soil_depth             ;the depth of soil within the patch
+  moisture               ;the water content of the soil (15 bar)
+  can-insert?            ;true if worms can randomly be inserted here, false if not
+  density                ;a measure of how closely distributed the worms are
 ]
 
 
@@ -92,10 +92,10 @@ to setup_environment
   ;calculate_temp ;uncomment this if you want to have temperature vary between patches
   
   ;array used to temporarily store obstacle parameters
-  set obstacle n-values 6 [0]
+  ;set obstacle n-values 6 [0] ; ??
   
   ;print obstacle
-  set obstacle_list []
+  ;set obstacle_list []
   
   ask patches
   [
@@ -130,12 +130,12 @@ to recolor_patches
   ]
 end
 
-to draw_obstacles
-    ask patches [
-      foreach obstacle_list [setup-obstacles ? ]
-      recolor-patch
-    ]
-end
+;to draw_obstacles
+;    ask patches [
+;      foreach obstacle_list [setup-obstacles ? ]
+;      recolor-patch
+;    ]
+;end
 
 to calculate_time
   
@@ -347,7 +347,7 @@ to recolor-selected
         [
           set being_monitored true
           set monitor_index monitor_number
-          set monitor_size temp_size
+          ;set monitor_size temp_size
           recolor-patch
         ]
         
@@ -366,7 +366,7 @@ to draw_monitor [xmin xmax ymin ymax name]
       [
         set being_monitored true
         set monitor_index monitor_number
-        set monitor_size temp_size
+        ;set monitor_size temp_size
         recolor-patch
       ]
   ]
@@ -435,81 +435,81 @@ to make-side [x1 y1 x2 y2]
   ]
 end
 
-to setup-obstacles [one_obstacle]
-  ;if obstacle parameters given
-
-  if (item 0 one_obstacle != 0) [
-    ;looks at items in the array to setup the obstacle
-
-    set temp_shape item 0 one_obstacle
-    set temp_size item 1 one_obstacle
-    set temp_x item 2 one_obstacle
-    set temp_y item 3 one_obstacle
-    set temp_pH item 4 one_obstacle
-    set temp_movable item 5 one_obstacle
-
-
-    if temp_shape = "mountain"
-    [
-      if (distancexy temp_x temp_y) < temp_size 
-      [
-        if (permeability != speed_in_water and permeability != road_speed)
-        [
-          set permeability 1
-        ]
-        set ph (ph - ((ph - patch_ph) / temp_size) * (temp_size - distancexy temp_x temp_y) )
-        set temp_diff_here (temp_diff_here + ((temperature_difference) / temp_size) * (temp_size - distancexy temp_x temp_y))
-      ]
-    ]
-    
-    if temp_shape = "lake"
-    [
-      if (distancexy temp_x temp_y) < temp_size 
-      [
-        set permeability speed_in_water
-        set food-here 0
-        set ph 7
-      ]
-    ]
-    
-    
-    if temp_shape = "square"
-    [
-      if pxcor >= temp_x - temp_size and pxcor <= temp_x + temp_size and pycor >= temp_y - temp_size and pycor <= temp_y + temp_size
-      [
-         set permeability speed_in_water
-         set food-here 0
-      ]
-    ]
-
-    if temp_shape = "horizontal-line"
-    [
-      if distancexy temp_x temp_y <= temp_size and temp_y = pycor
-      [
-        set permeability speed_in_water
-        set food-here 0
-      ]
-    ]
-    
-    if temp_shape = "vertical-line"
-    [
-      if distancexy temp_x temp_y <= temp_size and temp_x = pxcor
-      [
-          set permeability speed_in_water
-          set food-here 0
-      ]
-    ]
-    
-    if temp_shape = "monitor"
-    [
-      if (distancexy temp_x temp_y) < temp_size 
-        [
-
-        ]
-    ]
-
-  ]
-end
+;to setup-obstacles [one_obstacle]
+;  ;if obstacle parameters given
+;
+;  if (item 0 one_obstacle != 0) [
+;    ;looks at items in the array to setup the obstacle
+;
+;    set temp_shape item 0 one_obstacle
+;    set temp_size item 1 one_obstacle
+;    set temp_x item 2 one_obstacle
+;    set temp_y item 3 one_obstacle
+;    set temp_pH item 4 one_obstacle
+;    set temp_movable item 5 one_obstacle
+;
+;
+;    if temp_shape = "mountain"
+;    [
+;      if (distancexy temp_x temp_y) < temp_size 
+;      [
+;        if (permeability != speed_in_water and permeability != road_speed)
+;        [
+;          set permeability 1
+;        ]
+;        set ph (ph - ((ph - patch_ph) / temp_size) * (temp_size - distancexy temp_x temp_y) )
+;        set temp_diff_here (temp_diff_here + ((temperature_difference) / temp_size) * (temp_size - distancexy temp_x temp_y))
+;      ]
+;    ]
+;    
+;    if temp_shape = "lake"
+;    [
+;      if (distancexy temp_x temp_y) < temp_size 
+;      [
+;        set permeability speed_in_water
+;        set food-here 0
+;        set ph 7
+;      ]
+;    ]
+;    
+;    
+;    if temp_shape = "square"
+;    [
+;      if pxcor >= temp_x - temp_size and pxcor <= temp_x + temp_size and pycor >= temp_y - temp_size and pycor <= temp_y + temp_size
+;      [
+;         set permeability speed_in_water
+;         set food-here 0
+;      ]
+;    ]
+;
+;    if temp_shape = "horizontal-line"
+;    [
+;      if distancexy temp_x temp_y <= temp_size and temp_y = pycor
+;      [
+;        set permeability speed_in_water
+;        set food-here 0
+;      ]
+;    ]
+;    
+;    if temp_shape = "vertical-line"
+;    [
+;      if distancexy temp_x temp_y <= temp_size and temp_x = pxcor
+;      [
+;          set permeability speed_in_water
+;          set food-here 0
+;      ]
+;    ]
+;    
+;    if temp_shape = "monitor"
+;    [
+;      if (distancexy temp_x temp_y) < temp_size 
+;        [
+;
+;        ]
+;    ]
+;
+;  ]
+;end
 
 to name_monitor [name]
   set monitor_names lput name monitor_names 
