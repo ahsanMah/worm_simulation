@@ -96,8 +96,10 @@ end
 
 to setup_bs
   setup
+  set bs_run true
   setup_sim
   setup_export
+
 end
 
 to draw_river
@@ -1584,10 +1586,13 @@ NetLogo 5.3.1
 @#$#@#$#@
 @#$#@#$#@
 <experiments>
-  <experiment name="insertions" repetitions="3" runMetricsEveryStep="true">
+  <experiment name="insertions-1" repetitions="20" runMetricsEveryStep="true">
     <setup>setup_bs</setup>
     <go>go</go>
-    <steppedValueSet variable="insertion_frequency" first="0" step="3" last="10"/>
+    <enumeratedValueSet variable="insertion_frequency">
+      <value value="0"/>
+      <value value="5"/>
+    </enumeratedValueSet>
   </experiment>
   <experiment name="test" repetitions="3" runMetricsEveryStep="true">
     <setup>setup_bs</setup>
@@ -1596,7 +1601,7 @@ NetLogo 5.3.1
       <value value="0"/>
     </enumeratedValueSet>
   </experiment>
-  <experiment name="roads" repetitions="10" runMetricsEveryStep="false">
+  <experiment name="roads" repetitions="20" runMetricsEveryStep="false">
     <setup>setup_bs</setup>
     <go>go</go>
     <enumeratedValueSet variable="save_name">
@@ -1604,15 +1609,25 @@ NetLogo 5.3.1
       <value value="&quot;defaultRun&quot;"/>
     </enumeratedValueSet>
   </experiment>
-  <experiment name="ph" repetitions="3" runMetricsEveryStep="false">
+  <experiment name="ph-1" repetitions="3" runMetricsEveryStep="false">
     <setup>setup_bs</setup>
     <go>go</go>
-    <steppedValueSet variable="ph_tolerance" first="-0.2" step="0.1" last="0.1"/>
+    <enumeratedValueSet variable="ph_tolerance">
+      <value value="-0.1"/>
+      <value value="0"/>
+    </enumeratedValueSet>
   </experiment>
   <experiment name="temp" repetitions="3" runMetricsEveryStep="false">
     <setup>setup_bs</setup>
     <go>go</go>
     <steppedValueSet variable="temperature_tolerance" first="-0.5" step="0.5" last="0.5"/>
+  </experiment>
+  <experiment name="insertions-2" repetitions="20" runMetricsEveryStep="true">
+    <setup>setup_bs</setup>
+    <go>go</go>
+    <enumeratedValueSet variable="insertion_frequency">
+      <value value="10"/>
+    </enumeratedValueSet>
   </experiment>
 </experiments>
 @#$#@#$#@

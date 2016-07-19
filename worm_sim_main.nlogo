@@ -96,6 +96,7 @@ end
 
 to setup_bs
   setup
+  set bs_run true
   setup_sim
   setup_export
 end
@@ -572,7 +573,7 @@ ph_tolerance
 ph_tolerance
 -0.5
 0.5
-0
+-0.2
 0.1
 1
 NIL
