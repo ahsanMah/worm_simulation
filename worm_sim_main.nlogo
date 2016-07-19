@@ -186,7 +186,7 @@ to setup_export
   let grid_header (list"x-coordinate" "y-coordinate" "Population")
 
   set export_file (word "simulations/" save_name "/output/" temperature_tolerance "_" ph_tolerance "_" species_genetic_diversity "_" insertion_frequency ".csv")
-  set grid_file (word "simulations/" save_name "/output/heatmap/grid.csv")
+  set grid_file (word "simulations/" save_name "/output/heatmap/grid_" temperature_tolerance "_" ph_tolerance "_" species_genetic_diversity "_" insertion_frequency ".csv" )
 
 
   if (not file-exists? export_file) [ ;initializes a file if it doesn't exist
@@ -354,7 +354,7 @@ to save_heatmap
   let prev Show:
   set Show: "turtle density"
   recolor_patches
-  let filename (word "simulations/" save_name "/output/heatmap/" ticks ".png")
+  let filename (word "simulations/" save_name "/output/heatmap/" temperature_tolerance "_" ph_tolerance "_" species_genetic_diversity "_" insertion_frequency "_" ticks ".png")
   export-view filename
   set Show: prev
   recolor_patches
