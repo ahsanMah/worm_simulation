@@ -686,7 +686,7 @@ INPUTBOX
 140
 82
 save_name
-monTest
+defaultRun
 1
 0
 String (reporter)
@@ -714,7 +714,7 @@ CHOOSER
 Show:
 Show:
 "pH" "depth" "temperature" "monitor" "turtle density" "insertion points"
-4
+0
 
 TEXTBOX
 23
