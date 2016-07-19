@@ -1081,7 +1081,7 @@ INPUTBOX
 270
 82
 number_of_years
-15
+30
 1
 0
 Number
@@ -1596,7 +1596,7 @@ NetLogo 5.3.1
       <value value="0"/>
     </enumeratedValueSet>
   </experiment>
-  <experiment name="roads" repetitions="8" runMetricsEveryStep="false">
+  <experiment name="roads" repetitions="10" runMetricsEveryStep="false">
     <setup>setup_bs</setup>
     <go>go</go>
     <enumeratedValueSet variable="save_name">
