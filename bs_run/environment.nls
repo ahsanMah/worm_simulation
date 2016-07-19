@@ -1,17 +1,17 @@
 
 globals [
   ;;annual globals
-  day_num ;;day number
-  year
-  global_temperature
+  day_num ;number of days since the first day of the starting year of the simulation
+  year ;number of years since the start of the simulation, starting from 0
+  global_temperature ;the temperature of the environment on the current day
   prev_days_temp     ;stores temps for the previous 3 days
 
-  current_month
-  current_day
-  next_month
-  num_days
-  temperatures
-  day_of_month
+  current_month ;an integer 0-11 representing the current month
+  current_day ;an integer 0-30 representing the day of the current month
+  next_month ;an integer representing the month following the current month
+  num_days ;a list of the number of days in each month ******
+  temperatures ;a list of the average temperature of each month *******
+  day_of_month ;the number of the day of the month
   
   monitor_names
   monitor_number
