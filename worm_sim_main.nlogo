@@ -674,7 +674,7 @@ speed
 speed
 0
 1
-0.5
+0.55
 0.01
 1
 NIL
@@ -1596,7 +1596,7 @@ NetLogo 5.3.1
       <value value="0"/>
     </enumeratedValueSet>
   </experiment>
-  <experiment name="roads" repetitions="8" runMetricsEveryStep="false">
+  <experiment name="roads" repetitions="10" runMetricsEveryStep="false">
     <setup>setup_bs</setup>
     <go>go</go>
     <enumeratedValueSet variable="save_name">

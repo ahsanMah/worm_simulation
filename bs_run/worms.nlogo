@@ -674,7 +674,7 @@ speed
 speed
 0
 1
-0.5
+0.55
 0.01
 1
 NIL
@@ -1081,7 +1081,7 @@ INPUTBOX
 270
 82
 number_of_years
-10
+15
 1
 0
 Number

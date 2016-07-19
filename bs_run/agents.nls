@@ -1,6 +1,5 @@
 globals [
   
-  age_mortality_rate
   experiment_days
   
   ;daily globals
@@ -45,7 +44,6 @@ cocoons-own[
 
 to setup_agents
   set subspecies_count 0
-  set age_mortality_rate 0.001 ;1.0 / 2190 ; Simulates a 6 year life span --> Type 2 survivorship curve
   set agent_size 4
   set burrow false
   set species_list table:make
@@ -193,6 +191,7 @@ end
 
 to check_death  
   let survival_p random-float (1 + genetic_diversity_factor)
+  
   if (survival_p < death_threshold) [
     ;show death_threshold
     die
@@ -235,11 +234,15 @@ to check_burrow
   
 end
 
-to-report mortality_fn [hazard_rate day_number]
+to-report ph_mortality_fn [hazard_rate day_number]
   let mortality_rate 1 - (e ^ ((0 - hazard_rate) * day_number))
   report mortality_rate
 end
 
+to-report age_mortality_fn [worm_age]
+  let mortality_rate 0.00216 / ( (1 - 0.0004 * worm_age) * (1 + 0.005 * worm_age) )
+  report mortality_rate
+end
 
 ;updates probablities of dying and reproducing
 to update_thresholds
@@ -284,20 +287,16 @@ to update_thresholds
 
   set ph_hazard_rate (0 - ln (survival)) / experiment_days
   
-  set ph_factor mortality_fn ph_hazard_rate patch_days
-  set age_factor age_mortality_rate * age
+  set ph_factor ph_mortality_fn ph_hazard_rate patch_days
+  set age_factor age_mortality_fn age
   
   set cocoon_rate min (list temp_cocoon_rate ph_cocoon_rate)
-  set death_threshold temp_factor + ph_factor
+  set death_threshold temp_factor + ph_factor + age_factor
   
   if burrow [
     set death_threshold ph_factor
   ]
   
-  if (age mod 365 = 0) [
-    set death_threshold age_factor
-  ]
-   
 end
 
 ;;hatches temperature is optimum for birth
