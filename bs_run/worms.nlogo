@@ -315,7 +315,7 @@ to save_heatmap
   let prev Show:
   set Show: "turtle density"
   recolor_patches
-  let filename (word "heatmap/" ticks ".png")
+  let filename (word "output/heatmap/" ticks ".png")
   export-view filename
   set Show: prev
   recolor_patches
@@ -647,7 +647,7 @@ INPUTBOX
 140
 82
 save_name
-defaultRun
+monTest
 1
 0
 String (reporter)
@@ -675,7 +675,7 @@ CHOOSER
 Show:
 Show:
 "pH" "depth" "temperature" "monitor" "turtle density" "insertion points"
-0
+4
 
 TEXTBOX
 23
@@ -1042,7 +1042,7 @@ INPUTBOX
 270
 82
 number_of_years
-30
+10
 1
 0
 Number
