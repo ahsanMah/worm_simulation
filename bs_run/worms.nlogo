@@ -1586,11 +1586,10 @@ NetLogo 5.3.1
 @#$#@#$#@
 @#$#@#$#@
 <experiments>
-  <experiment name="insertions-1" repetitions="20" runMetricsEveryStep="true">
+  <experiment name="insertions-1" repetitions="10" runMetricsEveryStep="true">
     <setup>setup_bs</setup>
     <go>go</go>
     <enumeratedValueSet variable="insertion_frequency">
-      <value value="0"/>
       <value value="5"/>
     </enumeratedValueSet>
   </experiment>
@@ -1601,7 +1600,7 @@ NetLogo 5.3.1
       <value value="0"/>
     </enumeratedValueSet>
   </experiment>
-  <experiment name="roads" repetitions="20" runMetricsEveryStep="false">
+  <experiment name="roads" repetitions="10" runMetricsEveryStep="false">
     <setup>setup_bs</setup>
     <go>go</go>
     <enumeratedValueSet variable="save_name">
@@ -1609,7 +1608,7 @@ NetLogo 5.3.1
       <value value="&quot;defaultRun&quot;"/>
     </enumeratedValueSet>
   </experiment>
-  <experiment name="ph-1" repetitions="3" runMetricsEveryStep="false">
+  <experiment name="ph-1" repetitions="10" runMetricsEveryStep="false">
     <setup>setup_bs</setup>
     <go>go</go>
     <enumeratedValueSet variable="ph_tolerance">
@@ -1623,6 +1622,20 @@ NetLogo 5.3.1
     <steppedValueSet variable="temperature_tolerance" first="-0.5" step="0.5" last="0.5"/>
   </experiment>
   <experiment name="insertions-2" repetitions="20" runMetricsEveryStep="true">
+    <setup>setup_bs</setup>
+    <go>go</go>
+    <enumeratedValueSet variable="insertion_frequency">
+      <value value="10"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="ph-2" repetitions="10" runMetricsEveryStep="false">
+    <setup>setup_bs</setup>
+    <go>go</go>
+    <enumeratedValueSet variable="ph_tolerance">
+      <value value="0.1"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="insertions-2" repetitions="10" runMetricsEveryStep="true">
     <setup>setup_bs</setup>
     <go>go</go>
     <enumeratedValueSet variable="insertion_frequency">
