@@ -23,18 +23,18 @@ globals [
   patch_area ;the area of land that a single patch represents
   
 ;  temp_shape
-  temp_size
+  ;temp_size
   temp_x
   temp_y
 ;  temp_pH
 ;  temp_movable
   
-  selected
+  selected ;the set of patches that are currently selected
   
-  x-min
-  x-max
-  y-min
-  y-max
+  x-min ;used to designate a minimum x in several functions
+  x-max ;used to designate a maximum x in several functions
+  y-min ;used to designate a minimum y in several functions
+  y-max ;used to designate a maximum y in several functions
   
   ]
 
@@ -45,17 +45,17 @@ patches-own
   ph                     ;pH values ranging from 0-14
   food-here              ;amount of food on this patch
   permeability           ;0 - 1, 0 being completely impermeable, 1 meaning complete freedom of movement
-  local_death_threshold
-  food-consumed-from
-  temp_diff_here
+  local_death_threshold  ;death threshold of a single patch
+  ;food-consumed-from
+  temp_diff_here         ;a constant at each patch indicating how much warmer/colder it is than the global temperature
   temperature
-  being_monitored
-  monitor_size
-  monitor_index
-  soil_depth
-  moisture   
-  can-insert?          
-  density
+  being_monitored        ;indicates if the population of a patch is being monitored
+  ;monitor_size           ;if a patch is part of a monitor, it has a monitor_size equal to the size of the monitor it is a part of
+  monitor_index          ;keeps track of which monitor the patch is a part of (if it is in a monitor)
+  soil_depth             ;the depth of soil within the patch
+  moisture               ;the water content of the soil (15 bar)
+  can-insert?            ;true if worms can randomly be inserted here, false if not
+  density                ;a measure of how closely distributed the worms are
 ]
 
 
@@ -347,7 +347,7 @@ to recolor-selected
         [
           set being_monitored true
           set monitor_index monitor_number
-          set monitor_size temp_size
+          ;set monitor_size temp_size
           recolor-patch
         ]
         
@@ -366,7 +366,7 @@ to draw_monitor [xmin xmax ymin ymax name]
       [
         set being_monitored true
         set monitor_index monitor_number
-        set monitor_size temp_size
+        ;set monitor_size temp_size
         recolor-patch
       ]
   ]

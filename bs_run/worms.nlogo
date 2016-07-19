@@ -714,7 +714,7 @@ CHOOSER
 Show:
 Show:
 "pH" "depth" "temperature" "monitor" "turtle density" "insertion points"
-4
+0
 
 TEXTBOX
 23
