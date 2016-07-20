@@ -174,6 +174,11 @@ to pen
         set temp_diff_here temperature_difference
         recolor-patch
       ]
+      if (change: = "insertion point")
+      [
+        set can-insert? true
+        recolor-patch
+      ]
     ]
     display
   ]
@@ -939,7 +944,7 @@ CHOOSER
 change:
 change:
 "pH" "temperature difference" "pH and temperature difference" "highway" "water" "insertion point"
-3
+5
 
 BUTTON
 624
@@ -1097,7 +1102,7 @@ number_inserted
 number_inserted
 0
 50
-5
+0
 1
 1
 NIL
@@ -1616,10 +1621,10 @@ NetLogo 5.3.1
       <value value="0"/>
     </enumeratedValueSet>
   </experiment>
-  <experiment name="temp" repetitions="3" runMetricsEveryStep="false">
+  <experiment name="temp" repetitions="10" runMetricsEveryStep="false">
     <setup>setup_bs</setup>
     <go>go</go>
-    <steppedValueSet variable="temperature_tolerance" first="-0.5" step="0.5" last="0.5"/>
+    <steppedValueSet variable="temperature_tolerance" first="-0.3" step="0.3" last="0.3"/>
   </experiment>
   <experiment name="insertions-2" repetitions="20" runMetricsEveryStep="true">
     <setup>setup_bs</setup>
@@ -1641,6 +1646,11 @@ NetLogo 5.3.1
     <enumeratedValueSet variable="insertion_frequency">
       <value value="10"/>
     </enumeratedValueSet>
+  </experiment>
+  <experiment name="temp-2" repetitions="10" runMetricsEveryStep="false">
+    <setup>setup_bs</setup>
+    <go>go</go>
+    <steppedValueSet variable="temperature_tolerance" first="1" step="0.5" last="2"/>
   </experiment>
 </experiments>
 @#$#@#$#@
