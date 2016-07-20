@@ -111,7 +111,8 @@ def draw_hist_err (xlabels, yvals, err_list, legend):
         plt.ylabel("Density in Region")
         # colors = ['g','c','m','r','y','b','k']
 
-        colors = ["#ff0000",
+        colors = [
+                "#ff0000",
                 "#ff8000",
                 "#ffff00",
                 "#bfff00",
