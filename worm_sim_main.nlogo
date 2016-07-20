@@ -99,6 +99,7 @@ to setup_bs
   set bs_run true
   setup_sim
   setup_export
+
 end
 
 to draw_river
@@ -171,6 +172,11 @@ to pen
       if (change: = "temperature difference" or change: = "temperature difference and pH")
       [
         set temp_diff_here temperature_difference
+        recolor-patch
+      ]
+      if (change: = "insertion point")
+      [
+        set can-insert? true
         recolor-patch
       ]
     ]
@@ -938,7 +944,7 @@ CHOOSER
 change:
 change:
 "pH" "temperature difference" "pH and temperature difference" "highway" "water" "insertion point"
-3
+5
 
 BUTTON
 624
@@ -1082,7 +1088,7 @@ INPUTBOX
 270
 82
 number_of_years
-15
+30
 1
 0
 Number
@@ -1096,7 +1102,7 @@ number_inserted
 number_inserted
 0
 50
-5
+0
 1
 1
 NIL
@@ -1585,10 +1591,12 @@ NetLogo 5.3.1
 @#$#@#$#@
 @#$#@#$#@
 <experiments>
-  <experiment name="insertions" repetitions="3" runMetricsEveryStep="true">
+  <experiment name="insertions-1" repetitions="10" runMetricsEveryStep="true">
     <setup>setup_bs</setup>
     <go>go</go>
-    <steppedValueSet variable="insertion_frequency" first="0" step="3" last="10"/>
+    <enumeratedValueSet variable="insertion_frequency">
+      <value value="5"/>
+    </enumeratedValueSet>
   </experiment>
   <experiment name="test" repetitions="3" runMetricsEveryStep="true">
     <setup>setup_bs</setup>
@@ -1605,15 +1613,44 @@ NetLogo 5.3.1
       <value value="&quot;defaultRun&quot;"/>
     </enumeratedValueSet>
   </experiment>
-  <experiment name="ph" repetitions="3" runMetricsEveryStep="false">
+  <experiment name="ph-1" repetitions="10" runMetricsEveryStep="false">
     <setup>setup_bs</setup>
     <go>go</go>
-    <steppedValueSet variable="ph_tolerance" first="-0.2" step="0.1" last="0.1"/>
+    <enumeratedValueSet variable="ph_tolerance">
+      <value value="-0.1"/>
+      <value value="0"/>
+    </enumeratedValueSet>
   </experiment>
-  <experiment name="temp" repetitions="3" runMetricsEveryStep="false">
+  <experiment name="temp" repetitions="10" runMetricsEveryStep="false">
     <setup>setup_bs</setup>
     <go>go</go>
-    <steppedValueSet variable="temperature_tolerance" first="-0.5" step="0.5" last="0.5"/>
+    <steppedValueSet variable="temperature_tolerance" first="-0.3" step="0.3" last="0.3"/>
+  </experiment>
+  <experiment name="insertions-2" repetitions="20" runMetricsEveryStep="true">
+    <setup>setup_bs</setup>
+    <go>go</go>
+    <enumeratedValueSet variable="insertion_frequency">
+      <value value="10"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="ph-2" repetitions="10" runMetricsEveryStep="false">
+    <setup>setup_bs</setup>
+    <go>go</go>
+    <enumeratedValueSet variable="ph_tolerance">
+      <value value="0.1"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="insertions-2" repetitions="10" runMetricsEveryStep="true">
+    <setup>setup_bs</setup>
+    <go>go</go>
+    <enumeratedValueSet variable="insertion_frequency">
+      <value value="10"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="temp-2" repetitions="10" runMetricsEveryStep="false">
+    <setup>setup_bs</setup>
+    <go>go</go>
+    <steppedValueSet variable="temperature_tolerance" first="1" step="0.5" last="2"/>
   </experiment>
 </experiments>
 @#$#@#$#@
