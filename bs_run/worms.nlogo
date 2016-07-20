@@ -721,7 +721,7 @@ CHOOSER
 Show:
 Show:
 "pH" "depth" "temperature" "monitor" "turtle density" "insertion points"
-0
+5
 
 TEXTBOX
 23
@@ -1651,6 +1651,23 @@ NetLogo 5.3.1
     <setup>setup_bs</setup>
     <go>go</go>
     <steppedValueSet variable="temperature_tolerance" first="1" step="0.5" last="2"/>
+  </experiment>
+  <experiment name="location-1" repetitions="10" runMetricsEveryStep="false">
+    <setup>setup_bs</setup>
+    <go>go</go>
+    <enumeratedValueSet variable="save_name">
+      <value value="&quot;S1&quot;"/>
+      <value value="&quot;S2&quot;"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="location-2" repetitions="10" runMetricsEveryStep="false">
+    <setup>setup_bs</setup>
+    <go>go</go>
+    <enumeratedValueSet variable="save_name">
+      <value value="&quot;S3&quot;"/>
+      <value value="&quot;S4&quot;"/>
+      <value value="&quot;S5&quot;"/>
+    </enumeratedValueSet>
   </experiment>
 </experiments>
 @#$#@#$#@

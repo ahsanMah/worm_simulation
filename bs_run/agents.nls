@@ -51,6 +51,10 @@ to setup_agents
   set color_list (list red cyan pink orange magenta violet)
 end
 
+to insert_worms [x y num species_num]
+  add_species x y num species_num species_genetic_diversity ph_tolerance temperature_tolerance 0
+end
+
 to mouse_add_species
   ifelse (mouse-down?)
     

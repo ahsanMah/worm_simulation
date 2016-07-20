@@ -182,7 +182,9 @@ def extractFromFile (filename, reps):
                 std_err = [0]*len(avg_pop) #creates an array of 0s
 
         xlabels = sorted(data_table.keys())
-
+        print "Filname: ", filename
+        print "Mean: ", avg_pop
+        print "Std Error:", std_err
         # for idx,val in enumerate(avg_pop):
         #         print xlabels[idx],val,std_err[idx]
 
