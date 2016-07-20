@@ -45,53 +45,6 @@ def make_labels (val):
                 return "+" + str(val)
         return str(val)
 
-
-def getFromBS (data_reader):
-        data = open("test.csv", "rb")
-        data_reader = csv.reader(data)
-        data_table = []
-        xvals = []              #values to be plotted on the x-axis
-        yvals = []              #values to be plotted on the y-axis
-        run_data = []   #data for individual runs
-        current_row = data_reader.next()
-        while current_row[0] != "ph_tolerance":
-                var = data_reader.next()
-                if len(var) > 0:
-                        current_row = var
-
-        xvals = map(convert_to_float, current_row[1:]) #str to float
-        xvals = np.array(xvals)                            #list to array
-        xlabels = map(make_labels,xvals)
-
-        print xvals
-
-
-        while current_row[0] != "[initial & final values]":     
-                var = data_reader.next()
-                if len(var) > 0:
-                        current_row = var
-
-        for row in data_reader:
-                data_table.append(row)
-
-        for row in data_table:
-                for val in row:
-                        if len(val) > 0:
-                                run_data = val.split()
-                                run_data[0] = run_data[0][1:]
-                                run_data[-1] = run_data[-1][:-1]
-                                yvals.append(map(convert_to_float, run_data))
-                        run_data = []
-
-        # print yvals
-        # print yvals5yr
-        # print yvals10yr
-
-        # curve_fit(xvals,yvals10yr)
-        #draw_hist(xlabels,yvals)
-        return
-
-
 '''
 Draws a histogram with the given data
 
@@ -103,7 +56,7 @@ def draw_hist_err (xlabels, yvals, err_list, legend):
         xvals = np.arange(len(xlabels))
         width = 0.9/len(yvals)
         x_width = 0
-        plt.yscale('linear')
+        plt.yscale('symlog')
         plt.xticks(xvals+0.5, xlabels)
         # Pad margins so that markers don't get clipped by the axes
         # plt.margins(x=0.075)
@@ -112,6 +65,8 @@ def draw_hist_err (xlabels, yvals, err_list, legend):
         # colors = ['g','c','m','r','y','b','k']
 
         colors = [
+                # "#E74C3C", reserved for simulation comparisons
+                # "#5DADE2",
                 "#ff0000",
                 "#ff8000",
                 "#ffff00",
@@ -157,7 +112,8 @@ def extractFromFile (filename, reps):
                 yvals = []
                 row = data_reader.next()
                 data_table = {}
-        
+                
+                #gets highest density from 1 simulation
                 while row[0] != "END SIM":
 
                         monitor_num = row[1]
@@ -174,7 +130,7 @@ def extractFromFile (filename, reps):
                         yvals.append (data_table[key][2])        
                 
                 multi_run.append(yvals)
-
+        
         if reps > 1:
                 avg_pop = np.mean(multi_run, axis = 0)
                 std_err = np.std(multi_run, axis = 0) / np.sqrt(reps)        
@@ -186,6 +142,10 @@ def extractFromFile (filename, reps):
 
         # for idx,val in enumerate(avg_pop):
         #         print xlabels[idx],val,std_err[idx]
+
+        print "Filename:", filename
+        print "Mean:", avg_pop
+        print "Std Error:", std_err
 
         return avg_pop, std_err, xlabels
 
@@ -222,7 +182,7 @@ def getPlotVals(usr_input):
                         err_list.append(err)
 
         else:
-                if idx == 6:
+                if idx == 6: #if iterating through insertion frequency
                         val_list = map(lambda x: int(x), usr_input[3:])
                 else:
                         val_list = map(convert_to_float,usr_input[3:])
