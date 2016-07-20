@@ -10,5 +10,5 @@ mkdir simulations/roadTest/output/heatmap/
 java -Xmx2048m -Dfile.encoding=UTF-8 -cp dep/NetLogo.jar \
   org.nlogo.headless.Main \
   --model worms.nlogo \
-  --experiment temp-4 \
+  --experiment temp \
   --threads 3

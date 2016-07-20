@@ -5,15 +5,13 @@ globals [
   ;daily globals
   periods-in-day
   agent_size
-  burrow
-  survival_prob
+  burrow                    ;boolean- if true -> worms are unaffected by temperature and do not reproduce
+  survival_prob             ;probability of survival
   
   species_list
   shape_list
   color_list
   subspecies_count
-  
-  degree_accumulation_needed
 ]
 
 breed [cocoons]
@@ -34,18 +32,19 @@ turtles-own [
   cocoon                    ;cocoon counter that increments by cocoon_rate until it reaches 1 which hatches a cocoon
   prev_patch                ;ph of previous of patch to determine patch_days 
   patch_days                ;number of days spent on the same ph (used in ph_mortality_fn)
-  ph_shift                  ;amount by which PH curves are shifted <- taken from ph_tolerance
-  temp_shift                ;amount by which TEMPERATURE curves are shifted <- taken from temperature_tolerance
+  ph_shift                  ;amount by which pH curves are shifted <- taken from ph_tolerance
+  temp_shift                ;amount by which temperature curves are shifted <- taken from temperature_tolerance
   ]
+
 cocoons-own[
- degree_days 
- degree_accumulation
+ degree_days                ;a counter of degrees accumulated over days
+ acc_needed                 ;degree accumulation required for the cocoon
 ]
 
 to setup_agents
   set subspecies_count 0
-  set agent_size 4
-  set burrow false
+  set agent_size 4             ;size of the agent shown in the view
+  set burrow false              
   set species_list table:make
   set shape_list (list "red_worm" "cyan_worm" "pink_worm" "orange_worm" "magenta_worm" "violet_worm")
   set color_list (list red cyan pink orange magenta violet)
@@ -211,7 +210,7 @@ to check_reproduction
         
         if (cocoon >= 1)[
           hatch-cocoons 1 [
-            set degree_accumulation item (16 - reprod_min_temp) [1300 1200 1100 1000]
+            set acc_needed item (16 - reprod_min_temp) [1300 1200 1100 1000]
             set maturation_wait random-normal 91 22
             set age 0
             set color (item parent_breed color_list)
@@ -265,7 +264,7 @@ to update_thresholds
   let age_factor 0
   
   ;reproduction rate affected by temperature + pH
-  set temp_cocoon_rate 0.54 / 7
+  set temp_cocoon_rate 0.54 / 7                         ;<--- CHANGE COCOON RATE HERE 
   
   ;;pH of soil also affects survival + reproduction rate
   let mapped_ph precision (ph + ph_shift) 1
@@ -305,7 +304,7 @@ to check_if_hatch
     set degree_days degree_days + global_temperature
   ]
   
-  ifelse (degree_days >= degree_accumulation) [
+  ifelse (degree_days >= acc_needed) [
     set breed adults
     set size agent_size
     set shape (item parent_breed shape_list)

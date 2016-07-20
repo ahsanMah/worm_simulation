@@ -1025,7 +1025,7 @@ insertion_frequency
 insertion_frequency
 0
 104
-10
+0
 1
 1
 /year
@@ -1102,7 +1102,7 @@ number_inserted
 number_inserted
 0
 50
-0
+5
 1
 1
 NIL
@@ -1624,7 +1624,10 @@ NetLogo 5.3.1
   <experiment name="temp" repetitions="10" runMetricsEveryStep="false">
     <setup>setup_bs</setup>
     <go>go</go>
-    <steppedValueSet variable="temperature_tolerance" first="-0.3" step="0.3" last="0.3"/>
+    <enumeratedValueSet variable="temperature_tolerance">
+      <value value="-0.5"/>
+      <value value="0.5"/>
+    </enumeratedValueSet>
   </experiment>
   <experiment name="insertions-2" repetitions="20" runMetricsEveryStep="true">
     <setup>setup_bs</setup>

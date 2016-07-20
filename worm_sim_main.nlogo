@@ -185,9 +185,9 @@ to pen
 end
 
 to setup_export
-  set species_data [] ;list of collected info of each species for each monitor
-  set monthly_data [] ;list of data collected each month
-  set grid_data []    ;list of patches with worm population
+  set species_data []     ;list of collected info of each species for each monitor
+  set monthly_data []     ;list of data collected each month
+  set grid_data []        ;list of patches with worm population
 
   let export_header ["Month Number" "Monitor Number" "Species Number" "Population" "Density" "Genetic Diversity" "pH Tolerance" "Temperature Tolerance"]
   let grid_header (list"x-coordinate" "y-coordinate" "Population")
