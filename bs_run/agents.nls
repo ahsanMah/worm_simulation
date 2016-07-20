@@ -94,7 +94,7 @@ to add_species [x y population species_num usr_gd usr_ph_tol usr_temp_tol usr_re
     set gd species_genetic_diversity
     set ph_tol ph_tolerance
     set temp_tol temperature_tolerance
-    set reprod_min 0
+   ; set reprod_min 0
   ]
   
   let new_species (list species_num gd ph_tol temp_tol reprod_min population x y)

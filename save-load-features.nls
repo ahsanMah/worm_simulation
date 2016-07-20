@@ -1,3 +1,8 @@
+globals[
+ min-ph
+ max-ph 
+]
+
 
 to save_patches [name]
   ;save_obstacles name
@@ -145,5 +150,13 @@ to load_ph_dependancy [filename table]
     let param item 0 ?
     let values (but-first ?)
     table:put table param values
+    if (param < min-ph or min-ph = -1)
+    [
+      set min-ph param
+    ]
+    if (param > max-ph or max-ph = -1)
+    [
+      set max-ph param
+    ]
   ]
 end

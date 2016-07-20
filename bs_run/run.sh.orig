@@ -7,13 +7,27 @@ mkdir simulations/defaultRun/output/heatmap/
 rm -R simulations/roadTest/output/*
 mkdir simulations/roadTest/output/heatmap/
 
+rm -R simulations/S1/output/*
+mkdir simulations/S1/output/heatmap/
+
+rm -R simulations/S2/output/*
+mkdir simulations/S2/output/heatmap/
+
+rm -R simulations/S3/output/*
+mkdir simulations/S3/output/heatmap/
+
+rm -R simulations/S4/output/*
+mkdir simulations/S4/output/heatmap/
+
+rm -R simulations/S5/output/*
+mkdir simulations/S5/output/heatmap/
+
 java -Xmx2048m -Dfile.encoding=UTF-8 -cp dep/NetLogo.jar \
   org.nlogo.headless.Main \
   --model worms.nlogo \
 <<<<<<< HEAD
-  --experiment temp-4 \
-  --threads 3
+  --experiment location-2 \
 =======
-  --experiment ph-3 \
+  --experiment temp \
+>>>>>>> c270752a9937554a9fd358c7fd519ce0f140cd92
   --threads 3
->>>>>>> 18d68aeb68a511df427fddbd6d4d663f31a975cd
