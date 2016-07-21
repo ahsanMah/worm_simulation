@@ -442,11 +442,11 @@ end
 
 to go
 
-      let filename (word "movie/" ticks ".png")
-      if (ticks mod 2 = 0) [
-        export-interface filename
-      ]
-      if (ticks = 1800) [stop]
+;      let filename (word "movie/" ticks ".png")
+;      if (ticks mod 2 = 0) [
+;        export-interface filename
+;      ]
+;      if (ticks = 1800) [stop]
 
   calculate_time
 
