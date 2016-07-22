@@ -367,9 +367,9 @@ end
 
 to collect_data
 
-  if (ticks mod 1825 = 0) [
-    save_heatmap
-  ]
+;  if (ticks mod 1825 = 0) [
+;    save_heatmap
+;  ]
 
   if (year = number_of_years - 1) [
     collect_monthly_data
@@ -588,7 +588,7 @@ temperature_tolerance
 temperature_tolerance
 -2
 2
-0
+-0.1
 0.1
 1
 NIL
@@ -687,7 +687,7 @@ INPUTBOX
 140
 82
 save_name
-defaultRun
+roadTest1
 1
 0
 String (reporter)
@@ -1065,7 +1065,7 @@ BUTTON
 462
 53
 Setup
-;profiler:start\nsetup\nsetup_sim\n;load_agents save_name\nsetup_export
+;profiler:start\nsetup\nsetup_sim\n;load_agents save_name\nsetup_export\nrecolor_patches
 NIL
 1
 T
@@ -1601,7 +1601,6 @@ NetLogo 5.3.1
     <setup>setup_bs</setup>
     <go>go</go>
     <enumeratedValueSet variable="save_name">
-      <value value="&quot;roadTest1&quot;"/>
       <value value="&quot;defaultRun&quot;"/>
     </enumeratedValueSet>
   </experiment>

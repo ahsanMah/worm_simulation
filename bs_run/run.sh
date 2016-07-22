@@ -26,4 +26,4 @@ java -Xmx2048m -Dfile.encoding=UTF-8 -cp dep/NetLogo.jar \
   org.nlogo.headless.Main \
   --model worms.nlogo \
   --experiment roads \
-  --threads 7
+  --threads 6
