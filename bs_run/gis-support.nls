@@ -43,7 +43,28 @@ to setup_gis
   recolor_patches
   print "Finished setting up GIS"
   
-
+  ;; TAKE OUT THIS LINE OF CODE LATER
+;  ask patch 67 242
+;  [
+;    set can-insert? true
+;  ]
+;  ask patch 118 214
+;  [
+;    set can-insert? true
+;  ]
+;    ask patch 125 162
+;  [
+;    set can-insert? true
+;  ]
+;    ask patch 112 289
+;  [
+;    set can-insert? true
+;  ]
+;    ask patch 134 175
+;  [
+;    set can-insert? true
+;  ]
+    
   ;set fishing_spots [ [67.03 242.13] [118.73 214.20] [125.4 162.5] [112.48 289.6] [135.83 175.43] ]
   
   ;gis:set-drawing-color magenta
@@ -59,8 +80,6 @@ to load_ph
     table:put ph_map (item 0 ?)(list (item 2 ?)(item 3 ?)(item 4 ?))
     ]
 end
-
-
 
 
 to draw_map
