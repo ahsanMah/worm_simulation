@@ -99,6 +99,7 @@ to setup_bs
   set bs_run true
   setup_sim
   setup_export
+
 end
 
 to draw_river
@@ -173,15 +174,20 @@ to pen
         set temp_diff_here temperature_difference
         recolor-patch
       ]
+      if (change: = "insertion point")
+      [
+        set can-insert? true
+        recolor-patch
+      ]
     ]
     display
   ]
 end
 
 to setup_export
-  set species_data [] ;list of collected info of each species for each monitor
-  set monthly_data [] ;list of data collected each month
-  set grid_data []    ;list of patches with worm population
+  set species_data []     ;list of collected info of each species for each monitor
+  set monthly_data []     ;list of data collected each month
+  set grid_data []        ;list of patches with worm population
 
   let export_header ["Month Number" "Monitor Number" "Species Number" "Population" "Density" "Genetic Diversity" "pH Tolerance" "Temperature Tolerance"]
   let grid_header (list"x-coordinate" "y-coordinate" "Population")
@@ -442,11 +448,11 @@ end
 
 to go
 
-      let filename (word "movie/" ticks ".png")
-      if (ticks mod 2 = 0) [
-        export-interface filename
-      ]
-      if (ticks = 1800) [stop]
+  ;    let filename (word "movie/" ticks ".png")
+  ;    if (ticks mod 2 = 0) [
+  ;      export-interface filename
+  ;    ]
+  ;    if (ticks = 1800) [stop]
 
   calculate_time
 
@@ -938,7 +944,7 @@ CHOOSER
 change:
 change:
 "pH" "temperature difference" "pH and temperature difference" "highway" "water" "insertion point"
-3
+5
 
 BUTTON
 624
@@ -1096,7 +1102,7 @@ number_inserted
 number_inserted
 0
 50
-5
+0
 1
 1
 NIL
@@ -1585,10 +1591,12 @@ NetLogo 5.3.1
 @#$#@#$#@
 @#$#@#$#@
 <experiments>
-  <experiment name="insertions" repetitions="3" runMetricsEveryStep="true">
+  <experiment name="insertions-1" repetitions="10" runMetricsEveryStep="true">
     <setup>setup_bs</setup>
     <go>go</go>
-    <steppedValueSet variable="insertion_frequency" first="0" step="3" last="10"/>
+    <enumeratedValueSet variable="insertion_frequency">
+      <value value="5"/>
+    </enumeratedValueSet>
   </experiment>
   <experiment name="test" repetitions="3" runMetricsEveryStep="true">
     <setup>setup_bs</setup>
@@ -1605,15 +1613,44 @@ NetLogo 5.3.1
       <value value="&quot;defaultRun&quot;"/>
     </enumeratedValueSet>
   </experiment>
-  <experiment name="ph" repetitions="3" runMetricsEveryStep="false">
+  <experiment name="ph-1" repetitions="10" runMetricsEveryStep="false">
     <setup>setup_bs</setup>
     <go>go</go>
-    <steppedValueSet variable="ph_tolerance" first="-0.2" step="0.1" last="0.1"/>
+    <enumeratedValueSet variable="ph_tolerance">
+      <value value="-0.1"/>
+      <value value="0"/>
+    </enumeratedValueSet>
   </experiment>
-  <experiment name="temp" repetitions="3" runMetricsEveryStep="false">
+  <experiment name="temp" repetitions="10" runMetricsEveryStep="false">
     <setup>setup_bs</setup>
     <go>go</go>
-    <steppedValueSet variable="temperature_tolerance" first="-0.5" step="0.5" last="0.5"/>
+    <steppedValueSet variable="temperature_tolerance" first="-0.3" step="0.3" last="0.3"/>
+  </experiment>
+  <experiment name="insertions-2" repetitions="20" runMetricsEveryStep="true">
+    <setup>setup_bs</setup>
+    <go>go</go>
+    <enumeratedValueSet variable="insertion_frequency">
+      <value value="10"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="ph-2" repetitions="10" runMetricsEveryStep="false">
+    <setup>setup_bs</setup>
+    <go>go</go>
+    <enumeratedValueSet variable="ph_tolerance">
+      <value value="0.1"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="insertions-2" repetitions="10" runMetricsEveryStep="true">
+    <setup>setup_bs</setup>
+    <go>go</go>
+    <enumeratedValueSet variable="insertion_frequency">
+      <value value="10"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="temp-2" repetitions="10" runMetricsEveryStep="false">
+    <setup>setup_bs</setup>
+    <go>go</go>
+    <steppedValueSet variable="temperature_tolerance" first="1" step="0.5" last="2"/>
   </experiment>
 </experiments>
 @#$#@#$#@

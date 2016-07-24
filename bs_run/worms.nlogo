@@ -99,6 +99,7 @@ to setup_bs
   set bs_run true
   setup_sim
   setup_export
+
 end
 
 to draw_river
@@ -171,6 +172,11 @@ to pen
       if (change: = "temperature difference" or change: = "temperature difference and pH")
       [
         set temp_diff_here temperature_difference
+        recolor-patch
+      ]
+      if (change: = "insertion point")
+      [
+        set can-insert? true
         recolor-patch
       ]
     ]
@@ -273,7 +279,7 @@ to random_insertions
     if (ticks mod (precision (365 / insertion_frequency) 0) = 0 and count (patches with [can-insert?]) > 0) [
       ;show year
       let species one-of table:keys species_list
-      let spot one-of patches with [can-insert?];fishing_spots
+      let spot one-of patches with [can-insert?]
       let number number_inserted
       add_species [pxcor] of spot [pycor] of spot number species species_genetic_diversity ph_tolerance temperature_tolerance 0;(item 0 spot) (item 1 spot) population species gd ph_tol temp_tol
     ]
@@ -367,9 +373,9 @@ end
 
 to collect_data
 
-;  if (ticks mod 1825 = 0) [
-;    save_heatmap
-;  ]
+  if (ticks mod 1825 = 0) [
+    save_heatmap
+  ]
 
   if (year = number_of_years - 1) [
     collect_monthly_data
@@ -442,11 +448,11 @@ end
 
 to go
 
-;      let filename (word "movie/" ticks ".png")
-;      if (ticks mod 2 = 0) [
-;        export-interface filename
-;      ]
-;      if (ticks = 1800) [stop]
+  ;    let filename (word "movie/" ticks ".png")
+  ;    if (ticks mod 2 = 0) [
+  ;      export-interface filename
+  ;    ]
+  ;    if (ticks = 1800) [stop]
 
   calculate_time
 
@@ -588,7 +594,7 @@ temperature_tolerance
 temperature_tolerance
 -2
 2
--0.1
+0
 0.1
 1
 NIL
@@ -687,7 +693,7 @@ INPUTBOX
 140
 82
 save_name
-roadTest1
+defaultRun
 1
 0
 String (reporter)
@@ -715,7 +721,7 @@ CHOOSER
 Show:
 Show:
 "pH" "depth" "temperature" "monitor" "turtle density" "insertion points"
-0
+5
 
 TEXTBOX
 23
@@ -938,7 +944,7 @@ CHOOSER
 change:
 change:
 "pH" "temperature difference" "pH and temperature difference" "highway" "water" "insertion point"
-3
+5
 
 BUTTON
 624
@@ -1065,7 +1071,7 @@ BUTTON
 462
 53
 Setup
-;profiler:start\nsetup\nsetup_sim\n;load_agents save_name\nsetup_export\nrecolor_patches
+;profiler:start\nsetup\nsetup_sim\n;load_agents save_name\nsetup_export
 NIL
 1
 T
@@ -1585,10 +1591,12 @@ NetLogo 5.3.1
 @#$#@#$#@
 @#$#@#$#@
 <experiments>
-  <experiment name="insertions" repetitions="3" runMetricsEveryStep="true">
+  <experiment name="insertions-1" repetitions="10" runMetricsEveryStep="true">
     <setup>setup_bs</setup>
     <go>go</go>
-    <steppedValueSet variable="insertion_frequency" first="0" step="3" last="10"/>
+    <enumeratedValueSet variable="insertion_frequency">
+      <value value="5"/>
+    </enumeratedValueSet>
   </experiment>
   <experiment name="test" repetitions="3" runMetricsEveryStep="true">
     <setup>setup_bs</setup>
@@ -1601,18 +1609,68 @@ NetLogo 5.3.1
     <setup>setup_bs</setup>
     <go>go</go>
     <enumeratedValueSet variable="save_name">
+      <value value="&quot;roadTest&quot;"/>
       <value value="&quot;defaultRun&quot;"/>
     </enumeratedValueSet>
   </experiment>
-  <experiment name="ph" repetitions="3" runMetricsEveryStep="false">
+  <experiment name="ph-1" repetitions="10" runMetricsEveryStep="false">
     <setup>setup_bs</setup>
     <go>go</go>
-    <steppedValueSet variable="ph_tolerance" first="-0.2" step="0.1" last="0.1"/>
+    <enumeratedValueSet variable="ph_tolerance">
+      <value value="-0.1"/>
+      <value value="0"/>
+    </enumeratedValueSet>
   </experiment>
-  <experiment name="temp" repetitions="3" runMetricsEveryStep="false">
+  <experiment name="temp" repetitions="10" runMetricsEveryStep="false">
     <setup>setup_bs</setup>
     <go>go</go>
-    <steppedValueSet variable="temperature_tolerance" first="-0.5" step="0.5" last="0.5"/>
+    <enumeratedValueSet variable="temperature_tolerance">
+      <value value="-0.5"/>
+      <value value="0.5"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="insertions-2" repetitions="20" runMetricsEveryStep="true">
+    <setup>setup_bs</setup>
+    <go>go</go>
+    <enumeratedValueSet variable="insertion_frequency">
+      <value value="10"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="ph-2" repetitions="10" runMetricsEveryStep="false">
+    <setup>setup_bs</setup>
+    <go>go</go>
+    <enumeratedValueSet variable="ph_tolerance">
+      <value value="0.1"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="insertions-2" repetitions="10" runMetricsEveryStep="true">
+    <setup>setup_bs</setup>
+    <go>go</go>
+    <enumeratedValueSet variable="insertion_frequency">
+      <value value="10"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="temp-2" repetitions="10" runMetricsEveryStep="false">
+    <setup>setup_bs</setup>
+    <go>go</go>
+    <steppedValueSet variable="temperature_tolerance" first="1" step="0.5" last="2"/>
+  </experiment>
+  <experiment name="location-1" repetitions="10" runMetricsEveryStep="false">
+    <setup>setup_bs</setup>
+    <go>go</go>
+    <enumeratedValueSet variable="save_name">
+      <value value="&quot;S1&quot;"/>
+      <value value="&quot;S2&quot;"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="location-2" repetitions="10" runMetricsEveryStep="false">
+    <setup>setup_bs</setup>
+    <go>go</go>
+    <enumeratedValueSet variable="save_name">
+      <value value="&quot;S3&quot;"/>
+      <value value="&quot;S4&quot;"/>
+      <value value="&quot;S5&quot;"/>
+    </enumeratedValueSet>
   </experiment>
 </experiments>
 @#$#@#$#@

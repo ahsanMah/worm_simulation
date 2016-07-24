@@ -1,53 +1,58 @@
 globals [
   
-  experiment_days ;number of days over which the experiment for ph tolerance was runs
+  experiment_days
   
   ;daily globals
   periods-in-day
   agent_size
-  burrow                    ;boolean- if true -> worms are unaffected by temperature and do not reproduce
-  survival_prob             ;probability of survival
+  burrow
+  survival_prob
   
   species_list
   shape_list
   color_list
   subspecies_count
+  
+  degree_accumulation_needed
 ]
 
 breed [cocoons]
 breed [adults]
 
 turtles-own [
-  age                       ;age of individual in days
-  maturation_wait           ;number of days individual has to wait before reproducing
-  hatch_temp                ;minimum temperature required for cocoons to hatch
+  age 
+  maturation_wait
+  hatch_temp  ;minimum temperature required for cocoons to hatch
   subspecies_number
-  genetic_diversity         ;genetic diversity of worm (0-1)
-  genetic_diversity_factor  ;factor based on genetic diversity (unique to every individual) that affects survival probabilities
-  parent_breed              ;(species number - 1) to help with index positions in arrays 
-  death_threshold           ;probability of death
-  reprod_min_temp           ;minimum temperature required for worm to start reproducing <- set as one of [13 14 15 16] by default
-  reprod_max_temp           ;upper limit of temperature range <- set as reprod_min_temp + 10 by default 
-  cocoon_rate               ;cocoon per day
-  cocoon                    ;cocoon counter that increments by cocoon_rate until it reaches 1 which hatches a cocoon
-  prev_patch                ;ph of previous of patch to determine patch_days 
-  patch_days                ;number of days spent on the same ph (used in ph_mortality_fn)
-  ph_shift                  ;amount by which pH curves are shifted <- taken from ph_tolerance
-  temp_shift                ;amount by which temperature curves are shifted <- taken from temperature_tolerance
+  genetic_diversity
+  genetic_diversity_factor
+  parent_breed
+  death_threshold
+  reprod_min_temp
+  reprod_max_temp
+  cocoon_rate ;cocoon per day
+  cocoon
+  prev_patch
+  patch_days
+  ph_shift  ;shift in optimum ph due to tolerance
+  temp_shift
   ]
-
 cocoons-own[
- degree_days                ;a counter of degrees accumulated over days
- acc_needed                 ;degree accumulation required for the cocoon
+ degree_days 
+ degree_accumulation
 ]
 
 to setup_agents
   set subspecies_count 0
-  set agent_size 4             ;size of the agent shown in the view
-  set burrow false              
+  set agent_size 4
+  set burrow false
   set species_list table:make
   set shape_list (list "red_worm" "cyan_worm" "pink_worm" "orange_worm" "magenta_worm" "violet_worm")
   set color_list (list red cyan pink orange magenta violet)
+end
+
+to insert_worms [x y num species_num]
+  add_species x y num species_num species_genetic_diversity ph_tolerance temperature_tolerance 0
 end
 
 to mouse_add_species
@@ -89,7 +94,7 @@ to add_species [x y population species_num usr_gd usr_ph_tol usr_temp_tol usr_re
     set gd species_genetic_diversity
     set ph_tol ph_tolerance
     set temp_tol temperature_tolerance
-    ;set reprod_min 0
+   ; set reprod_min 0
   ]
   
   let new_species (list species_num gd ph_tol temp_tol reprod_min population x y)
@@ -210,7 +215,7 @@ to check_reproduction
         
         if (cocoon >= 1)[
           hatch-cocoons 1 [
-            set acc_needed item (16 - reprod_min_temp) [1300 1200 1100 1000]
+            set degree_accumulation item (16 - reprod_min_temp) [1300 1200 1100 1000]
             set maturation_wait random-normal 91 22
             set age 0
             set color (item parent_breed color_list)
@@ -264,7 +269,7 @@ to update_thresholds
   let age_factor 0
   
   ;reproduction rate affected by temperature + pH
-  set temp_cocoon_rate 0.54 / 7                         ;<--- CHANGE COCOON RATE HERE 
+  set temp_cocoon_rate 0.54 / 7
   
   ;;pH of soil also affects survival + reproduction rate
   let mapped_ph precision (ph + ph_shift) 1
@@ -304,7 +309,7 @@ to check_if_hatch
     set degree_days degree_days + global_temperature
   ]
   
-  ifelse (degree_days >= acc_needed) [
+  ifelse (degree_days >= degree_accumulation) [
     set breed adults
     set size agent_size
     set shape (item parent_breed shape_list)

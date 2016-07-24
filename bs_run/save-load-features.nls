@@ -1,8 +1,3 @@
-globals[
- min-ph
- max-ph 
-]
-
 
 to save_patches [name]
   ;save_obstacles name
@@ -20,7 +15,7 @@ to save_patches [name]
     [
       ask patch i j
       [
-        let info (list i j ph food-here permeability local_death_threshold temp_diff_here pcolor soil_depth moisture can-insert? being_monitored monitor_index)
+        let info (list i j ph food-here permeability local_death_threshold temp_diff_here pcolor soil_depth moisture can-insert? being_monitored monitor_index );monitor_size)
         file-print csv:to-row info
         set j j + 1
       ]
@@ -61,6 +56,7 @@ to load_patches [name]
       set can-insert? item 10 info
       set being_monitored item 11 info
       set monitor_index item 12 info
+      ;set monitor_size item 13 info
     ]
   ]
   file-close
@@ -149,13 +145,5 @@ to load_ph_dependancy [filename table]
     let param item 0 ?
     let values (but-first ?)
     table:put table param values
-    if (param < min-ph or min-ph = -1)
-    [
-      set min-ph param
-    ]
-    if (param > max-ph or max-ph = -1)
-    [
-      set max-ph param
-    ]
   ]
 end
