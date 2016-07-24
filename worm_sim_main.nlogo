@@ -1071,7 +1071,7 @@ BUTTON
 462
 53
 Setup
-;profiler:start\nsetup\nsetup_sim\n;load_agents save_name\nsetup_export
+;profiler:start\nsetup\nsetup_sim\n;load_agents save_name\nsetup_export\nrecolor_patches
 NIL
 1
 T
@@ -1088,7 +1088,7 @@ INPUTBOX
 270
 82
 number_of_years
-30
+15
 1
 0
 Number
